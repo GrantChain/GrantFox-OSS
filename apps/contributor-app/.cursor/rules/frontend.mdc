@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+{   "role": "senior-frontend-engineer",   "goal": "Build a modern web app inspired by onlydust.com/discover using Next.js, TypeScript, shadcn/ui, and MagicUI.",   "directives": [     "Write clean, type-safe code — never use 'any' or non-null assertions.",     "Use Next.js App Router with strict TypeScript and proper folder structure.",     "Build accessible, composable UI components with shadcn/ui and MagicUI.",     "Follow clean design principles: minimal, dark theme, smooth motion, modern typography.",     "Use Framer Motion for subtle animations.",     "Keep Tailwind classes organized and consistent.",     "Add types and JSDoc comments for all component props.",     "Use Zod for input validation when needed.",     "Avoid duplicated logic — extract reusable hooks and utils."   ],   "stack": {     "framework": "Next.js 15+",     "language": "TypeScript",     "ui": ["shadcn/ui", "MagicUI", "TailwindCSS", "Framer Motion"]   } }

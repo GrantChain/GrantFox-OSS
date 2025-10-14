@@ -1,0 +1,70 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { githubHttp } from "@/lib/http";
+import { GitHubReposService } from "../services/GitHubReposService";
+
+const reposService = new GitHubReposService(githubHttp);
+
+export function useGitHubRepo(owner: string, repo: string) {
+  return useQuery({
+    queryKey: ["gh", "repo", owner, repo],
+    queryFn: () => reposService.getRepo(owner, repo),
+    enabled: Boolean(owner && repo),
+  });
+}
+
+export function useGitHubRepoIssues(
+  owner: string,
+  repo: string,
+  params?: {
+    per_page?: number;
+    page?: number;
+    state?: "open" | "closed" | "all";
+    labels?: string;
+  }
+) {
+  return useQuery({
+    queryKey: ["gh", "repo-issues", owner, repo, params],
+    queryFn: () => reposService.listIssues(owner, repo, params),
+    enabled: Boolean(owner && repo),
+  });
+}
+
+export function useGitHubRepoIssue(
+  owner: string,
+  repo: string,
+  issue_number: number
+) {
+  return useQuery({
+    queryKey: ["gh", "repo-issue", owner, repo, issue_number],
+    queryFn: () => reposService.getIssue(owner, repo, issue_number),
+    enabled: Boolean(owner && repo && issue_number),
+  });
+}
+
+export function useGitHubIssueComments(
+  owner: string,
+  repo: string,
+  issue_number: number,
+  params?: { per_page?: number; page?: number }
+) {
+  return useQuery({
+    queryKey: ["gh", "issue-comments", owner, repo, issue_number, params],
+    queryFn: () =>
+      reposService.listIssueComments(owner, repo, issue_number, params),
+    enabled: Boolean(owner && repo && issue_number),
+  });
+}
+
+export function useGitHubAllIssueComments(
+  owner: string,
+  repo: string,
+  params?: { per_page?: number; page?: number; since?: string }
+) {
+  return useQuery({
+    queryKey: ["gh", "repo-issues-comments", owner, repo, params],
+    queryFn: () => reposService.listAllIssueComments(owner, repo, params),
+    enabled: Boolean(owner && repo),
+  });
+}
