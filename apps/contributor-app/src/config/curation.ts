@@ -15,6 +15,7 @@ export const CURATED_ORG_LOGINS: string[] = [
   "PACTO-LAT",
   "OFFER-HUB",
   "Crypto-Jaguars",
+  "ACTA-Team",
 ];
 
 /**
