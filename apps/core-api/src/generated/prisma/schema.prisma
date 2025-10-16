@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =============================================
+// USERS & AUTH
+// =============================================
+
+model User {
+  user_id    String     @id @default(uuid()) @db.Uuid
+  email      String     @unique
+  username   String?    @unique
+  avatar_url String?
+  roles      UserRole[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  is_active  Boolean    @default(true)
+
+  // Relaciones
+  maintainer_profile  MaintainerProfile?
+  contributor_profile ContributorProfile?
+  admin_profile       AdminProfile?
+  project_maintainers ProjectMaintainer[]
+  project_reviews     ProjectReview[]
+  wallets             Wallet[]
+
+  @@index([roles])
+  @@index([is_active])
+  @@index([username])
+  @@map("user")
+}
+
+model MaintainerProfile {
+  user_id      String   @id @db.Uuid
+  bio          String?
+  social_media Json?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("maintainer_profile")
+}
+
+model ContributorProfile {
+  user_id       String   @id @db.Uuid
+  skills        String[]
+  bio           String?
+  portfolio_url String?
+  social_media  Json?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([skills])
+  @@map("contributor_profile")
+}
+
+model AdminProfile {
+  user_id    String   @id @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("admin_profile")
+}
+
+// =============================================
+// WALLETS
+// =============================================
+
+model Wallet {
+  wallet_id  String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  address    String   @unique
+  is_primary Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([address])
+  @@map("wallet")
+}
+
+// =============================================
+// PROJECTS
+// =============================================
+
+model Project {
+  project_id        String          @id @default(uuid()) @db.Uuid
+  name              String
+  github_handle     String
+  short_description String
+  description       String          @db.Text
+  tech_stack        String[]
+  category          ProjectCategory
+  status            ProjectStatus   @default(PENDING)
+  created_by        String          @db.Uuid
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  reviewed_at       DateTime?
+
+  repositories Repository[]
+  maintainers  ProjectMaintainer[]
+  reviews      ProjectReview[]
+
+  @@index([status])
+  @@index([category])
+  @@index([created_by])
+  @@index([status, created_at])
+  @@map("project")
+}
+
+model Repository {
+  github_repo_id BigInt   @id
+  project_id     String   @db.Uuid
+  github_url     String
+  name           String
+  description    String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+
+  @@index([project_id])
+  @@map("repository")
+}
+
+model ProjectMaintainer {
+  id            String   @id @default(uuid()) @db.Uuid
+  project_id    String   @db.Uuid
+  maintainer_id String   @db.Uuid
+  is_owner      Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  is_active     Boolean  @default(true)
+
+  project    Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  maintainer User    @relation(fields: [maintainer_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([project_id, maintainer_id])
+  @@index([project_id])
+  @@index([maintainer_id])
+  @@map("project_maintainer")
+}
+
+// =============================================
+// PROJECT REVIEWS
+// =============================================
+
+model ProjectReview {
+  review_id  String       @id @default(uuid()) @db.Uuid
+  project_id String       @db.Uuid
+  admin_id   String       @db.Uuid
+  action     ReviewAction
+  reason     String?      @db.Text
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  admin   User    @relation(fields: [admin_id], references: [user_id])
+
+  @@index([project_id])
+  @@index([admin_id])
+  @@index([created_at])
+  @@map("project_review")
+}
+
+// =============================================
+// ENUMS
+// =============================================
+
+enum UserRole {
+  ADMIN
+  MAINTAINER
+  CONTRIBUTOR
+}
+
+enum ProjectStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ProjectCategory {
+  DEFI
+  NFT
+  TOOLING
+  PAYMENTS
+  GAMING
+  INFRASTRUCTURE
+  OTHER
+}
+
+enum ReviewAction {
+  APPROVED
+  REJECTED
+}
