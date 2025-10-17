@@ -12,6 +12,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavMain } from "./nav-main";
+import { WalletButton } from "../tw-blocks/wallet-kit/WalletButtons";
 
 // This is sample data.
 const data = {
@@ -40,9 +41,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.items} />
       </SidebarContent>
+
+      <WalletButton />
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
