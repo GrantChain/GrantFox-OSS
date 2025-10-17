@@ -5,17 +5,25 @@ import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
-import { redirect } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+  const router = useRouter();
 
-  if (!user) {
-    redirect("/login");
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
+    return null;
   }
 
   return (
@@ -23,7 +31,7 @@ export default function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         <Header />
-        <div className="block p-10">{children}</div>
+        <div className="block p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
