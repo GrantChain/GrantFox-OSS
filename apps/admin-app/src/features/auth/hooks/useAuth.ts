@@ -51,8 +51,6 @@ export const useAuth = () => {
 
       if (error) {
         toast.error(error.message);
-      } else {
-        router.push("/");
       }
     } catch (error) {
       console.error(error);
