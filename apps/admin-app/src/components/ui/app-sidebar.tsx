@@ -27,17 +27,17 @@ const data = {
   items: [
     {
       name: "Project Submissions",
-      url: "/projects",
+      url: "/dashboard/projects",
       icon: Folder,
     },
     {
       name: "Campaigns",
-      url: "/campaigns",
+      url: "/dashboard/campaigns",
       icon: Warehouse,
     },
     {
-      name: "Funding Requests",
-      url: "/funding-requests",
+      name: "Funding",
+      url: "/dashboard/funding",
       icon: CreditCard,
     },
   ],
