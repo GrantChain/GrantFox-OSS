@@ -7,6 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { CampaignProvider } from "@/context/CampaignContext";
 
 export default function DashboardLayout({
   children,
@@ -31,7 +32,9 @@ export default function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         <Header />
-        <div className="block p-6">{children}</div>
+        <CampaignProvider>
+          <div className="block p-6">{children}</div>
+        </CampaignProvider>
       </SidebarInset>
     </SidebarProvider>
   );
