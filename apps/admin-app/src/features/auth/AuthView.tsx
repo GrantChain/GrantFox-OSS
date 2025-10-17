@@ -1,24 +1,44 @@
 import { LoginForm } from "@/features/auth/LoginForm";
-import { GalleryVerticalEnd } from "lucide-react";
 import Image from "next/image";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { ResetPasswordForm } from "./ResetPasswordForm";
+import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-export const AuthView = () => {
+type AuthViewProps = {
+  variant?: "login" | "reset" | "forgot";
+};
+
+export const AuthView = ({ variant = "login" }: AuthViewProps) => {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex items-center justify-between gap-2">
-          <a href="#" className="flex items-center gap-2 font-medium">
-            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <GalleryVerticalEnd className="size-4" />
-            </div>
-            Acme Inc.
-          </a>
+        <div className="flex items-center justify-end gap-2">
           <AnimatedThemeToggler />
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            <>
+              <h1 className="text-2xl font-bold">
+                {variant === "login"
+                  ? "Login"
+                  : variant === "reset"
+                    ? "Reset Password"
+                    : "Forgot Password"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {variant === "login"
+                  ? "Enter your email and password to login to your account"
+                  : variant === "reset"
+                    ? "Enter your new password"
+                    : "Enter your email to reset your password"}
+              </p>
+
+              <div className="mt-6">
+                {variant === "login" && <LoginForm />}
+                {variant === "reset" && <ResetPasswordForm />}
+                {variant === "forgot" && <ForgotPasswordForm />}
+              </div>
+            </>
           </div>
         </div>
       </div>

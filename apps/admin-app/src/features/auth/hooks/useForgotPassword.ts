@@ -1,0 +1,70 @@
+"use client";
+
+import { supabase } from "@/lib/supabase";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import type { z } from "zod";
+import { forgotPasswordSchema } from "../schemas/auth.schema";
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export const useForgotPassword = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
+  });
+
+  const handleRequestReset = async (data: ForgotPasswordFormValues) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const redirectTo = `${window.location.origin}/reset-password`;
+
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo,
+      });
+
+      if (error) {
+        if (error.message.includes("30 seconds")) {
+          toast.info("Please wait 30 seconds before trying again.");
+          return;
+        }
+        throw error;
+      }
+
+      setIsSuccess(true);
+      toast.success(
+        "An email with instructions to reset your password has been sent"
+      );
+    } catch (err: unknown) {
+      console.error("Password reset request error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to send reset email"
+      );
+      toast.error("Failed to send reset email");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    form,
+    isLoading,
+    isSuccess,
+    error,
+    showPassword,
+    showConfirmPassword,
+    setShowPassword,
+    setShowConfirmPassword,
+    handleRequestReset,
+  };
+};
