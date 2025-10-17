@@ -131,7 +131,8 @@ model Repository {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  project Project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  project   Project              @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  campaigns CampaignRepository[]
 
   @@index([project_id])
   @@map("repository")
@@ -177,6 +178,42 @@ model ProjectReview {
   @@map("project_review")
 }
 
+model Campaign {
+  campaign_id String @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  tags        String[]
+  start_date  DateTime
+  end_date    DateTime
+  status      CampaignStatus @default(PENDING)
+  created_by  String @db.Uuid
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  repositories CampaignRepository[]
+
+  @@index([tags])
+  @@index([status])
+  @@index([created_by])
+  @@index([status, start_date])
+  @@map("campaign")
+}
+
+model CampaignRepository {
+  campaign_id   String   @db.Uuid
+  repository_id BigInt
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  campaign   Campaign   @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  repository Repository @relation(fields: [repository_id], references: [github_repo_id], onDelete: Cascade)
+
+  @@id([campaign_id, repository_id])
+  @@index([campaign_id])
+  @@index([repository_id])
+  @@map("campaign_repository")
+}
+
 // =============================================
 // ENUMS
 // =============================================
@@ -206,4 +243,10 @@ enum ProjectCategory {
 enum ReviewAction {
   APPROVED
   REJECTED
+}
+
+enum CampaignStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
 }
