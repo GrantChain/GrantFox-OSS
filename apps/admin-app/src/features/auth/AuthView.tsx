@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/ui/login-form";
+import { LoginForm } from "@/features/auth/LoginForm";
 import { GalleryVerticalEnd } from "lucide-react";
 import Image from "next/image";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
@@ -22,14 +22,23 @@ export const AuthView = () => {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
-        <Image
-          src="/assets/grantfox-stellar-light.svg"
-          alt="GrantFox Logo"
-          width={100}
-          height={100}
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+      <div className="bg-muted relative hidden sm:flex items-center justify-center p-10">
+        <div className="relative w-full max-w-2xl aspect-square">
+          <Image
+            src="/assets/grantfox-stellar-light.svg"
+            alt="GrantFox Logo"
+            fill
+            priority
+            className="dark:hidden object-contain"
+          />
+          <Image
+            src="/assets/grantfox-stellar-dark.svg"
+            alt="GrantFox Logo"
+            fill
+            priority
+            className="hidden dark:block object-contain"
+          />
+        </div>
       </div>
     </div>
   );
