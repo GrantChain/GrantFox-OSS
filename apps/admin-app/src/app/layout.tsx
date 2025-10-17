@@ -23,10 +23,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* SSR-safe theme initialization: prefers stored theme, then system */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function(){
+              try{
+                var stored=localStorage.getItem('theme');
+                var prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var isDark = stored==='dark' || (stored!=='light' && prefersDark);
+                if (isDark) { document.documentElement.classList.add('dark'); }
+              }catch(e){}
+            })();
+          `,
+          }}
+        />
         {children}
       </body>
     </html>

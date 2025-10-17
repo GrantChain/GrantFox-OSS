@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export const Header = () => {
   return (
@@ -15,13 +16,14 @@ export const Header = () => {
         orientation="vertical"
         className="mr-2 data-[orientation=vertical]:h-4"
       />
-      <Breadcrumb>
+      <Breadcrumb className="flex-1">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage>October 2024</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+      <AnimatedThemeToggler />
     </header>
   );
 };
