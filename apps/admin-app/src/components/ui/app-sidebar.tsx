@@ -1,16 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  BookOpen,
-  Bot,
-  CreditCard,
-  Folder,
-  Frame,
-  Map,
-  PieChart,
-  Warehouse,
-} from "lucide-react";
+import { CircleDollarSign, Folder, Tent } from "lucide-react";
 import { NavUser } from "@/components/ui/nav-user";
 import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
@@ -33,12 +24,12 @@ const data = {
     {
       name: "Campaigns",
       url: "/dashboard/campaigns",
-      icon: Warehouse,
+      icon: Tent,
     },
     {
       name: "Funding",
       url: "/dashboard/funding",
-      icon: CreditCard,
+      icon: CircleDollarSign,
     },
   ],
 };
