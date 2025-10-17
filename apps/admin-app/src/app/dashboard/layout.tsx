@@ -2,7 +2,8 @@
 
 import { Header } from "@/components/shared/Header";
 import { AppSidebar } from "@/components/ui/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { redirect } from "next/navigation";
 
@@ -22,7 +23,7 @@ export default function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         <Header />
-        {children}
+        <div className="block p-10">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

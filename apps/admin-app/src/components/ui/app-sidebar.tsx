@@ -1,64 +1,59 @@
-import * as React from "react";
-import { Plus } from "lucide-react";
+"use client";
 
-import { Calendars } from "@/components/ui/calendars";
-import { DatePicker } from "@/components/ui/date-picker";
+import * as React from "react";
+import {
+  BookOpen,
+  Bot,
+  CreditCard,
+  Folder,
+  Frame,
+  Map,
+  PieChart,
+  Warehouse,
+} from "lucide-react";
 import { NavUser } from "@/components/ui/nav-user";
+import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { NavMain } from "./nav-main";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  calendars: [
+  items: [
     {
-      name: "My Calendars",
-      items: ["Personal", "Work", "Family"],
+      name: "Project Submissions",
+      url: "/projects",
+      icon: Folder,
     },
     {
-      name: "Favorites",
-      items: ["Holidays", "Birthdays"],
+      name: "Campaigns",
+      url: "/campaigns",
+      icon: Warehouse,
     },
     {
-      name: "Other",
-      items: ["Travel", "Reminders", "Deadlines"],
+      name: "Funding Requests",
+      url: "/funding-requests",
+      icon: CreditCard,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props}>
-      <SidebarHeader className="border-sidebar-border h-16 border-b">
-        <NavUser user={data.user} />
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <DatePicker />
-        <SidebarSeparator className="mx-0" />
-        <Calendars calendars={data.calendars} />
+        <NavMain items={data.items} />
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Plus />
-              <span>New Calendar</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
