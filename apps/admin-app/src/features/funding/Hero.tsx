@@ -1,7 +1,6 @@
 "use client";
 
 import { DottedMap } from "@/components/ui/dotted-map";
-import { useEffect, useState } from "react";
 
 const markers = [
   // North America

@@ -23,7 +23,11 @@ export const metadata: Metadata = {
   description: "Admin dashboard for GrantFox",
 };
 
-export default function RootLayout({ children }: { children: any }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body

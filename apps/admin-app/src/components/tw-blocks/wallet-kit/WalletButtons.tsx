@@ -32,7 +32,8 @@ export const WalletButton = () => {
       await navigator.clipboard.writeText(walletAddress);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch (_) {
+    } catch (_err) {
+      console.error("Error copying address:", _err);
       // noop
     }
   };

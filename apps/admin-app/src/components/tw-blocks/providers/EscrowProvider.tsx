@@ -69,6 +69,7 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
         setSelectedEscrowState(parsed);
       }
     } catch (_err) {
+      console.error("Error getting selected escrow from local storage:", _err);
       // ignore malformed localStorage content
     }
   }, []);
