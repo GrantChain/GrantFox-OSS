@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from "react";
 import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -48,7 +50,7 @@ export const useGetEscrowsByContractIdsForm = () => {
       const escrowData = await getEscrowByContractIds({
         contractIds: payload.contractIds.map((item) => item.value),
         validateOnChain: true,
-      });
+      }) as any;
 
       if (!escrowData) {
         throw new Error("No escrow data received");

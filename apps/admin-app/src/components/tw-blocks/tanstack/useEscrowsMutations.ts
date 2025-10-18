@@ -450,10 +450,7 @@ export const useEscrowsMutations = () => {
       type: EscrowType;
       address: string;
     }) => {
-      const { unsignedTransaction } = await withdrawRemainingFunds(
-        payload,
-        type
-      );
+      const { unsignedTransaction } = await withdrawRemainingFunds(payload);
 
       if (!unsignedTransaction) {
         throw new Error(
