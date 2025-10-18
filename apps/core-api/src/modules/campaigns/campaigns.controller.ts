@@ -17,7 +17,6 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CampaignsService } from './campaigns.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
@@ -32,7 +31,6 @@ import { UserRole, CampaignStatus } from '@prisma/client';
 @ApiTags('campaigns')
 @Controller('campaigns')
 @UseGuards(RolesGuard)
-@ApiBearerAuth()
 export class CampaignsController {
   constructor(private readonly campaignsService: CampaignsService) {}
 

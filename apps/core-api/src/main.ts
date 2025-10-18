@@ -29,6 +29,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('users', 'User management endpoints')
     .addTag('profiles', 'User profiles (Maintainer, Contributor, Admin)')
+    .addTag('campaigns', 'Campaign management endpoints')
+    .addTag('wallets', 'Wallet management endpoints')
+    .addTag('projects', 'Project management endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
