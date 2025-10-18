@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -186,6 +185,7 @@ model Campaign {
   start_date  DateTime
   end_date    DateTime
   status      CampaignStatus @default(PENDING)
+  image_url   String?
   created_by  String @db.Uuid
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
