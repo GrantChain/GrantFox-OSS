@@ -18,7 +18,16 @@ export class UsersService {
    * Create a new user with a specific role
    */
   async create(dto: CreateUserDto) {
-    // Check if user already exists
+    // Check if user_id already exists
+    const existingUserId = await this.prisma.user.findUnique({
+      where: { user_id: dto.user_id },
+    });
+
+    if (existingUserId) {
+      throw new ConflictException('User with this ID already exists');
+    }
+
+    // Check if email already exists
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -41,6 +50,7 @@ export class UsersService {
     // Create user with initial role
     return await this.prisma.user.create({
       data: {
+        user_id: dto.user_id,
         email: dto.email,
         username: dto.username,
         avatar_url: dto.avatar_url,
