@@ -5,6 +5,8 @@ import UserProvider from "@/context/UserContext";
 import { Toaster } from "sonner";
 import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { EscrowProvider } from "@/components/tw-blocks/providers/EscrowProvider";
+import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +30,15 @@ export default function RootLayout({ children }: { children: any }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReactQueryClientProvider>
-          <WalletProvider>
-            <UserProvider>{children}</UserProvider>
+          <TrustlessWorkProvider>
+            <WalletProvider>
+              <EscrowProvider>
+                <UserProvider>{children}</UserProvider>
 
-            <Toaster position="top-right" richColors />
-          </WalletProvider>
+                <Toaster position="top-right" richColors />
+              </EscrowProvider>
+            </WalletProvider>
+          </TrustlessWorkProvider>
         </ReactQueryClientProvider>
       </body>
     </html>

@@ -17,12 +17,15 @@ export const FundEscrowForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-6 w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full flex-col gap-3 sm:flex-row"
+      >
         <FormField
           control={form.control}
           name="amount"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="w-full">
               <FormLabel>Amount</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="Enter amount" {...field} />
@@ -32,20 +35,13 @@ export const FundEscrowForm = () => {
           )}
         />
 
-        <div className="mt-4">
+        <div className="flex items-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
             className="cursor-pointer"
+            disabled={isSubmitting}
           >
-            {isSubmitting ? (
-              <div className="flex items-center">
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span className="ml-2">Funding...</span>
-              </div>
-            ) : (
-              "Fund"
-            )}
+            {isSubmitting ? "Funding..." : "Fund"}
           </Button>
         </div>
       </form>
