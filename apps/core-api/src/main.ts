@@ -32,6 +32,7 @@ async function bootstrap() {
     .addTag('campaigns', 'Campaign management endpoints')
     .addTag('wallets', 'Wallet management endpoints')
     .addTag('projects', 'Project management endpoints')
+    .addTag('repositories', 'Repository management endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

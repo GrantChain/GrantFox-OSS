@@ -6,10 +6,19 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsUUID,
 } from 'class-validator';
 import { UserRole } from '@prisma/client';
 
 export class CreateUserDto {
+  @ApiProperty({
+    description: 'User ID from Supabase Auth',
+    example: 'ee746352-e319-4b3a-8963-b24c3016cca9',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  user_id: string;
+
   @ApiProperty({
     description: 'User email address',
     example: 'user@example.com',
