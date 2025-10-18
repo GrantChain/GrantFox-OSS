@@ -25,9 +25,12 @@ export class CampaignsService {
     // Create campaign without repositories (maintainers will add them later)
     const campaign = await this.prisma.campaign.create({
       data: {
-        ...dto,
+        name: dto.name,
+        description: dto.description,
+        tags: dto.tags,
         start_date: startDate,
         end_date: endDate,
+        image_url: dto.image_url,
         created_by: createdBy,
       },
       include: {
