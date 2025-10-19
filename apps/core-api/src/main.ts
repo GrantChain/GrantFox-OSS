@@ -3,6 +3,11 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
+// Fix BigInt serialization issue
+BigInt.prototype.toJSON = function () {
+  return Number(this);
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
@@ -33,6 +38,9 @@ async function bootstrap() {
     .addTag('wallets', 'Wallet management endpoints')
     .addTag('projects', 'Project management endpoints')
     .addTag('repositories', 'Repository management endpoints')
+    .addTag('project-maintainers', 'Project-Maintainer relationship endpoints')
+    .addTag('project-reviews', 'Project review and approval endpoints')
+    .addTag('campaign-repositories', 'Campaign-Repository relationship endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -19,6 +19,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { CampaignsService } from './campaigns.service';
+import { CampaignsExtendedService } from './campaigns-extended.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { UpdateCampaignStatusDto } from './dto/update-campaign-status.dto';
@@ -32,7 +33,10 @@ import { UserRole, CampaignStatus } from '@prisma/client';
 @Controller('campaigns')
 @UseGuards(RolesGuard)
 export class CampaignsController {
-  constructor(private readonly campaignsService: CampaignsService) {}
+  constructor(
+    private readonly campaignsService: CampaignsService,
+    private readonly campaignsExtendedService: CampaignsExtendedService,
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -151,4 +155,35 @@ export class CampaignsController {
   remove(@Param('id') id: string) {
     return this.campaignsService.remove(id);
   }
+
+  @Get('active/with-projects')
+  @ApiOperation({
+    summary: 'Get all active campaigns with projects and repositories',
+    description:
+      'Returns all ACTIVE campaigns with their participating projects and repositories. Ideal for contributor landing page.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of active campaigns with projects',
+  })
+  getActiveCampaignsWithProjects() {
+    return this.campaignsExtendedService.getActiveCampaignsWithProjects();
+  }
+
+  @Get(':id/projects-with-repos')
+  @ApiOperation({
+    summary: 'Get campaign with all projects and repositories',
+    description:
+      'Returns a campaign with all participating projects grouped with their repositories.',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Campaign UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Campaign with projects and repositories',
+  })
+  @ApiResponse({ status: 404, description: 'Campaign not found' })
+  getCampaignWithProjectsAndRepos(@Param('id') id: string) {
+    return this.campaignsExtendedService.getCampaignWithProjectsAndRepos(id);
+  }
 }
+

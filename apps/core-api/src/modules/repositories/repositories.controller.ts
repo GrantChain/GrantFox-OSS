@@ -21,6 +21,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { RepositoriesService } from './repositories.service';
+import { CampaignsExtendedService } from '../campaigns/campaigns-extended.service';
 import { AddRepositoryDto } from './dto/add-repository.dto';
 import { RepositoryResponseDto } from './dto/repository-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -32,7 +33,10 @@ import { UserRole } from '@prisma/client';
 @Controller('repositories')
 @UseGuards(RolesGuard)
 export class RepositoriesController {
-  constructor(private readonly repositoriesService: RepositoriesService) {}
+  constructor(
+    private readonly repositoriesService: RepositoriesService,
+    private readonly campaignsExtendedService: CampaignsExtendedService,
+  ) {}
 
   @Post('project/:projectId')
   @Roles(UserRole.MAINTAINER)
@@ -149,10 +153,71 @@ export class RepositoriesController {
   @ApiResponse({ status: 403, description: 'Forbidden - Must be project owner' })
   @ApiResponse({ status: 404, description: 'Repository not found' })
   @HttpCode(HttpStatus.OK)
-  reactivate(
+  reactivateRepository(
     @Param('repoId', ParseIntPipe) repoId: number,
     @CurrentUser() user: any,
   ) {
     return this.repositoriesService.reactivate(repoId, user.user_id);
   }
+
+  @Get(':repoId/github-data')
+  @ApiOperation({
+    summary: 'Get GitHub metadata for a repository',
+    description:
+      'Returns GitHub metadata (stars, forks, issues, language, topics) for a repository.',
+  })
+  @ApiParam({
+    name: 'repoId',
+    type: Number,
+    description: 'GitHub Repository ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'GitHub metadata',
+  })
+  @ApiResponse({ status: 404, description: 'Repository not found' })
+  getRepositoryGitHubData(@Param('repoId', ParseIntPipe) repoId: number) {
+    return this.campaignsExtendedService.getRepositoryGitHubData(repoId);
+  }
+
+  @Get(':repoId/github-issues')
+  @ApiOperation({
+    summary: 'Get GitHub issues for a repository',
+    description:
+      'Returns open issues from GitHub for a repository. Useful for contributor landing page.',
+  })
+  @ApiParam({
+    name: 'repoId',
+    type: Number,
+    description: 'GitHub Repository ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of GitHub issues',
+  })
+  @ApiResponse({ status: 404, description: 'Repository not found' })
+  getRepositoryGitHubIssues(@Param('repoId', ParseIntPipe) repoId: number) {
+    return this.campaignsExtendedService.getRepositoryGitHubIssues(repoId);
+  }
+
+  @Get(':repoId/full-details')
+  @ApiOperation({
+    summary: 'Get complete repository details (ALL IN ONE)',
+    description:
+      'Returns repository info + GitHub metadata + GitHub issues in a single request. Ideal for repository details page.',
+  })
+  @ApiParam({
+    name: 'repoId',
+    type: Number,
+    description: 'GitHub Repository ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Complete repository details',
+  })
+  @ApiResponse({ status: 404, description: 'Repository not found' })
+  getRepositoryFullDetails(@Param('repoId', ParseIntPipe) repoId: number) {
+    return this.campaignsExtendedService.getRepositoryFullDetails(repoId);
+  }
 }
+

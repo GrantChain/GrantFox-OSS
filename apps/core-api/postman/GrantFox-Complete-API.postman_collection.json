@@ -1,0 +1,488 @@
+{
+  "info": {
+    "name": "GrantFox - Complete API",
+    "description": "Colección completa de endpoints de GrantFox API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "type": "string"
+    },
+    {
+      "key": "campaign_id",
+      "value": "d3ffbc99-9c0b-4ef8-bb6d-6bb9bd380a44",
+      "type": "string"
+    },
+    {
+      "key": "project_id",
+      "value": "b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380a22",
+      "type": "string"
+    },
+    {
+      "key": "repo_id",
+      "value": "538809110",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏠 Landing Page Endpoints",
+      "item": [
+        {
+          "name": "Get Active Campaigns with Projects (Landing)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/active/with-projects",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "active", "with-projects"]
+            },
+            "description": "🎯 ENDPOINT PRINCIPAL para landing page de contributors.\n\nRetorna todas las campañas activas con sus proyectos y repos.\n\n✅ Público (no requiere auth)"
+          }
+        },
+        {
+          "name": "Get Campaign with Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/projects-with-repos",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "projects-with-repos"]
+            },
+            "description": "Obtiene una campaña específica con todos sus proyectos y repos.\n\n✅ Público"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Repository Details",
+      "item": [
+        {
+          "name": "Get Repository Full Details (ALL IN ONE)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/repositories/{{repo_id}}/full-details",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "{{repo_id}}", "full-details"]
+            },
+            "description": "🎯 ENDPOINT PRINCIPAL para página de detalles del repo.\n\nRetorna en 1 solo request:\n- Info del repo\n- Metadata de GitHub (stars, forks, language)\n- Issues abiertos de GitHub\n\n✅ Público"
+          }
+        },
+        {
+          "name": "Get Repository GitHub Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/repositories/{{repo_id}}/github-data",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "{{repo_id}}", "github-data"]
+            },
+            "description": "Solo metadata de GitHub (stars, forks, language, topics).\n\n✅ Público"
+          }
+        },
+        {
+          "name": "Get Repository GitHub Issues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/repositories/{{repo_id}}/github-issues",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "{{repo_id}}", "github-issues"]
+            },
+            "description": "Solo issues abiertos de GitHub.\n\n✅ Público"
+          }
+        },
+        {
+          "name": "Get Repository Basic Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/repositories/{{repo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "{{repo_id}}"]
+            },
+            "description": "Info básica del repo (sin GitHub API).\n\n✅ Público"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Campaigns",
+      "item": [
+        {
+          "name": "Get All Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Get Campaign by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Create Campaign (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q2 2024 Grant Round\",\n  \"description\": \"Funding for innovative projects\",\n  \"tags\": [\"defi\", \"nft\"],\n  \"start_date\": \"2024-04-01\",\n  \"end_date\": \"2024-06-30\",\n  \"image_url\": \"https://example.com/image.png\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"]
+            },
+            "description": "🔒 Requiere rol ADMIN"
+          }
+        },
+        {
+          "name": "Update Campaign Status (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "status"]
+            },
+            "description": "🔒 Requiere rol ADMIN\n\nStatus: PENDING | ACTIVE | INACTIVE"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 Projects",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["projects"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Get Project by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Create Project (MAINTAINER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My DeFi Project\",\n  \"github_handle\": \"my-org\",\n  \"short_description\": \"A revolutionary DeFi protocol\",\n  \"description\": \"Full description here...\",\n  \"tech_stack\": [\"Rust\", \"Stellar\", \"Soroban\"],\n  \"category\": \"DEFI\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["projects"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔗 Campaign-Repositories",
+      "item": [
+        {
+          "name": "Get Repositories by Campaign",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaign-repositories/campaign/{{campaign_id}}/repositories",
+              "host": ["{{base_url}}"],
+              "path": ["campaign-repositories", "campaign", "{{campaign_id}}", "repositories"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Get Campaigns by Repository",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaign-repositories/repository/{{repo_id}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaign-repositories", "repository", "{{repo_id}}", "campaigns"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Get Active Campaign for Repository",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaign-repositories/repository/{{repo_id}}/active-campaign",
+              "host": ["{{base_url}}"],
+              "path": ["campaign-repositories", "repository", "{{repo_id}}", "active-campaign"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Add Repositories to Campaign (MAINTAINER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repository_ids\": [538809110, 559032124]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaign-repositories/campaign/{{campaign_id}}/repositories",
+              "host": ["{{base_url}}"],
+              "path": ["campaign-repositories", "campaign", "{{campaign_id}}", "repositories"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER (owner del proyecto)"
+          }
+        },
+        {
+          "name": "Remove Repository from Campaign (MAINTAINER)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/campaign-repositories/campaign/{{campaign_id}}/repositories/{{repo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaign-repositories", "campaign", "{{campaign_id}}", "repositories", "{{repo_id}}"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER (owner del proyecto)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Repositories",
+      "item": [
+        {
+          "name": "Get Repositories by Project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/repositories/project/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "project", "{{project_id}}"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Add Repository to Project (MAINTAINER)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"github_repo_id\": 538809110,\n  \"github_url\": \"https://github.com/stellar/soroban-examples\",\n  \"name\": \"soroban-examples\",\n  \"description\": \"Example smart contracts\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/repositories/project/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "project", "{{project_id}}"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER (owner del proyecto)"
+          }
+        },
+        {
+          "name": "Deactivate Repository (MAINTAINER)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/repositories/{{repo_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["repositories", "{{repo_id}}"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER (owner del proyecto)\n\nSoft delete: marca is_active=false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Users & Profiles",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"uuid-from-supabase\",\n  \"email\": \"user@example.com\",\n  \"username\": \"username\",\n  \"avatar_url\": \"https://example.com/avatar.png\",\n  \"roles\": [\"MAINTAINER\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            },
+            "description": "✅ Público (llamado desde frontend después de Supabase Auth)"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            },
+            "description": "✅ Público"
+          }
+        },
+        {
+          "name": "Create Maintainer Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Blockchain developer passionate about DeFi\",\n  \"social_media\": {\n    \"twitter\": \"@username\",\n    \"github\": \"username\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profiles/maintainer",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "maintainer"]
+            },
+            "description": "🔒 Requiere rol MAINTAINER"
+          }
+        }
+      ]
+    }
+  ]
+}
