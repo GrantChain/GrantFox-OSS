@@ -10,6 +10,7 @@ import { RepositoriesModule } from './modules/repositories/repositories.module';
 import { ProjectMaintainersModule } from './modules/project-maintainers/project-maintainers.module';
 import { ProjectReviewsModule } from './modules/project-reviews/project-reviews.module';
 import { CampaignRepositoriesModule } from './modules/campaign-repositories/campaign-repositories.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware';
 
 @Module({
@@ -28,6 +29,7 @@ import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware
     ProjectMaintainersModule,
     ProjectReviewsModule,
     CampaignRepositoriesModule,
+    UploadsModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -63,6 +65,9 @@ export class AppModule implements NestModule {
         { path: 'campaign-repositories/repository/:repoId/campaigns', method: RequestMethod.GET },
         { path: 'campaign-repositories/repository/:repoId/active-campaign', method: RequestMethod.GET },
         { path: 'campaign-repositories/campaign/:campaignId/repositories/:repoId/check', method: RequestMethod.GET },
+        // Rutas públicas de uploads (POST - permite subir sin auth)
+        { path: 'uploads/avatar/:userId', method: RequestMethod.POST },
+        { path: 'uploads/campaign/:campaignId', method: RequestMethod.POST },
       )
       .forRoutes(
         // Campaigns protegidos (ADMIN)
