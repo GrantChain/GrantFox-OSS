@@ -8,6 +8,7 @@ import {
   IsUrl,
   ArrayMinSize,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateCampaignDto {
   @ApiProperty({
@@ -30,6 +31,16 @@ export class CreateCampaignDto {
     description: 'Campaign tags for categorization',
     example: ['opensource', 'hacktoberfest', 'blockchain'],
     type: [String],
+  })
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return [value];
+      }
+    }
+    return value;
   })
   @IsArray()
   @ArrayMinSize(1)

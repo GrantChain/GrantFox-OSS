@@ -10,7 +10,10 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,6 +24,8 @@ import {
   ApiTags,
   ApiResponse,
   ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UserRole } from '@prisma/client';
@@ -31,10 +36,25 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('avatar'))
   @ApiOperation({
     summary: 'Create a new user with a specific role',
     description:
-      'Creates a new user with an initial role. Email must be unique.',
+      'Creates a new user with an initial role. Email must be unique. Avatar image is optional.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['user_id', 'email', 'username', 'role'],
+      properties: {
+        user_id: { type: 'string', format: 'uuid', description: 'User ID from Supabase Auth' },
+        email: { type: 'string', format: 'email' },
+        username: { type: 'string' },
+        role: { type: 'string', enum: ['ADMIN', 'MAINTAINER', 'CONTRIBUTOR'] },
+        avatar: { type: 'string', format: 'binary', description: 'Optional avatar image' },
+      },
+    },
   })
   @ApiResponse({
     status: 201,
@@ -42,8 +62,11 @@ export class UsersController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 409, description: 'Email or username already exists' })
-  create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+  create(
+    @Body() dto: CreateUserDto,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ) {
+    return this.usersService.create(dto, avatar);
   }
 
   @Get()

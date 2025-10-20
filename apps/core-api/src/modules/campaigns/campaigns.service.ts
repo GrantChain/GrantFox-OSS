@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { UploadsService } from '../uploads/uploads.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { UpdateCampaignStatusDto } from './dto/update-campaign-status.dto';
@@ -11,9 +12,12 @@ import { CampaignStatus } from '@prisma/client';
 
 @Injectable()
 export class CampaignsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadsService: UploadsService,
+  ) {}
 
-  async create(dto: CreateCampaignDto, createdBy: string) {
+  async create(dto: CreateCampaignDto, createdBy: string, imageFile?: Express.Multer.File) {
     // Validate dates
     const startDate = new Date(dto.start_date);
     const endDate = new Date(dto.end_date);
@@ -41,6 +45,15 @@ export class CampaignsService {
         },
       },
     });
+
+    // Upload image if provided
+    if (imageFile) {
+      const uploadResult = await this.uploadsService.uploadCampaignImage(
+        imageFile,
+        campaign.campaign_id,
+      );
+      return this.formatCampaignResponse(uploadResult.campaign);
+    }
 
     return this.formatCampaignResponse(campaign);
   }
