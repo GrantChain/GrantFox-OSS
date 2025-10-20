@@ -5,10 +5,21 @@ import { CampaignCard } from "./CampaignCard";
 import { Hero } from "./Hero";
 import { useCampaignsQuery } from "./hooks/useCampaignsQuery";
 import { CampaignSheetForm } from "@/features/campaigns/CampaignSheetForm";
-import { Loader2 } from "lucide-react";
+import { FileIcon, Loader2 } from "lucide-react";
 
 export const CampaignsView = () => {
   const { data: campaigns, isLoading } = useCampaignsQuery();
+
+  if (campaigns?.length === 0 && !campaigns) {
+    return (
+      <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+        <FileIcon className="size-10" />
+        <span className="text-sm text-muted-foreground">
+          No campaigns found
+        </span>
+      </Card>
+    );
+  }
 
   return (
     <>
