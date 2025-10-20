@@ -2,15 +2,15 @@ import { User, UserPayload } from "@/types/user.type";
 import { AxiosError, AxiosInstance } from "axios";
 
 export class AuthService {
-  private readonly http: AxiosInstance;
+  private readonly httpUnauthorized: AxiosInstance;
 
-  constructor(http: AxiosInstance) {
-    this.http = http;
+  constructor(httpUnauthorized: AxiosInstance) {
+    this.httpUnauthorized = httpUnauthorized;
   }
 
   async register(user: UserPayload) {
     try {
-      const { data } = await this.http.post("/users", user);
+      const { data } = await this.httpUnauthorized.post("/users", user);
       return data;
     } catch (error) {
       throw new Error("Failed to create user");
@@ -19,7 +19,7 @@ export class AuthService {
 
   async getUser(user_id: string): Promise<User | null> {
     try {
-      const { data } = await this.http.get(`/users/${user_id}`);
+      const { data } = await this.httpUnauthorized.get(`/users/${user_id}`);
       return data;
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.status === 404) {

@@ -3,12 +3,20 @@
 import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "../../components/ui/button";
-import { ArrowRightIcon, Edit, Trash2 } from "lucide-react";
-import { Campaign } from "@/types/campaign.type";
+import { ArrowRightIcon, ChevronDown, Edit } from "lucide-react";
+import { Campaign, CampaignStatus } from "@/types/campaign.type";
 import { Details } from "./Details";
 import { useCampaignContext } from "@/context/CampaignContext";
-import { EditDialog } from "./EditDialog";
-import { DeleteDialog } from "./DeleteDialog";
+import { CampaignSheetForm } from "./CampaignSheetForm";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button as UIButton } from "@/components/ui/button";
+import { useCampaignsMutations } from "./hooks/useCampaignsMutations";
+import { Badge } from "@/components/ui/badge";
 
 interface CardTransform {
   rotateX: number;
@@ -21,15 +29,8 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastMousePosition = useRef({ x: 0, y: 0 });
-  const {
-    openDetails,
-    setOpenDetails,
-    openEdit,
-    setOpenEdit,
-    openDelete,
-    setOpenDelete,
-    setCampaign,
-  } = useCampaignContext();
+  const { openDetails, setOpenDetails, openEdit, setOpenEdit, setCampaign } =
+    useCampaignContext();
 
   useEffect(() => {
     const card = cardRef.current;
@@ -123,12 +124,17 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
   return (
     <Card ref={cardRef} className="max-w-md">
       <CardHeader>
-        <CardTitle>{campaign.title}</CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>{campaign.name}</CardTitle>
+          {campaign.status === CampaignStatus.INACTIVE && (
+            <Badge variant="destructive">INACTIVE</Badge>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="space-y-6 text-sm">
         <img
           ref={imageRef}
-          src={campaign.image}
+          src={campaign.image_url}
           alt="Banner"
           className="aspect-video w-full rounded-md object-cover"
           width={500}
@@ -149,7 +155,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
             View Campaign <ArrowRightIcon />
           </Button>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Button
               variant="outline"
               className="cursor-pointer"
@@ -161,29 +167,60 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
               <Edit className="size-4" />
             </Button>
 
-            <Button
-              variant="outline"
-              className="cursor-pointer"
-              onClick={() => {
-                setCampaign(campaign);
-                setOpenDelete(true);
-              }}
-            >
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <UIButton variant="outline" className="cursor-pointer">
+                  {campaign.status} <ChevronDown className="size-4" />
+                </UIButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <StatusItem
+                  campaignId={campaign.campaign_id}
+                  current={campaign.status}
+                  target={CampaignStatus.PENDING}
+                />
+                <StatusItem
+                  campaignId={campaign.campaign_id}
+                  current={campaign.status}
+                  target={CampaignStatus.ACTIVE}
+                />
+                <StatusItem
+                  campaignId={campaign.campaign_id}
+                  current={campaign.status}
+                  target={CampaignStatus.INACTIVE}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardContent>
 
       {/** View Sheet */}
-
       {campaign && openDetails && <Details />}
 
-      {/** Edit Dialog */}
-      {campaign && openEdit && <EditDialog />}
-
-      {/** Delete confirmation Dialog */}
-      {campaign && openDelete && <DeleteDialog />}
+      {/** Edit Sheet */}
+      {campaign && openEdit && <CampaignSheetForm mode="edit" />}
     </Card>
   );
 };
+
+function StatusItem({
+  campaignId,
+  current,
+  target,
+}: {
+  campaignId: string;
+  current: CampaignStatus;
+  target: CampaignStatus;
+}) {
+  const { updateCampaignStatus } = useCampaignsMutations();
+  return (
+    <DropdownMenuItem
+      onClick={() => updateCampaignStatus({ id: campaignId, status: target })}
+      variant={target === CampaignStatus.INACTIVE ? "destructive" : "default"}
+    >
+      {target}
+      {current === target ? " (current)" : ""}
+    </DropdownMenuItem>
+  );
+}

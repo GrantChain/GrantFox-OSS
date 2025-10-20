@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "../services/campaign.service";
-import http from "@/lib/http";
+import { http } from "@/lib/http";
 
 export const useCampaignsQuery = () => {
   const campaignService = new CampaignService(http);
