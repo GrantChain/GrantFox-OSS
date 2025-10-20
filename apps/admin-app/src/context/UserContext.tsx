@@ -8,21 +8,10 @@ import React, {
   useState,
 } from "react";
 import { supabase } from "@/lib/supabase";
-
-export type AppUser = {
-  id: string;
-  email?: string;
-  user_metadata: {
-    avatar_url?: string;
-    full_name?: string;
-    user_name?: string;
-    name?: string;
-  };
-  created_at?: string;
-};
+import { User } from "@/types/user.type";
 
 type UserContextValue = {
-  user: AppUser | null;
+  user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -34,7 +23,7 @@ export default function UserProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +34,7 @@ export default function UserProvider({
         data: { session },
       } = await supabase.auth.getSession();
       if (!isActive) return;
-      setUser((session?.user as unknown as AppUser) ?? null);
+      setUser((session?.user as unknown as User) ?? null);
       setLoading(false);
     };
 
@@ -55,7 +44,7 @@ export default function UserProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isActive) return;
-      setUser((session?.user as unknown as AppUser) ?? null);
+      setUser((session?.user as unknown as User) ?? null);
       setLoading(false);
     });
 

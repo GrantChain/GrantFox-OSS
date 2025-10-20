@@ -8,11 +8,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import { loginSchema } from "../schemas/auth.schema";
+import { AuthService } from "../services/auth.service";
+import http from "@/lib/http";
+import { UserRole } from "@/types/user.type";
 
 export const useAuth = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const authService = new AuthService(http);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -30,6 +34,18 @@ export const useAuth = () => {
         email: payload.email,
         password: payload.password,
       });
+
+      const user = await authService.getUser(data?.session?.user?.id ?? "");
+
+      if (!user) {
+        await authService.register({
+          user_id: data?.session?.user?.id ?? "",
+          email: payload.email,
+          username: payload.email.split("@")[0],
+          avatar_url: data?.session?.user?.user_metadata?.avatar_url ?? "",
+          role: UserRole.ADMIN,
+        });
+      }
 
       if (error && error.status === 400) {
         toast.error(error.message);
