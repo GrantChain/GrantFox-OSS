@@ -10,13 +10,18 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { CampaignsService } from './campaigns.service';
 import { CampaignsExtendedService } from './campaigns-extended.service';
@@ -40,10 +45,26 @@ export class CampaignsController {
 
   @Post()
   @Roles(UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({
     summary: 'Create a new campaign (ADMIN only)',
     description:
-      'Creates a new campaign. Only accessible by users with ADMIN role.',
+      'Creates a new campaign. Only accessible by users with ADMIN role. Campaign image is optional.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['name', 'description', 'start_date', 'end_date'],
+      properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+        start_date: { type: 'string', format: 'date-time' },
+        end_date: { type: 'string', format: 'date-time' },
+        image: { type: 'string', format: 'binary', description: 'Optional campaign image' },
+      },
+    },
   })
   @ApiResponse({
     status: 201,
@@ -55,8 +76,9 @@ export class CampaignsController {
   create(
     @Body() createCampaignDto: CreateCampaignDto,
     @CurrentUser() user: any,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
-    return this.campaignsService.create(createCampaignDto, user.user_id);
+    return this.campaignsService.create(createCampaignDto, user.user_id, image);
   }
 
   @Get()

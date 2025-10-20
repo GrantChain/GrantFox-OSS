@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { UploadsService } from '../uploads/uploads.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
@@ -12,12 +13,15 @@ import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadsService: UploadsService,
+  ) {}
 
   /**
-   * Create a new user with a specific role
+   * Create a new user with a specific role and optional avatar
    */
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto, avatarFile?: Express.Multer.File) {
     // Check if user_id already exists
     const existingUserId = await this.prisma.user.findUnique({
       where: { user_id: dto.user_id },
@@ -48,7 +52,7 @@ export class UsersService {
     }
 
     // Create user with initial role
-    return await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         user_id: dto.user_id,
         email: dto.email,
@@ -57,6 +61,17 @@ export class UsersService {
         roles: [dto.role],
       },
     });
+
+    // Upload avatar if provided
+    if (avatarFile) {
+      const uploadResult = await this.uploadsService.uploadAvatar(
+        avatarFile,
+        user.user_id,
+      );
+      return uploadResult.user;
+    }
+
+    return user;
   }
 
   /**
