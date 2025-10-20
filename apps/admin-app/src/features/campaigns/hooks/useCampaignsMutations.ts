@@ -19,7 +19,7 @@ export const useCampaignsMutations = () => {
       });
     },
     onError: (err: unknown) => {
-      const message = (err as any)?.message || "Failed to create campaign";
+      const message = (err as Error)?.message || "Failed to create campaign";
       toast.error(message);
     },
   });

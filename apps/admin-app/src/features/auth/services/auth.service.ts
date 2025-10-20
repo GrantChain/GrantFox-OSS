@@ -13,7 +13,7 @@ export class AuthService {
       const { data } = await this.httpUnauthorized.post("/users", user);
       return data;
     } catch (error) {
-      throw new Error("Failed to create user");
+      throw new Error("Failed to create user", { cause: error });
     }
   }
 
@@ -26,7 +26,7 @@ export class AuthService {
         return null;
       }
 
-      throw new Error("Failed to get user");
+      throw new Error("Failed to get user", { cause: error });
     }
   }
 }

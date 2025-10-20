@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import Calendar05 from "@/components/ui/calendar-05";
 import { DateRange } from "react-day-picker";
 import { Loader2, Plus } from "lucide-react";
-import { useCampaignsMutations } from "./hooks/useCampaignsMutations";
 import {
   Popover,
   PopoverContent,
@@ -34,6 +33,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useCampaignContext } from "@/context/CampaignContext";
+import Image from "next/image";
 
 type SheetMode = "create" | "edit";
 
@@ -247,7 +247,9 @@ export const CampaignSheetForm = ({
                 <FormLabel>Banner image</FormLabel>
                 <div className="space-y-2">
                   {imagePreview && (
-                    <img
+                    <Image
+                      width={500}
+                      height={500}
                       src={imagePreview}
                       alt="Preview"
                       className="aspect-video w-full rounded-md object-cover"

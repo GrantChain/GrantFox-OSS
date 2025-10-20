@@ -443,11 +443,9 @@ export const useEscrowsMutations = () => {
   const withdrawRemainingFundsMutation = useMutation({
     mutationFn: async ({
       payload,
-      type,
       address,
     }: {
       payload: WithdrawRemainingFundsPayload;
-      type: EscrowType;
       address: string;
     }) => {
       const { unsignedTransaction } = await withdrawRemainingFunds(payload);

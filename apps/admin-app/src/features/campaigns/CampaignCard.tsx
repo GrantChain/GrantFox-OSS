@@ -17,6 +17,7 @@ import {
 import { Button as UIButton } from "@/components/ui/button";
 import { useCampaignsMutations } from "./hooks/useCampaignsMutations";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface CardTransform {
   rotateX: number;
@@ -132,7 +133,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6 text-sm">
-        <img
+        <Image
           ref={imageRef}
           src={campaign.image_url}
           alt="Banner"

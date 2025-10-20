@@ -17,7 +17,7 @@ export class CampaignService {
       const { data } = await this.http.get("/campaigns");
       return data;
     } catch (error) {
-      throw new Error("Failed to get campaigns");
+      throw new Error("Failed to get campaigns", { cause: error });
     }
   }
 
@@ -26,7 +26,7 @@ export class CampaignService {
       const { data } = await this.http.get(`/campaigns/${id}`);
       return data;
     } catch (error) {
-      throw new Error("Failed to get campaign");
+      throw new Error("Failed to get campaign", { cause: error });
     }
   }
 
@@ -39,7 +39,7 @@ export class CampaignService {
       });
       return data;
     } catch (error) {
-      throw new Error("Failed to create campaign");
+      throw new Error("Failed to create campaign", { cause: error });
     }
   }
 
@@ -52,7 +52,7 @@ export class CampaignService {
       });
       return data;
     } catch (error) {
-      throw new Error("Failed to update campaign");
+      throw new Error("Failed to update campaign", { cause: error });
     }
   }
 
@@ -63,7 +63,7 @@ export class CampaignService {
       });
       return data;
     } catch (error) {
-      throw new Error("Failed to update campaign status");
+      throw new Error("Failed to update campaign status", { cause: error });
     }
   }
 
@@ -72,7 +72,9 @@ export class CampaignService {
       const { data } = await this.http.get("/campaigns/active/with-projects");
       return data;
     } catch (error) {
-      throw new Error("Failed to get active campaigns with projects");
+      throw new Error("Failed to get active campaigns with projects", {
+        cause: error,
+      });
     }
   }
 
@@ -83,7 +85,7 @@ export class CampaignService {
       );
       return data;
     } catch (error) {
-      throw new Error("Failed to get campaign with details");
+      throw new Error("Failed to get campaign with details", { cause: error });
     }
   }
 }
