@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import type { z } from "zod";
 import { loginSchema } from "../schemas/auth.schema";
 import { AuthService } from "../services/auth.service";
-import http from "@/lib/http";
+import { http } from "@/lib/http";
 import { UserRole } from "@/types/user.type";
 
 export const useAuth = () => {
