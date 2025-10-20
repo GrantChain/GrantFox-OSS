@@ -12,9 +12,6 @@ export type CampaignContextType = {
 
   openEdit: boolean;
   setOpenEdit: (open: boolean) => void;
-
-  openDelete: boolean;
-  setOpenDelete: (open: boolean) => void;
 };
 
 const CampaignContext = createContext<CampaignContextType | undefined>(
@@ -36,7 +33,6 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [openDetails, setOpenDetails] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
 
   const value = useMemo(
     () => ({
@@ -46,10 +42,8 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       setOpenDetails,
       openEdit,
       setOpenEdit,
-      openDelete,
-      setOpenDelete,
     }),
-    [campaign, openDetails, openEdit, openDelete]
+    [campaign, openDetails, openEdit]
   );
 
   return (
