@@ -5,7 +5,7 @@ import { Meteors } from "@/components/ui/meteors";
 export function LandingView() {
   return (
     <>
-      <div className="relative flex h-[300px] w-full flex-col items-center justify-center overflow-hidden rounded-lg">
+      <div className="relative z-0 flex h-[300px] w-full flex-col items-center justify-center overflow-hidden rounded-lg">
         <Meteors number={30} />
         <span className="pointer-events-none bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-8xl leading-none font-semibold whitespace-pre-wrap text-transparent dark:from-white dark:to-slate-900/10">
           Welcome to GrantFox
