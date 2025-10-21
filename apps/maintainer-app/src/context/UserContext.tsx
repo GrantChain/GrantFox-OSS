@@ -94,8 +94,7 @@ export default function UserProvider({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo:
-          typeof window !== "undefined" ? `${window.location.origin}/` : "/",
+        redirectTo: `${window.location.origin}/`,
         scopes: "read:user user:email",
       },
     });
