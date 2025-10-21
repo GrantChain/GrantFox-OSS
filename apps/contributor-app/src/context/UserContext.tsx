@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { supabase, type User } from "@/lib/supabase";
 import { http } from "@/lib/api";
-import { UserRole } from "@/types/user.type";
+import { UserRole } from "@/types";
 import { AuthService } from "@/features/auth/services/auth.service";
 
 type UserContextValue = {

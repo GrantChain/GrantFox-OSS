@@ -1,4 +1,4 @@
-import { ApiUser, UserPayload, UserRole } from "@/types/user.type";
+import { ApiUser, UserPayload, UserRole } from "@/types";
 import { AxiosError, AxiosInstance } from "axios";
 
 export class AuthService {

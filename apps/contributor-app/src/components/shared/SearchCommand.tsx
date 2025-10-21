@@ -10,7 +10,7 @@ import {
 } from "@/features/github/hooks/useGitHubSearch";
 import Link from "next/link";
 import Image from "next/image";
-import { Owner, Repository } from "@/types/github";
+import { Owner, Repository } from "@/types";
 
 export function SearchCommand({ onClose }: { onClose?: () => void }) {
   const [open, setOpen] = React.useState(false);
