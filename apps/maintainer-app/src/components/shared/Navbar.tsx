@@ -14,10 +14,12 @@ import Image from "next/image";
 import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 import { UserButton } from "./UserButton";
 import { useUser } from "@/context/UserContext";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const isMobile = useIsMobile();
   const { user } = useUser();
+  const pathname = usePathname();
 
   return (
     <div className="relative z-50 flex container mx-auto justify-between items-center p-4">
@@ -83,25 +85,34 @@ export const Navbar = () => {
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className:
+                    pathname === "/maintainer/projects" ? "bg-muted/90" : "",
+                })}
               >
-                <Link href="/projects">Projects</Link>
+                <Link href="/maintainer/projects">Projects</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className:
+                    pathname === "/maintainer/campaigns" ? "bg-muted/90" : "",
+                })}
               >
-                <Link href="/campaigns">Campaigns</Link>
+                <Link href="/maintainer/campaigns">Campaigns</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className:
+                    pathname === "/maintainer/financials" ? "bg-muted/90" : "",
+                })}
               >
-                <Link href="/financials">Financials</Link>
+                <Link href="/maintainer/financials">Financials</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
