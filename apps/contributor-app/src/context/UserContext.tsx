@@ -8,6 +8,9 @@ import React, {
   useState,
 } from "react";
 import { supabase, type User } from "@/lib/supabase";
+import { http } from "@/lib/api";
+import { UserRole } from "@/types/user.type";
+import { AuthService } from "@/features/auth/services/auth.service";
 
 type UserContextValue = {
   user: User | null;
@@ -25,25 +28,59 @@ export default function UserProvider({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const authService = new AuthService(http);
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
+    // Get initial session and ensure user exists/has role after redirect
+    const syncUserAfterAuth = async (authedUser: User | null) => {
+      if (!authedUser) return;
+
+      try {
+        const existing = await authService.getUser(authedUser.id);
+
+        if (!existing) {
+          await authService.register({
+            user_id: authedUser.id,
+            email: authedUser.email ?? "",
+            username: authedUser.user_metadata?.user_name ?? "",
+            avatar_url: authedUser.user_metadata?.avatar_url ?? "",
+            role: UserRole.CONTRIBUTOR,
+          });
+          return;
+        }
+
+        const hasRole = (existing.roles ?? []).includes(UserRole.CONTRIBUTOR);
+        if (!hasRole) {
+          await authService.addRole(authedUser.id, UserRole.CONTRIBUTOR);
+        }
+      } catch (error) {
+        console.error("Failed to sync user with API:", error);
+      }
+    };
+
+    const init = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
       setLoading(false);
+      await syncUserAfterAuth(currentUser);
     };
 
-    getInitialSession();
+    init();
 
-    // Listen for auth changes
+    // Listen for auth changes (covers redirect back from GitHub)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
+      const authedUser = session?.user ?? null;
+      setUser(authedUser);
       setLoading(false);
+      // Run sync on LOGIN and TOKEN_REFRESH to ensure roles are up-to-date
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        await syncUserAfterAuth(authedUser);
+      }
     });
 
     return () => subscription.unsubscribe();
