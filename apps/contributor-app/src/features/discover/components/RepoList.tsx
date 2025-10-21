@@ -6,7 +6,7 @@ import { useQueries } from "@tanstack/react-query";
 import { githubHttp } from "@/lib/http";
 import { GitHubOrgsService } from "@/features/github/services/GitHubOrgsService";
 import Image from "next/image";
-import { Repository } from "@/types/Github";
+import { Repository } from "@/types/github";
 import { CURATED_ORG_LOGINS } from "@/config/curation";
 
 interface RepoItemData {
