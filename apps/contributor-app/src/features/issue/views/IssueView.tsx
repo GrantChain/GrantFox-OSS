@@ -11,7 +11,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
-import { IssueLabel } from "@/types";
+import { IssueLabel } from "@/types/Github";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useGitHubRepoIssue } from "@/features/github/hooks/useGitHubRepos";

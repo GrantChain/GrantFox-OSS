@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
 import { Back } from "@/components/shared/Back";
-import { Issue } from "@/types";
+import { Issue } from "@/types/Github";
 
 export function RepoView({ org, repo }: { org: string; repo: string }) {
   const {

@@ -19,7 +19,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Organization, Repository } from "@/types";
+import { Organization, Repository } from "@/types/Github";
 import { Badge } from "@/components/ui/badge";
 import { Star, GitFork, MessageSquare } from "lucide-react";
 import Image from "next/image";

@@ -9,7 +9,7 @@ import { useState } from "react";
 import { HyperText } from "@/components/ui/hyper-text";
 import { Highlighter } from "@/components/ui/highlighter";
 import { RepoList } from "../components/RepoList";
-import { Organization, Repository } from "@/types";
+import { Organization, Repository } from "@/types/Github";
 import { Badge } from "@/components/ui/badge";
 import { Star, GitFork, MessageSquare } from "lucide-react";
 import {

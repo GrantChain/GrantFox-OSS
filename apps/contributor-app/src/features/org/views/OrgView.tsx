@@ -15,7 +15,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
-import { Repository } from "@/types";
+import { Repository } from "@/types/Github";
 import { LoaderCard } from "@/components/ui/loader";
 import { Back } from "@/components/shared/Back";
 
