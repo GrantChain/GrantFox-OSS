@@ -18,6 +18,10 @@ const http = axios.create({
 
 http.interceptors.request.use(
   (config) => {
+    if (typeof window === "undefined") {
+      return config;
+    }
+
     const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(
       "https://",
       ""
