@@ -10,7 +10,9 @@ import { RepositoriesModule } from './modules/repositories/repositories.module';
 import { ProjectMaintainersModule } from './modules/project-maintainers/project-maintainers.module';
 import { ProjectReviewsModule } from './modules/project-reviews/project-reviews.module';
 import { CampaignRepositoriesModule } from './modules/campaign-repositories/campaign-repositories.module';
+import { CampaignContributorsModule } from './modules/campaign-contributors/campaign-contributors.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { EscrowsModule } from './modules/escrows/escrows.module';
 import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware';
 
 @Module({
@@ -29,7 +31,9 @@ import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware
     ProjectMaintainersModule,
     ProjectReviewsModule,
     CampaignRepositoriesModule,
+    CampaignContributorsModule,
     UploadsModule,
+    EscrowsModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -68,6 +72,13 @@ export class AppModule implements NestModule {
         // Rutas públicas de uploads (POST - permite subir sin auth)
         { path: 'uploads/avatar/:userId', method: RequestMethod.POST },
         { path: 'uploads/campaign/:campaignId', method: RequestMethod.POST },
+        // Rutas públicas de escrows (GET)
+        { path: 'escrows', method: RequestMethod.GET },
+        { path: 'escrows/:id', method: RequestMethod.GET },
+        { path: 'escrows/campaign/:campaignId', method: RequestMethod.GET },
+        // Rutas públicas de campaign-contributors (GET)
+        { path: 'campaign-contributors/campaign/:campaignId', method: RequestMethod.GET },
+        { path: 'campaign-contributors/contributor/:contributorId', method: RequestMethod.GET },
       )
       .forRoutes(
         // Campaigns protegidos (ADMIN)
@@ -78,12 +89,12 @@ export class AppModule implements NestModule {
         // Projects protegidos (MAINTAINER)
         { path: 'projects', method: RequestMethod.POST },
         { path: 'projects/:id', method: RequestMethod.PATCH },
-        { path: 'projects/:id/status', method: RequestMethod.PATCH },
         { path: 'projects/:id', method: RequestMethod.DELETE },
         { path: 'projects/:id/maintainers', method: RequestMethod.POST },
         { path: 'projects/:id/maintainers/:maintainerId', method: RequestMethod.DELETE },
         // Repositories protegidos (MAINTAINER)
         { path: 'repositories/project/:projectId', method: RequestMethod.POST },
+        { path: 'repositories/project/:projectId/bulk', method: RequestMethod.POST },
         { path: 'repositories/:repoId', method: RequestMethod.DELETE },
         { path: 'repositories/:repoId/reactivate', method: RequestMethod.PATCH },
         // Project-maintainers protegidos (MAINTAINER)
@@ -94,6 +105,11 @@ export class AppModule implements NestModule {
         // Campaign-repositories protegidos (MAINTAINER)
         { path: 'campaign-repositories/campaign/:campaignId/repositories', method: RequestMethod.POST },
         { path: 'campaign-repositories/campaign/:campaignId/repositories/:repoId', method: RequestMethod.DELETE },
+        // Escrows protegidos (ADMIN)
+        { path: 'escrows', method: RequestMethod.POST },
+        { path: 'escrows/:id', method: RequestMethod.PATCH },
+        // Campaign-contributors protegidos (CONTRIBUTOR)
+        { path: 'campaign-contributors/campaign/:campaignId/register', method: RequestMethod.POST },
       );
   }
 }

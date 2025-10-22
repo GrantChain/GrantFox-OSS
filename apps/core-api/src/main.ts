@@ -41,6 +41,8 @@ async function bootstrap() {
     .addTag('project-maintainers', 'Project-Maintainer relationship endpoints')
     .addTag('project-reviews', 'Project review and approval endpoints')
     .addTag('campaign-repositories', 'Campaign-Repository relationship endpoints')
+    .addTag('campaign-contributors', 'Campaign-Contributor registration endpoints')
+    .addTag('escrows', 'Escrow management endpoints')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
