@@ -29,6 +29,8 @@ model User {
   project_maintainers ProjectMaintainer[]
   project_reviews     ProjectReview[]
   wallets             Wallet[]
+  escrows             Escrow[]
+  campaign_registrations CampaignContributor[]
 
   @@index([roles])
   @@index([is_active])
@@ -194,6 +196,8 @@ model Campaign {
   updated_at  DateTime @updatedAt
 
   repositories CampaignRepository[]
+  escrows      Escrow[]
+  contributors CampaignContributor[]
 
   @@index([tags])
   @@index([status])
@@ -215,6 +219,42 @@ model CampaignRepository {
   @@index([campaign_id])
   @@index([repository_id])
   @@map("campaign_repository")
+}
+
+model CampaignContributor {
+  id             String   @id @default(uuid()) @db.Uuid
+  campaign_id    String   @db.Uuid
+  contributor_id String   @db.Uuid
+  registered_at  DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  contributor User     @relation(fields: [contributor_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([campaign_id, contributor_id])
+  @@index([campaign_id])
+  @@index([contributor_id])
+  @@map("campaign_contributor")
+}
+
+// =============================================
+// ESCROWS
+// =============================================
+
+model Escrow {
+  escrow_id   String     @id @db.Uuid
+  escrow_type EscrowType
+  campaign_id String     @db.Uuid
+  created_by  String     @db.Uuid
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  campaign   Campaign @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade)
+  created_by_user User @relation(fields: [created_by], references: [user_id], onDelete: Cascade)
+
+  @@index([campaign_id])
+  @@index([created_by])
+  @@index([escrow_type])
+  @@map("escrow")
 }
 
 // =============================================
@@ -252,6 +292,12 @@ enum ReviewAction {
 
 enum CampaignStatus {
   PENDING
+  UPCOMMING
   ACTIVE
   INACTIVE
+}
+
+enum EscrowType {
+  MAINTAINER
+  CONTRIBUTOR
 }

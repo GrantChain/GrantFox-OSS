@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { AddRepositoryDto } from './dto/add-repository.dto';
+import { AddMultipleRepositoriesDto } from './dto/add-multiple-repositories.dto';
 
 @Injectable()
 export class RepositoriesService {
@@ -57,6 +58,88 @@ export class RepositoriesService {
     });
 
     return repository;
+  }
+
+  async addMultipleToProject(
+    projectId: string,
+    dto: AddMultipleRepositoriesDto,
+    userId: string,
+  ) {
+    // Verificar que el proyecto existe
+    const project = await this.prisma.project.findUnique({
+      where: { project_id: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // Verificar que el usuario es owner del proyecto
+    await this.verifyOwnership(projectId, userId);
+
+    const results: {
+      created: any[];
+      reactivated: any[];
+      errors: Array<{ github_repo_id: number; error: string }>;
+    } = {
+      created: [],
+      reactivated: [],
+      errors: [],
+    };
+
+    // Procesar cada repositorio
+    for (const repo of dto.repositories) {
+      try {
+        // Verificar si el repositorio ya existe
+        const existingRepo = await this.prisma.repository.findUnique({
+          where: { github_repo_id: repo.github_repo_id },
+        });
+
+        if (existingRepo) {
+          // Si existe pero está inactivo, reactivarlo
+          if (!existingRepo.is_active) {
+            const reactivated = await this.prisma.repository.update({
+              where: { github_repo_id: repo.github_repo_id },
+              data: { is_active: true },
+            });
+            results.reactivated.push(reactivated);
+          } else {
+            // Si existe y está activo, agregar a errores
+            results.errors.push({
+              github_repo_id: repo.github_repo_id,
+              error: 'Repository already registered and active',
+            });
+          }
+        } else {
+          // Crear nuevo repositorio
+          const repository = await this.prisma.repository.create({
+            data: {
+              github_repo_id: repo.github_repo_id,
+              project_id: projectId,
+              github_url: repo.github_url,
+              name: repo.name,
+              description: repo.description,
+            },
+          });
+          results.created.push(repository);
+        }
+      } catch (error) {
+        results.errors.push({
+          github_repo_id: repo.github_repo_id,
+          error: error.message,
+        });
+      }
+    }
+
+    return {
+      message: `Processed ${dto.repositories.length} repositories`,
+      summary: {
+        created: results.created.length,
+        reactivated: results.reactivated.length,
+        errors: results.errors.length,
+      },
+      results,
+    };
   }
 
   async findByProject(projectId: string, includeInactive = false) {

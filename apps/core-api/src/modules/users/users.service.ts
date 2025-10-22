@@ -22,6 +22,23 @@ export class UsersService {
    * Create a new user with a specific role and optional avatar
    */
   async create(dto: CreateUserDto, avatarFile?: Express.Multer.File) {
+    // Validate avatar BEFORE creating user
+    if (avatarFile) {
+      // Validate file type
+      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedMimeTypes.includes(avatarFile.mimetype)) {
+        throw new BadRequestException(
+          'Invalid file type. Only JPEG, PNG, and WebP are allowed.',
+        );
+      }
+
+      // Validate file size (2MB)
+      const maxSize = 2 * 1024 * 1024;
+      if (avatarFile.size > maxSize) {
+        throw new BadRequestException('File size must be less than 2MB');
+      }
+    }
+
     // Check if user_id already exists
     const existingUserId = await this.prisma.user.findUnique({
       where: { user_id: dto.user_id },
@@ -62,7 +79,7 @@ export class UsersService {
       },
     });
 
-    // Upload avatar if provided
+    // Upload avatar if provided (validation already done)
     if (avatarFile) {
       const uploadResult = await this.uploadsService.uploadAvatar(
         avatarFile,
