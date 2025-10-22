@@ -87,7 +87,11 @@ export const Navbar = () => {
                 asChild
                 className={navigationMenuTriggerStyle({
                   className:
-                    pathname === "/maintainer/projects" ? "bg-muted/90" : "",
+                    pathname === "/maintainer/projects" ||
+                    pathname === "/maintainer/project-management" ||
+                    pathname.startsWith("/maintainer/projects/")
+                      ? "bg-muted/90"
+                      : "",
                 })}
               >
                 <Link href="/maintainer/projects">Projects</Link>
