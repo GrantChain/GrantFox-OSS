@@ -14,14 +14,20 @@ import Image from "next/image";
 import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 import { UserButton } from "./UserButton";
 import { useUser } from "@/context/UserContext";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const isMobile = useIsMobile();
   const { user } = useUser();
+  const pathname = usePathname();
 
   return (
-    <div className="relative z-50 flex container mx-auto justify-between items-center p-4">
-      <Link href="/" aria-label="Home" className="flex items-center">
+    <div className="relative z-50 container mx-auto p-4 flex flex-col gap-3 justify-center sm:flex-row sm:items-center sm:justify-between">
+      <Link
+        href="/"
+        aria-label="Home"
+        className="flex items-center justify-center"
+      >
         {/* Light theme logo */}
         <Image
           src="/assets/grantfox-stellar-light.svg"
@@ -43,8 +49,11 @@ export const Navbar = () => {
       </Link>
 
       {user && (
-        <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="flex-wrap">
+        <NavigationMenu
+          viewport={isMobile}
+          className="w-full mx-auto sm:w-auto sm:absolute sm:left-1/2 sm:-translate-x-1/2"
+        >
+          <NavigationMenuList className="w-full flex-col items-center justify-center text-center gap-2 sm:flex-row sm:flex-wrap sm:gap-0">
             {/* <NavigationMenuItem>
               <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -80,35 +89,51 @@ export const Navbar = () => {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem> */}
-            <NavigationMenuItem>
+            <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className: `${
+                    pathname === "/maintainer/projects" ||
+                    pathname === "/maintainer/project-management" ||
+                    pathname.startsWith("/maintainer/projects/")
+                      ? "bg-muted/90"
+                      : ""
+                  } w-full justify-center text-center sm:w-auto`,
+                })}
               >
-                <Link href="/projects">Projects</Link>
+                <Link href="/maintainer/projects">Projects</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className: `${
+                    pathname === "/maintainer/campaigns" ? "bg-muted/90" : ""
+                  } w-full justify-center text-center sm:w-auto`,
+                })}
               >
-                <Link href="/campaigns">Campaigns</Link>
+                <Link href="/maintainer/campaigns">Campaigns</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem>
+            <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
                 asChild
-                className={navigationMenuTriggerStyle()}
+                className={navigationMenuTriggerStyle({
+                  className: `${
+                    pathname === "/maintainer/financials" ? "bg-muted/90" : ""
+                  } w-full justify-center text-center sm:w-auto`,
+                })}
               >
-                <Link href="/financials">Financials</Link>
+                <Link href="/maintainer/financials">Financials</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex w-full items-center justify-center gap-3 sm:w-auto sm:ml-auto">
         <UserButton />
 
         <AnimatedThemeToggler
