@@ -299,7 +299,7 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
 
           <div className="w-full md:max-w-9/12">
             <Tabs defaultValue="repositories" className="gap-4">
-              <TabsList className="bg-background rounded-none border-b p-0 gap-4">
+              <TabsList className="bg-background rounded-none border-b p-0 sm:gap-4 flex w-full justify-center">
                 {tabs.map((tab: TabDef) => (
                   <TabsTrigger
                     key={tab.value}

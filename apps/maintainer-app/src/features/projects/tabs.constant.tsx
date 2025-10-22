@@ -37,10 +37,6 @@ export const getProjectTabs = (
   {
     name: "Maintainers",
     value: "maintainers",
-    content: (
-      <>
-        <Maintainers />
-      </>
-    ),
+    content: <>{projectId ? <Maintainers projectId={projectId} /> : null}</>,
   },
 ];
