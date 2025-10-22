@@ -5,12 +5,10 @@ import {
   Mail,
   Twitter,
   Globe,
-  Github,
   Users,
   Code2,
   Calendar,
   CheckCircle2,
-  ExternalLink,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

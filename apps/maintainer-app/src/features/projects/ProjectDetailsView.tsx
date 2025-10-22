@@ -8,7 +8,6 @@ import {
   BadgeCheck,
   CalendarIcon,
   Code2,
-  ExternalLink,
   FileIcon,
   Globe,
   Heart,
@@ -26,6 +25,7 @@ import { getProjectTabs } from "./tabs.constant";
 import type { ReactNode } from "react";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { useCampaignContext } from "@/context/CampaignContext";
+import Image from "next/image";
 
 export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
   const projectsService = new ProjectsService(http);
@@ -105,7 +105,7 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
           <CardContent>
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="flex-shrink-0">
-                <img
+                <Image
                   src={organizationData.avatar_url || "/placeholder.svg"}
                   alt={organizationData.name}
                   className="w-24 h-24 rounded-lg border border-border"

@@ -4,7 +4,11 @@ import * as React from "react";
 import { useWallet } from "./useWallet";
 import { useWalletContext } from "./WalletProvider";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Check, Copy, LogOut, ChevronDown, Wallet } from "lucide-react";
 
 /**
@@ -29,7 +33,7 @@ export const WalletButton = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (_) {
-      // noop
+      if (_) console.error(_);
     }
   };
 

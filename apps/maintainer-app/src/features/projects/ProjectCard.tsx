@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MagicCard } from "@/components/ui/magic-card";
-import { getCategoryColor, getStatusColor } from "@/lib/utils";
+import { getCategoryColor } from "@/lib/utils";
 import { Project } from "@/types/project.type";
 import { ArrowRight, CircleAlert, GitFork, Users } from "lucide-react";
 import { useTheme } from "next-themes";
