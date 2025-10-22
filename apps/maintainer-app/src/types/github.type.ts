@@ -1,4 +1,18 @@
 export interface GitHubUser {
+  name: string;
+  bio: string;
+  company: string;
+  location: string;
+  email: string;
+  blog: string;
+  hireable: boolean;
+  twitter_username: string;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  created_at: string;
+  updated_at: string;
   login: string;
   id: number;
   node_id: string;
