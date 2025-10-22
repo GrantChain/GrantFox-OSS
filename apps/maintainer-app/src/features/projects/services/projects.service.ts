@@ -17,6 +17,15 @@ export class ProjectsService {
     }
   }
 
+  async getProject(projectId: string): Promise<Project> {
+    try {
+      const { data } = await this.http.get(`/projects/${projectId}`);
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get project", { cause: error });
+    }
+  }
+
   async createProject(project: ProjectPayload): Promise<Project> {
     try {
       const { data } = await this.http.post("/projects", project);

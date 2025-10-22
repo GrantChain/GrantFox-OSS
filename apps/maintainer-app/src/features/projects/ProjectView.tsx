@@ -1,59 +1,29 @@
-import { Project } from "@/types/project.type";
+"use client";
+
 import { ProjectCard } from "./ProjectCard";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-
-const projects: Project[] = [
-  {
-    project_id: "1",
-    name: "Project 1",
-    github_handle: "github_handle_1",
-    short_description: "Short description 1",
-    description: "Description 1",
-    tech_stack: ["Tech stack 1"],
-    category: "Category 1",
-    status: "Status 1",
-    created_by: "Created by 1",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    reviewed_at: new Date().toISOString(),
-    maintainers: [],
-    repositories: [],
-  },
-  {
-    project_id: "2",
-    name: "Project 2",
-    github_handle: "github_handle_2",
-    short_description: "Short description 2",
-    description: "Description 2",
-    tech_stack: ["Tech stack 2"],
-    category: "Category 2",
-    status: "Status 2",
-    created_by: "Created by 2",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    reviewed_at: new Date().toISOString(),
-    maintainers: [],
-    repositories: [],
-  },
-  {
-    project_id: "3",
-    name: "Project 3",
-    github_handle: "github_handle_3",
-    short_description: "Short description 3",
-    description: "Description 3",
-    tech_stack: ["Tech stack 3"],
-    category: "Category 3",
-    status: "Status 3",
-    created_by: "Created by 3",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    reviewed_at: new Date().toISOString(),
-    maintainers: [],
-    repositories: [],
-  },
-];
+import Link from "next/link";
+import { useUser } from "@/context/UserContext";
+import { useProjectQuery } from "./hooks/useProjectQuery";
+import { Card } from "@/components/ui/card";
+import { FileIcon, Loader2 } from "lucide-react";
 
 export const ProjectView = () => {
+  const { user, loading } = useUser();
+  const { data: projects, isFetching } = useProjectQuery({
+    userId: user?.id,
+    enabled: !loading,
+  });
+
+  if (projects?.length === 0 && !projects) {
+    return (
+      <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+        <FileIcon className="size-10" />
+        <span className="text-sm text-muted-foreground">No projects found</span>
+      </Card>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -64,16 +34,27 @@ export const ProjectView = () => {
           </p>
         </div>
 
-        <RainbowButton size="lg" variant="outline">
-          Add Project
-        </RainbowButton>
+        <Link href="/maintainer/projects/management?mode=create">
+          <RainbowButton size="lg" variant="outline">
+            Add Project
+          </RainbowButton>
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projects.map((project) => (
-          <ProjectCard key={project.project_id} project={project} />
-        ))}
-      </div>
+      {isFetching ? (
+        <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+          <Loader2 className="size-10 animate-spin" />
+          <span className="text-sm text-muted-foreground">
+            Loading projects...
+          </span>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {projects?.map((project) => (
+            <ProjectCard key={project.project_id} project={project} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
