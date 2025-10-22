@@ -160,7 +160,7 @@ export const Repositories = ({
                 disabled={isBusy || isAlreadyRegistered}
               >
                 {isAlreadyRegistered
-                  ? "Already registered"
+                  ? "Repository in Project"
                   : isBusy
                     ? "Registering..."
                     : "Register to Project"}
@@ -192,7 +192,7 @@ export const RegisteredRepositories = ({
 }) => {
   const queryClient = useQueryClient();
   const { activeCampaign, upcomingCampaign } = useCampaignContext();
-  const targetCampaign = upcomingCampaign ?? activeCampaign;
+  const targetCampaign = activeCampaign ?? upcomingCampaign;
 
   const { data, isLoading, isError } = useQuery<DbRepository[]>({
     queryKey: ["project-repos", projectId],
@@ -433,7 +433,7 @@ export const RegisteredRepositories = ({
                 >
                   {registeringRepo === repository.id
                     ? "Registering..."
-                    : "Register to Campaign"}
+                    : "Register to Active Campaign"}
                 </Button>
               )}
             </div>
