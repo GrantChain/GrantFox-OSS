@@ -17,3 +17,14 @@ export type RepositoryPayload = Pick<
 export interface CampaignRepositoryPayload {
   repository_ids: number[];
 }
+
+export interface AddRepositoriesToCampaignErrorItem {
+  repository_id: number;
+  error: string;
+}
+
+export interface AddRepositoriesToCampaignResponse {
+  message: string;
+  added: Repository[];
+  errors: AddRepositoriesToCampaignErrorItem[];
+}
