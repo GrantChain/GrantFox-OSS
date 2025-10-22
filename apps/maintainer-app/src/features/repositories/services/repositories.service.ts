@@ -3,6 +3,7 @@ import {
   Repository,
   RepositoryPayload,
   AddRepositoriesToCampaignResponse,
+  CampaignRepository,
 } from "@/types/repositories.type";
 import { AxiosInstance } from "axios";
 
@@ -82,15 +83,16 @@ export class RepositoriesService {
       // We normalize to a simple list of { github_repo_id } for the UI.
       const list = Array.isArray(data) ? data : [];
       const normalized = list
-        .map((item: any) => {
-          const id =
-            item?.repository?.github_repo_id ??
-            item?.github_repo_id ??
-            item?.repository_id;
+        .map((item: CampaignRepository) => {
+          const id = item?.repository?.github_repo_id ?? item?.repository_id;
           const num = Number(id);
           return Number.isFinite(num) ? { github_repo_id: num } : null;
         })
-        .filter((x: any): x is { github_repo_id: number } => Boolean(x));
+        .filter(
+          (
+            x: { github_repo_id: number } | null
+          ): x is { github_repo_id: number } => Boolean(x)
+        );
       return normalized;
     } catch (error) {
       throw new Error("Failed to get repositories by campaign", {

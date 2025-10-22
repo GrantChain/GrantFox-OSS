@@ -100,8 +100,8 @@ export function ProjectCard({ project }: { project: Project }) {
           <div className="flex items-center gap-2 my-4">
             <CircleAlert className="w-6 h-6 text-destructive" />
             <p className="text-sm text-muted-foreground">
-              Once your project is approved by Stellar and GrantFox, you'll be
-              able to register repositories to a campaign.
+              Once your project is approved by Stellar and GrantFox, you&apos;ll
+              be able to register repositories to a campaign.
             </p>
           </div>
         )}
