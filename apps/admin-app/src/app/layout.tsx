@@ -7,6 +7,7 @@ import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/React
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { EscrowProvider } from "@/components/tw-blocks/providers/EscrowProvider";
 import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,17 +34,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryClientProvider>
-          <TrustlessWorkProvider>
-            <WalletProvider>
-              <EscrowProvider>
-                <UserProvider>{children}</UserProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryClientProvider>
+            <TrustlessWorkProvider>
+              <WalletProvider>
+                <EscrowProvider>
+                  <UserProvider>{children}</UserProvider>
 
-                <Toaster position="top-right" richColors />
-              </EscrowProvider>
-            </WalletProvider>
-          </TrustlessWorkProvider>
-        </ReactQueryClientProvider>
+                  <Toaster position="top-right" richColors />
+                </EscrowProvider>
+              </WalletProvider>
+            </TrustlessWorkProvider>
+          </ReactQueryClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

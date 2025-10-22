@@ -6,6 +6,8 @@ import UserProvider from "@/context/UserContext";
 import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { CampaignProvider } from "@/context/CampaignContext";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,20 +30,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryClientProvider>
-          <UserProvider>
-            <WalletProvider>
-              <CampaignProvider>
-                <Navbar />
-                {children}
-              </CampaignProvider>
-            </WalletProvider>
-          </UserProvider>
-        </ReactQueryClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryClientProvider>
+            <UserProvider>
+              <WalletProvider>
+                <CampaignProvider>
+                  <Navbar />
+                  {children}
+
+                  <Toaster />
+                </CampaignProvider>
+              </WalletProvider>
+            </UserProvider>
+          </ReactQueryClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
