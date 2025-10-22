@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { ProjectProvider } from "@/context/ProjectContext";
 
 export default function MaintainerLayout({
   children,
@@ -22,5 +23,9 @@ export default function MaintainerLayout({
     return null;
   }
 
-  return <div className="block container mx-auto p-6">{children}</div>;
+  return (
+    <ProjectProvider>
+      <div className="block container mx-auto p-6">{children}</div>
+    </ProjectProvider>
+  );
 }

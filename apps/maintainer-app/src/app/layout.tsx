@@ -5,6 +5,7 @@ import { Navbar } from "@/components/shared/Navbar";
 import UserProvider from "@/context/UserContext";
 import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { CampaignProvider } from "@/context/CampaignContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +35,10 @@ export default function RootLayout({
         <ReactQueryClientProvider>
           <UserProvider>
             <WalletProvider>
-              <Navbar />
-              {children}
+              <CampaignProvider>
+                <Navbar />
+                {children}
+              </CampaignProvider>
             </WalletProvider>
           </UserProvider>
         </ReactQueryClientProvider>
