@@ -15,7 +15,7 @@ export default function MaintainerLayout({
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login");
+      router.replace("/signin");
     }
   }, [loading, user, router]);
 
