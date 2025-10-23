@@ -1,3 +1,4 @@
+import { Project } from "./project.type";
 import { Repository } from "./repositories.type";
 
 export type Campaign = {
@@ -9,6 +10,9 @@ export type Campaign = {
   end_date: string;
   status: "ACTIVE" | "INACTIVE" | "DRAFT" | string;
   image_url: string;
+  projects: Project[];
+  total_projects: number;
+  total_repositories: number;
   created_by: string;
   created_at: string;
   updated_at: string;

@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-import { cn } from "@/lib/utils";
 import type { Campaign } from "@/types/campaign.type";
 import type { ApiUser } from "@/types/user.type";
 import CampaignSectionTabs from "./CampaignSectionTabs";
@@ -35,7 +33,7 @@ const CampaignReposAndContributors = ({
     }, [sectionActive]);
 
   const service = useMemo(() => new CampaignService(http), []);
-  const { data: campaignWithProjects } = useQuery({
+  const { data: campaignWithProjects } = useQuery<Campaign>({
     queryKey: [
       "campaign",
       "active",
