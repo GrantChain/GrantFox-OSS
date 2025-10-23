@@ -4,13 +4,11 @@ import Link from "next/link";
 
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { IconCloud } from "@/components/ui/icon-cloud";
 import { Marquee } from "@/components/ui/marquee";
-import {
-  useCuratedOrganizations,
-  useCuratedOrgReposOnce,
-} from "@/features/github/hooks/useGitHubOrgs";
-import { useCuratedRepositoriesOnce } from "@/features/github/hooks/useGitHubSearch";
+import { useQueries } from "@tanstack/react-query";
+import { GitHubReposService } from "@/features/github/services/GitHubReposService";
+import { GitHubOrgsService } from "@/features/github/services/GitHubOrgsService";
+import { githubHttp } from "@/lib/http";
 import { ShineBorder } from "@/components/ui/shine-border";
 import {
   RocketIcon,
@@ -19,12 +17,13 @@ import {
 } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Organization, Repository } from "@/types/Github";
+import { Repository as GitHubRepository } from "@/types/Github";
 import { Badge } from "@/components/ui/badge";
 import { Star, GitFork, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Search } from "lucide-react";
+import { getAllApprovedProjects } from "@/features/projects/hooks/useProjects";
 
 const files = [
   {
@@ -42,19 +41,124 @@ const files = [
 ];
 
 export function LandingView() {
-  const { data: orgs } = useCuratedOrganizations();
-  const { data: popular } = useCuratedRepositoriesOnce({
-    per_page: 10,
-    page: 1,
+  const { data: projects } = getAllApprovedProjects();
+
+  const repoTargetsSet = new Set<string>();
+  const repoTargets: Array<{ owner: string; repo: string }> = [];
+  for (const p of projects ?? []) {
+    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
+    if (sources.length === 0 && p.github_handle) {
+      sources.push(p.github_handle);
+    }
+    for (const url of sources) {
+      let owner = "";
+      let repo = "";
+      try {
+        if (url?.startsWith("http")) {
+          const u = new URL(url);
+          const parts = u.pathname.replace(/^\//, "").split("/");
+          if (parts.length >= 2) {
+            owner = parts[0];
+            repo = parts[1];
+          }
+        } else if (url && url.includes("/")) {
+          const parts = url.split("/");
+          owner = parts[0];
+          repo = parts[1];
+        }
+      } catch {}
+      if (owner && repo) {
+        const key = `${owner}/${repo}`.toLowerCase();
+        if (!repoTargetsSet.has(key)) {
+          repoTargetsSet.add(key);
+          repoTargets.push({ owner, repo });
+        }
+      }
+      if (repoTargets.length >= 40) break;
+    }
+    if (repoTargets.length >= 40) break;
+  }
+
+  const reposService = new GitHubReposService(githubHttp);
+  const repoQueries = useQueries({
+    queries: repoTargets.map(({ owner, repo }) => ({
+      queryKey: ["gh", "repo", owner, repo],
+      queryFn: () => reposService.getRepo(owner, repo),
+      staleTime: 60_000,
+    })),
   });
-  const { data: popularCloud } = useCuratedRepositoriesOnce({
-    per_page: 20,
-    page: 1,
+
+  const githubRepos: GitHubRepository[] = repoQueries
+    .map((q) => q.data as GitHubRepository | undefined)
+    .filter(Boolean) as GitHubRepository[];
+
+  // Resolve org avatars for each project owner login
+  const orgsService = new GitHubOrgsService(githubHttp);
+  const ownerLoginsSet = new Set<string>();
+  for (const p of projects ?? []) {
+    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
+    if (sources.length === 0 && p.github_handle) sources.push(p.github_handle);
+    for (const url of sources) {
+      try {
+        if (url?.startsWith("http")) {
+          const u = new URL(url);
+          const parts = u.pathname.replace(/^\//, "").split("/");
+          if (parts.length >= 1 && parts[0]) ownerLoginsSet.add(parts[0]);
+        } else if (url && url.includes("/")) {
+          const parts = url.split("/");
+          if (parts[0]) ownerLoginsSet.add(parts[0]);
+        }
+      } catch {}
+    }
+  }
+
+  const ownerLogins = Array.from(ownerLoginsSet).slice(0, 40);
+  const orgQueries = useQueries({
+    queries: ownerLogins.map((login) => ({
+      queryKey: ["gh", "org", login],
+      queryFn: () => orgsService.getOrganization(login),
+      staleTime: 60_000,
+    })),
   });
-  const cloudImages = ((popularCloud?.items ?? []) as Repository[])
-    .map((r) => r.owner?.avatar_url)
-    .filter(Boolean);
-  const cloudImagesLarge = [...cloudImages, ...cloudImages];
+
+  const loginToOrgAvatar = new Map<string, string>();
+  ownerLogins.forEach((login, idx) => {
+    const data = orgQueries[idx]?.data as { avatar_url?: string } | undefined;
+    if (data?.avatar_url)
+      loginToOrgAvatar.set(login.toLowerCase(), data.avatar_url);
+  });
+
+  // Build project cards for marquee from approved projects
+  const projectCards = (projects ?? []).map((p) => {
+    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
+    if (sources.length === 0 && p.github_handle) sources.push(p.github_handle);
+    let ownerLogin: string | null = null;
+    for (const url of sources) {
+      try {
+        if (url?.startsWith("http")) {
+          const u = new URL(url);
+          const parts = u.pathname.replace(/^\//, "").split("/");
+          if (parts.length >= 1) ownerLogin = parts[0];
+        } else if (url && url.includes("/")) {
+          const parts = url.split("/");
+          ownerLogin = parts[0];
+        }
+        if (ownerLogin) break;
+      } catch {}
+    }
+    const avatarUrl =
+      (ownerLogin
+        ? loginToOrgAvatar.get(ownerLogin.toLowerCase())
+        : undefined) ??
+      p.maintainers?.[0]?.avatar_url ??
+      "/favicon.ico";
+    return {
+      key: p.project_id,
+      display: p.name,
+      ownerLogin,
+      avatarUrl,
+    };
+  });
 
   return (
     <>
@@ -144,28 +248,18 @@ export function LandingView() {
           </div>
         </section>
 
-        <section className="relative z-10 mt-16">
-          <Marquee pauseOnHover className="rounded-md border bg-card">
-            {(orgs ?? []).map((o: Organization) => (
-              <div key={o.id} className="mx-4 flex items-center gap-3 py-2">
-                <span className="inline-flex size-8 items-center justify-center rounded-full bg-muted">
-                  <img src={o.avatar_url} alt={o.login} className="size-5" />
-                </span>
-                <span className="text-sm font-medium">{o.login}</span>
-              </div>
-            ))}
-          </Marquee>
-        </section>
-
-        <section className="relative z-10 mt-16 grid grid-cols-1 gap-8 md:grid-cols-2">
+        <section className="relative z-10 mt-16 grid grid-cols-1 gap-8">
           <div className="relative rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10">
             <ShineBorder
               className="pointer-events-none"
               shineColor={["#7c3aed33", "#22d3ee33"]}
             />
-            <h2 className="mb-3 text-lg font-semibold">Repositories</h2>
-            <div className="space-y-3">
-              {(popular?.items ?? []).map((r: Repository) => (
+            <h2 className="text-lg font-semibold">Repositories</h2>
+            <p className="text-sm text-muted-foreground">
+              Most popular repositories from approved projects.
+            </p>
+            <div className="space-y-3 mt-4">
+              {githubRepos.slice(0, 5).map((r: GitHubRepository) => (
                 <div
                   key={r.id}
                   className="relative rounded-xl border p-4 hover:bg-accent/40 transition-all hover:-translate-y-0.5 shadow-sm"
@@ -227,9 +321,6 @@ export function LandingView() {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="flex items-center justify-center rounded-xl border p-4">
-            <IconCloud images={cloudImagesLarge} />
           </div>
         </section>
       </main>
