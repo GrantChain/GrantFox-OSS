@@ -5,6 +5,7 @@ import TanstackProvider from "@/providers/TanstackProvider";
 import UserProvider from "@/context/UserContext";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { NavBar } from "@/components/shared/NavBar";
+import { CampaignProvider } from "@/context/CampaignContext";
 import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
@@ -41,8 +42,10 @@ export default function RootLayout({
           <TanstackProvider>
             <UserProvider>
               <WalletProvider>
-                <NavBar />
-                {children}
+                <CampaignProvider>
+                  <NavBar />
+                  {children}
+                </CampaignProvider>
               </WalletProvider>
             </UserProvider>
           </TanstackProvider>
