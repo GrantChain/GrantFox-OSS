@@ -42,11 +42,11 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
           : null;
       setActiveCampaign(active);
 
-      // fetch all campaigns and select the one marked as UPCOMMING/UPCOMING (no date comparisons)
+      // fetch all campaigns and select the one marked as UPCOMING (no date comparisons)
       const all = await service.getAllCampaigns();
       const upcoming = (all ?? []).find((c) => {
         const st = (c.status ?? "").toUpperCase();
-        return st === "UPCOMMING" || st === "UPCOMING";
+        return st === "UPCOMING";
       });
       setUpcomingCampaign(upcoming ?? null);
     } catch (error) {

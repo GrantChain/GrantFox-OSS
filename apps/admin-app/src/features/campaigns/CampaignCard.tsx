@@ -183,7 +183,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
                 <StatusItem
                   campaignId={campaign.campaign_id}
                   current={campaign.status}
-                  target={CampaignStatus.UPCOMMING}
+                  target={CampaignStatus.UPCOMING}
                 />
                 <StatusItem
                   campaignId={campaign.campaign_id}
