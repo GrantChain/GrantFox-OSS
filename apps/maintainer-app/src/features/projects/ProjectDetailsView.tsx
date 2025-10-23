@@ -226,77 +226,83 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
               </CardContent>
             </Card>
 
-            <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
-              <BorderBeam duration={8} size={100} />
-              <CardHeader>
-                <CardTitle className="text-xl">Active Campaign</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>Name</span>
+            {activeCampaign && (
+              <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
+                <BorderBeam duration={8} size={100} />
+                <CardHeader>
+                  <CardTitle className="text-xl">Active Campaign</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>Name</span>
+                      </div>
+                      <Badge variant="secondary">{activeCampaign?.name}</Badge>
                     </div>
-                    <Badge variant="secondary">{activeCampaign?.name}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>Start Date</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>Start Date</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {formatDate(activeCampaign?.start_date ?? "")}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary">
-                      {formatDate(activeCampaign?.start_date ?? "")}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>End Date</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>End Date</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {formatDate(activeCampaign?.end_date ?? "")}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary">
-                      {formatDate(activeCampaign?.end_date ?? "")}
-                    </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
-            <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
-              <BorderBeam duration={8} size={100} />
-              <CardHeader>
-                <CardTitle className="text-xl">Upcoming Campaign</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>Name</span>
+            {upcomingCampaign && (
+              <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
+                <BorderBeam duration={8} size={100} />
+                <CardHeader>
+                  <CardTitle className="text-xl">Upcoming Campaign</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>Name</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {upcomingCampaign?.name}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary">{upcomingCampaign?.name}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>Start Date</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>Start Date</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {formatDate(upcomingCampaign?.start_date ?? "")}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary">
-                      {formatDate(upcomingCampaign?.start_date ?? "")}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <BadgeCheck className="w-4 h-4" />
-                      <span>End Date</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="w-4 h-4" />
+                        <span>End Date</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {formatDate(upcomingCampaign?.end_date ?? "")}
+                      </Badge>
                     </div>
-                    <Badge variant="secondary">
-                      {formatDate(upcomingCampaign?.end_date ?? "")}
-                    </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <div className="w-full md:max-w-9/12">
