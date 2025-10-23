@@ -4,16 +4,25 @@ import { PulsatingButton } from "@/components/ui/pulsating-button";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import { Campaign } from "@/types/campaign.type";
+import { ApiUser } from "@/types/user.type";
 import { useCampaignsMutations } from "../hooks/useCampaignMutation";
 
 interface CampaignHeroProps {
   activeCampaign: Campaign | null;
   contributorsCount: number;
+  contributors?: ApiUser[];
 }
 
-export default function CampaignHero({ activeCampaign, contributorsCount }: CampaignHeroProps) {
-  const { user } = useUser()
+export default function CampaignHero({
+  activeCampaign,
+  contributorsCount,
+  contributors,
+}: CampaignHeroProps) {
+  const { user } = useUser();
   const { registerContributor } = useCampaignsMutations();
+  const isRegistered = Boolean(
+    contributors?.some((c) => c.user_id === user?.id)
+  );
 
   return (
     <section className="relative flex flex-col gap-28 rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10">
@@ -28,17 +37,21 @@ export default function CampaignHero({ activeCampaign, contributorsCount }: Camp
       />
       <div className="w-full flex justify-between items-center">
         <h1 className="text-3xl font-bold">{activeCampaign?.name}</h1>
-        <PulsatingButton onClick={() => registerContributor({ 
-          campaignId: activeCampaign?.campaign_id ?? "", 
-          userId: user?.id ?? "" })}
-        >
+        {!isRegistered && (
+          <PulsatingButton
+            onClick={() =>
+              registerContributor({
+                campaignId: activeCampaign?.campaign_id ?? "",
+                userId: user?.id ?? "",
+              })
+            }
+          >
             Register
-        </PulsatingButton>
+          </PulsatingButton>
+        )}
       </div>
       <div className="w-full flex justify-between items-center">
-        <p className="w-lg">
-          {activeCampaign?.description ?? ""}
-        </p>
+        <p className="w-lg">{activeCampaign?.description ?? ""}</p>
         <div className="w-full flex justify-end items-center gap-5">
           <div className="p-2 flex flex-col justify-center items-center">
             <NumberTicker

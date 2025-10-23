@@ -5,10 +5,7 @@ import Link from "next/link";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { Marquee } from "@/components/ui/marquee";
-import { useQueries } from "@tanstack/react-query";
-import { GitHubReposService } from "@/features/github/services/GitHubReposService";
-import { GitHubOrgsService } from "@/features/github/services/GitHubOrgsService";
-import { githubHttp } from "@/lib/http";
+import { useMemo } from "react";
 import { ShineBorder } from "@/components/ui/shine-border";
 import {
   RocketIcon,
@@ -17,7 +14,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Repository as GitHubRepository } from "@/types/Github";
+import type { Repository } from "@/types/repositories.type";
 import { Badge } from "@/components/ui/badge";
 import { Star, GitFork, MessageSquare } from "lucide-react";
 import Image from "next/image";
@@ -43,122 +40,59 @@ const files = [
 export function LandingView() {
   const { data: projects } = getAllApprovedProjects();
 
-  const repoTargetsSet = new Set<string>();
-  const repoTargets: Array<{ owner: string; repo: string }> = [];
-  for (const p of projects ?? []) {
-    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
-    if (sources.length === 0 && p.github_handle) {
-      sources.push(p.github_handle);
-    }
-    for (const url of sources) {
-      let owner = "";
-      let repo = "";
-      try {
-        if (url?.startsWith("http")) {
-          const u = new URL(url);
-          const parts = u.pathname.replace(/^\//, "").split("/");
-          if (parts.length >= 2) {
-            owner = parts[0];
-            repo = parts[1];
+  // Build project cards for marquee from approved projects without GitHub API calls
+  const projectCards = useMemo(() => {
+    return (projects ?? []).map((p) => {
+      const sources: string[] = (p?.repositories ?? []).map(
+        (r) => r.github_url
+      );
+      if (sources.length === 0 && p.github_handle)
+        sources.push(p.github_handle);
+      let ownerLogin: string | null = null;
+      for (const url of sources) {
+        try {
+          if (url?.startsWith("http")) {
+            const u = new URL(url);
+            const parts = u.pathname.replace(/^\//, "").split("/");
+            if (parts.length >= 1) ownerLogin = parts[0];
+          } else if (url && url.includes("/")) {
+            const parts = url.split("/");
+            ownerLogin = parts[0];
           }
-        } else if (url && url.includes("/")) {
-          const parts = url.split("/");
-          owner = parts[0];
-          repo = parts[1];
-        }
-      } catch {}
-      if (owner && repo) {
-        const key = `${owner}/${repo}`.toLowerCase();
-        if (!repoTargetsSet.has(key)) {
-          repoTargetsSet.add(key);
-          repoTargets.push({ owner, repo });
+          if (ownerLogin) break;
+        } catch {}
+      }
+      // Use GitHub avatar CDN directly (non-API) or fallback to first maintainer
+      const avatarUrl =
+        (ownerLogin
+          ? `https://github.com/${ownerLogin}.png?size=64`
+          : undefined) ??
+        p.maintainers?.[0]?.avatar_url ??
+        "/favicon.ico";
+      return {
+        key: p.project_id,
+        display: p.name,
+        ownerLogin,
+        avatarUrl,
+      };
+    });
+  }, [projects]);
+
+  // Flatten repositories from projects; avoid GitHub API calls entirely
+  const flatRepositories: Repository[] = useMemo(() => {
+    const list: Repository[] = [];
+    const seen = new Set<string>();
+    for (const p of projects ?? []) {
+      for (const r of p.repositories ?? []) {
+        const key = `${r.github_url}`.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          list.push(r);
         }
       }
-      if (repoTargets.length >= 40) break;
     }
-    if (repoTargets.length >= 40) break;
-  }
-
-  const reposService = new GitHubReposService(githubHttp);
-  const repoQueries = useQueries({
-    queries: repoTargets.map(({ owner, repo }) => ({
-      queryKey: ["gh", "repo", owner, repo],
-      queryFn: () => reposService.getRepo(owner, repo),
-      staleTime: 60_000,
-    })),
-  });
-
-  const githubRepos: GitHubRepository[] = repoQueries
-    .map((q) => q.data as GitHubRepository | undefined)
-    .filter(Boolean) as GitHubRepository[];
-
-  // Resolve org avatars for each project owner login
-  const orgsService = new GitHubOrgsService(githubHttp);
-  const ownerLoginsSet = new Set<string>();
-  for (const p of projects ?? []) {
-    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
-    if (sources.length === 0 && p.github_handle) sources.push(p.github_handle);
-    for (const url of sources) {
-      try {
-        if (url?.startsWith("http")) {
-          const u = new URL(url);
-          const parts = u.pathname.replace(/^\//, "").split("/");
-          if (parts.length >= 1 && parts[0]) ownerLoginsSet.add(parts[0]);
-        } else if (url && url.includes("/")) {
-          const parts = url.split("/");
-          if (parts[0]) ownerLoginsSet.add(parts[0]);
-        }
-      } catch {}
-    }
-  }
-
-  const ownerLogins = Array.from(ownerLoginsSet).slice(0, 40);
-  const orgQueries = useQueries({
-    queries: ownerLogins.map((login) => ({
-      queryKey: ["gh", "org", login],
-      queryFn: () => orgsService.getOrganization(login),
-      staleTime: 60_000,
-    })),
-  });
-
-  const loginToOrgAvatar = new Map<string, string>();
-  ownerLogins.forEach((login, idx) => {
-    const data = orgQueries[idx]?.data as { avatar_url?: string } | undefined;
-    if (data?.avatar_url)
-      loginToOrgAvatar.set(login.toLowerCase(), data.avatar_url);
-  });
-
-  // Build project cards for marquee from approved projects
-  const projectCards = (projects ?? []).map((p) => {
-    const sources: string[] = (p?.repositories ?? []).map((r) => r.github_url);
-    if (sources.length === 0 && p.github_handle) sources.push(p.github_handle);
-    let ownerLogin: string | null = null;
-    for (const url of sources) {
-      try {
-        if (url?.startsWith("http")) {
-          const u = new URL(url);
-          const parts = u.pathname.replace(/^\//, "").split("/");
-          if (parts.length >= 1) ownerLogin = parts[0];
-        } else if (url && url.includes("/")) {
-          const parts = url.split("/");
-          ownerLogin = parts[0];
-        }
-        if (ownerLogin) break;
-      } catch {}
-    }
-    const avatarUrl =
-      (ownerLogin
-        ? loginToOrgAvatar.get(ownerLogin.toLowerCase())
-        : undefined) ??
-      p.maintainers?.[0]?.avatar_url ??
-      "/favicon.ico";
-    return {
-      key: p.project_id,
-      display: p.name,
-      ownerLogin,
-      avatarUrl,
-    };
-  });
+    return list;
+  }, [projects]);
 
   return (
     <>
@@ -259,61 +193,53 @@ export function LandingView() {
               Most popular repositories from approved projects.
             </p>
             <div className="space-y-3 mt-4">
-              {githubRepos.slice(0, 5).map((r: GitHubRepository) => (
+              {flatRepositories.slice(0, 5).map((r: Repository) => (
                 <div
-                  key={r.id}
+                  key={r.github_url}
                   className="relative rounded-xl border p-4 hover:bg-accent/40 transition-all hover:-translate-y-0.5 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-2 min-w-0">
                       <Image
-                        src={r.owner?.avatar_url}
-                        alt={r.full_name}
+                        src={(() => {
+                          try {
+                            if (r.github_url?.startsWith("http")) {
+                              const u = new URL(r.github_url);
+                              const parts = u.pathname
+                                .replace(/^\//, "")
+                                .split("/");
+                              if (parts.length >= 1 && parts[0]) {
+                                return `https://github.com/${parts[0]}.png?size=40`;
+                              }
+                            } else if (
+                              r.github_url &&
+                              r.github_url.includes("/")
+                            ) {
+                              const parts = r.github_url.split("/");
+                              if (parts[0])
+                                return `https://github.com/${parts[0]}.png?size=40`;
+                            }
+                          } catch {}
+                          return "/favicon.ico";
+                        })()}
+                        alt={r.name}
                         width={28}
                         height={28}
                         className="rounded"
                       />
                       <div className="min-w-0">
                         <Link
-                          href={`/org/${r.owner?.login}/repo/${r.name}`}
+                          href={r.github_url}
                           className="font-medium hover:underline truncate block"
                         >
-                          {r.full_name ?? r.name}
+                          {r.name}
                         </Link>
                         {r.description && (
                           <p className="text-xs text-muted-foreground line-clamp-2">
                             {r.description}
                           </p>
                         )}
-                        <div className="mt-2 flex flex-wrap items-center gap-2">
-                          {r.language && (
-                            <Badge
-                              variant="secondary"
-                              className="px-2 py-0.5 text-[10px]"
-                            >
-                              {r.language}
-                            </Badge>
-                          )}
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <Star className="h-3 w-3" /> {r.stargazers_count}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <GitFork className="h-3 w-3" /> {r.forks_count}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <MessageSquare className="h-3 w-3" />{" "}
-                            {r.open_issues_count}
-                          </Badge>
-                        </div>
+                        {/* No dynamic GH stats to avoid API usage */}
                       </div>
                     </div>
                     <div className="shrink-0 text-xs text-muted-foreground leading-none"></div>

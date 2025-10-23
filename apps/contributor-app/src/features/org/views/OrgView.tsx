@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 
-import {
-  useOrganization,
-  useOrgRepos,
-} from "@/features/github/hooks/useGitHubOrgs";
+import { useOrganization } from "@/features/github/hooks/useGitHubOrgs";
 import { ShineBorder } from "@/components/ui/shine-border";
 import {
   Empty,
@@ -15,19 +12,41 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
-import { Repository } from "@/types/Github";
 import { LoaderCard } from "@/components/ui/loader";
 import { Back } from "@/components/shared/Back";
+import { useCampaignContext } from "@/context/CampaignContext";
+import { useQuery } from "@tanstack/react-query";
+import { CampaignService } from "@/features/campaings/services/campaign.service";
+import { http } from "@/lib/api";
+import type { Repository as CampaignRepository } from "@/types/repositories.type";
 
 export function OrgView({ org }: { org: string }) {
+  const { activeCampaign } = useCampaignContext();
   const {
     data: orgData,
     isLoading: orgLoading,
     isError: orgError,
   } = useOrganization(org);
-  const { data: repos, isLoading: reposLoading } = useOrgRepos(org, {
-    per_page: 20,
+  const service = new CampaignService(http);
+  const { data: campaignWithProjects, isLoading: campaignLoading } = useQuery({
+    queryKey: [
+      "campaign",
+      "active",
+      activeCampaign?.campaign_id,
+      "with-projects-repos",
+    ],
+    queryFn: () =>
+      service.getActiveCampaignWithProjectsAndRepos({
+        campaign_id: activeCampaign?.campaign_id as string,
+      }),
+    enabled: Boolean(activeCampaign?.campaign_id),
+    staleTime: 60_000,
   });
+
+  const project = (campaignWithProjects?.projects ?? []).find(
+    (p) => p.github_handle.toLowerCase() === org.toLowerCase()
+  );
+  const repos: CampaignRepository[] = project?.repositories ?? [];
 
   if (orgLoading) {
     return (
@@ -65,44 +84,66 @@ export function OrgView({ org }: { org: string }) {
         <h1 className="text-3xl font-semibold">
           <span className="font-medium">Organization:</span> {orgData.login}
         </h1>
-        <p className="text-muted-foreground">Available Repositories</p>
+        <p className="text-muted-foreground">Campaign Repositories</p>
 
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {((reposLoading ? [] : repos) ?? []).map((r: Repository) => (
-            <div
-              key={r.id}
-              className="relative rounded-xl border p-4 hover:bg-accent/40 transition-colors"
-            >
-              <ShineBorder
-                className="pointer-events-none"
-                shineColor={["#7c3aed33", "#22d3ee33"]}
-              />
-              <div className="flex justify-between items-center gap-3 min-w-0">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={r.owner?.avatar_url}
-                    alt={r.full_name}
-                    className="size-8 rounded-full"
-                  />
-                  <div className="min-w-0">
-                    <Link
-                      href={`/org/${r.owner?.login}/repo/${r.name}`}
-                      className="font-medium hover:underline truncate block"
-                    >
-                      {r.full_name}
-                    </Link>
+        {campaignLoading ? (
+          <section className="relative z-10 mt-8 flex justify-center">
+            <LoaderCard
+              title="Loading campaign…"
+              subtitle="Fetching campaign repositories for this organization."
+            />
+          </section>
+        ) : !project ? (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Ban />
+              </EmptyMedia>
+              <EmptyTitle>No repositories in this campaign</EmptyTitle>
+              <EmptyDescription>
+                This organization has no repositories registered for the active
+                campaign.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {repos.map((r) => (
+              <div
+                key={r.github_repo_id}
+                className="relative rounded-xl border p-4 hover:bg-accent/40 transition-colors"
+              >
+                <ShineBorder
+                  className="pointer-events-none"
+                  shineColor={["#7c3aed33", "#22d3ee33"]}
+                />
+                <div className="flex justify-between items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={`https://github.com/${org}.png`}
+                      alt={r.name}
+                      className="size-8 rounded-full"
+                    />
+                    <div className="min-w-0">
+                      <Link
+                        href={`/org/${org}/repo/${r.name}`}
+                        className="font-medium hover:underline truncate block"
+                      >
+                        {`${org}/${r.name}`}
+                      </Link>
 
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {r.description === null || r.description === ""
-                        ? "No description provided."
-                        : r.description}
-                    </p>
+                      {r.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {r.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );

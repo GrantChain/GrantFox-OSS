@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { GithubUserCard } from "@/components/shared/GithubUser"
-import type { ApiUser } from "@/types/user.type"
+import { GithubUserCard } from "@/components/shared/GithubUser";
+import type { ApiUser } from "@/types/user.type";
 
 interface CampaignContributorsGridProps {
-  users: ApiUser[]
+  users: ApiUser[];
 }
 
 const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
@@ -13,14 +13,16 @@ const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
       {users.map((user) => (
         <GithubUserCard
           key={user.user_id}
-          img={user.avatar_url ?? "https://avatars.githubusercontent.com/u/178688063?v=4"}
+          img={
+            user.avatar_url ??
+            "https://avatars.githubusercontent.com/u/178688063?v=4"
+          }
           name={user.username ?? "Unknown"}
           username={user.username ?? "unknown"}
-          body={"This a short bio about the user."}
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default CampaignContributorsGrid
+export default CampaignContributorsGrid;

@@ -18,9 +18,13 @@ import {
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
 import { Back } from "@/components/shared/Back";
-import { Issue } from "@/types/Github";
+import { Issue, IssueLabel } from "@/types/Github";
+import { useCampaignContext } from "@/context/CampaignContext";
+import { Card } from "@/components/ui/card";
 
 export function RepoView({ org, repo }: { org: string; repo: string }) {
+  const { activeCampaign } = useCampaignContext();
+  const campaignLabel = activeCampaign?.name || undefined;
   const {
     data,
     isLoading: repoLoading,
@@ -32,6 +36,7 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
     {
       per_page: 30,
       state: "open",
+      labels: campaignLabel,
     }
   );
   if (repoLoading) {
@@ -74,7 +79,7 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
             </div>
           </div>
           <Button asChild>
-            <a
+            <Link
               href={
                 data.html_url ??
                 `https://github.com/${data.owner?.login ?? org}/${data.name}`
@@ -83,44 +88,95 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
               rel="noreferrer"
             >
               Open on GitHub
-            </a>
+            </Link>
           </Button>
         </div>
 
-        <h2 className="mt-8 text-xl font-semibold">Open Issues</h2>
+        <h2 className="mt-8 text-xl font-semibold">Campaign Issues</h2>
         <div className="mt-4 grid grid-cols-1 gap-3">
-          {issues && issues.length === 0 && (
+          {campaignLabel &&
+            issues &&
+            (issues ?? []).filter((i: Issue) =>
+              (i.labels ?? []).some((l) => l.name === campaignLabel)
+            ).length === 0 && (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Ban />
+                  </EmptyMedia>
+                  <EmptyTitle>No campaign issues</EmptyTitle>
+                  <EmptyDescription>
+                    {`No issues found with label ${campaignLabel}.`}
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            )}
+
+          {(campaignLabel
+            ? ((issuesLoading ? [] : issues) ?? []).filter((issue: Issue) =>
+                (issue.labels ?? []).some((l) => l.name === campaignLabel)
+              )
+            : []
+          ).map((issue: Issue) => (
+            <Link
+              key={issue.id}
+              href={`/org/${org}/repo/${repo}/issue/${issue.number}`}
+            >
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">
+                    #{issue.number} {issue.title}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    • {issue.comments} comments
+                  </div>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Opened by {issue.user?.login} on{" "}
+                  {new Date(issue.created_at).toLocaleDateString()}
+                </div>
+
+                {Array.isArray(issue.labels) && issue.labels.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-1 mt-2">
+                    {issue.labels.map((l: IssueLabel, idx: number) => {
+                      const name: string = l.name;
+                      const color =
+                        typeof l === "string" ? undefined : l?.color;
+                      return (
+                        <span
+                          key={idx}
+                          className="rounded-full border px-2 py-0.5 text-xs"
+                          style={
+                            color
+                              ? {
+                                  backgroundColor: `#${color}20`,
+                                  borderColor: `#${color}40`,
+                                }
+                              : undefined
+                          }
+                        >
+                          {name}
+                        </span>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </Card>
+            </Link>
+          ))}
+          {!campaignLabel && (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Ban />
                 </EmptyMedia>
-                <EmptyTitle>No open issues</EmptyTitle>
-                <EmptyDescription>No open issues found.</EmptyDescription>
+                <EmptyTitle>No active campaign</EmptyTitle>
+                <EmptyDescription>
+                  Select an active campaign to view labeled issues.
+                </EmptyDescription>
               </EmptyHeader>
             </Empty>
           )}
-
-          {((issuesLoading ? [] : issues) ?? []).map((issue: Issue) => (
-            <Link
-              key={issue.id}
-              href={`/org/${org}/repo/${repo}/issue/${issue.number}`}
-              className="rounded-lg border p-4 hover:bg-accent"
-            >
-              <div className="flex items-center justify-between">
-                <div className="font-medium">
-                  #{issue.number} {issue.title}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  • {issue.comments} comments
-                </div>
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                Opened by {issue.user?.login} on{" "}
-                {new Date(issue.created_at).toLocaleDateString()}
-              </div>
-            </Link>
-          ))}
         </div>
       </section>
     </main>

@@ -42,12 +42,19 @@ export const CampaignsView = () => {
             Loading campaigns...
           </span>
         </Card>
-      ) : (
+      ) : campaigns && campaigns.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {campaigns?.map((campaign) => (
             <CampaignCard key={campaign.campaign_id} campaign={campaign} />
           ))}
         </div>
+      ) : (
+        <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+          <FileIcon className="size-10" />
+          <span className="text-sm text-muted-foreground">
+            No campaigns found
+          </span>
+        </Card>
       )}
     </>
   );

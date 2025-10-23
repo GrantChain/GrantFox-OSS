@@ -7,6 +7,7 @@ import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider
 import { NavBar } from "@/components/shared/NavBar";
 import { CampaignProvider } from "@/context/CampaignContext";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
                 <CampaignProvider>
                   <NavBar />
                   {children}
+                  <Toaster />
                 </CampaignProvider>
               </WalletProvider>
             </UserProvider>

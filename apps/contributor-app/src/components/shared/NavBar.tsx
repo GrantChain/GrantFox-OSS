@@ -4,10 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { Search } from "lucide-react";
+import { Tent } from "lucide-react";
 import { SearchCommand } from "@/components/shared/SearchCommand";
 import { UserButton } from "@/components/shared/UserButton";
+import { RainbowButton } from "../ui/rainbow-button";
 
 export const NavBar = () => {
   return (
@@ -34,13 +34,19 @@ export const NavBar = () => {
               priority
             />
           </Link>
-          <Link href="/discover" className="hidden sm:block">
+          {/* <Link href="/discover" className="hidden sm:block">
             <ShimmerButton className="px-4 py-2 text-sm flex items-center gap-2">
               <Search className="size-3" /> Discover
             </ShimmerButton>
-          </Link>
+          </Link> */}
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/campaigns" className="hidden sm:block">
+            <RainbowButton variant="outline">
+              <Tent className="size-3" /> Campaign
+            </RainbowButton>
+          </Link>
+
           <SearchCommand />
 
           <UserButton />

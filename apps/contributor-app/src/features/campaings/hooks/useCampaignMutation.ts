@@ -1,31 +1,35 @@
 import { http } from "@/lib/api";
 import { CampaignService } from "../services/campaign.service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";;
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 type CampaignMutationParams = {
-    campaignId: string;
-    userId: string;
-}
+  campaignId: string;
+  userId: string;
+};
 
 export const useCampaignsMutations = () => {
   const campaignService = new CampaignService(http);
   const queryClient = useQueryClient();
 
-  const registerContributor = useMutation({
+  const registerContributor = useMutation<
+    void,
+    unknown,
+    CampaignMutationParams
+  >({
     mutationFn: (campaign: CampaignMutationParams) => {
       const { campaignId, userId } = campaign;
       return campaignService.registerContributor(campaignId, userId);
     },
-    onSuccess: () => {
-      toast.success("Contributor registered successfully");
-      queryClient.invalidateQueries({ queryKey: ["campaigns"] });
+    onSuccess: (_data, variables) => {
+      toast.success("You have been registered to the campaign successfully");
       queryClient.invalidateQueries({
-        queryKey: ["register-contributors-with-campaign"],
+        queryKey: ["campaign-contributors", variables.campaignId],
       });
     },
     onError: (err: unknown) => {
-      const message = (err as Error)?.message || "Failed to create campaign";
+      const message =
+        (err as Error)?.message || "Failed to register contributor";
       toast.error(message);
     },
   });

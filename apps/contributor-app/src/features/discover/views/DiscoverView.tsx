@@ -9,17 +9,32 @@ import { useState } from "react";
 import { HyperText } from "@/components/ui/hyper-text";
 import { Highlighter } from "@/components/ui/highlighter";
 import { RepoList } from "../components/RepoList";
-import { Organization, Repository } from "@/types/Github";
+import type { Project } from "@/types/project.type";
+import type { Repository } from "@/types/repositories.type";
 import { Badge } from "@/components/ui/badge";
 import { Star, GitFork, MessageSquare } from "lucide-react";
-import {
-  useCuratedOrganizations,
-  useCuratedOrgReposInfinite,
-} from "@/features/github/hooks/useGitHubOrgs";
+import { useCampaignContext } from "@/context/CampaignContext";
+import { CampaignService } from "@/features/campaings/services/campaign.service";
+import { http } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 export function DiscoverView() {
-  const { data: curatedOrgs } = useCuratedOrganizations();
-  const reposInfinite = useCuratedOrgReposInfinite(30);
+  const { activeCampaign } = useCampaignContext();
+  const service = new CampaignService(http);
+  const { data: campaign } = useQuery({
+    queryKey: [
+      "campaign",
+      "active",
+      activeCampaign?.campaign_id,
+      "with-projects-repos",
+    ],
+    queryFn: () =>
+      service.getActiveCampaignWithProjectsAndRepos({
+        campaign_id: activeCampaign?.campaign_id as string,
+      }),
+    enabled: Boolean(activeCampaign?.campaign_id),
+    staleTime: 60_000,
+  });
   return (
     <>
       <div className="flex flex-col sm:flex-row w-full sm:w-11/12 mx-auto justify-between">
@@ -36,7 +51,9 @@ export function DiscoverView() {
           </p>
         </div>
 
-        <RepoList />
+        <RepoList
+          repositories={(campaign?.repositories ?? []) as Repository[]}
+        />
       </div>
 
       <main className="relative mx-auto w-full max-w-7xl px-4 py-10 space-y-10">
@@ -46,9 +63,9 @@ export function DiscoverView() {
           </h2>
 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(curatedOrgs as Organization[] | undefined)?.map((org) => (
+            {(campaign?.projects as Project[] | undefined)?.map((proj) => (
               <div
-                key={org.id}
+                key={proj.project_id}
                 className="relative rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10 hover:from-accent/10 hover:to-transparent transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 group overflow-hidden"
               >
                 <ShineBorder
@@ -58,17 +75,17 @@ export function DiscoverView() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={org.avatar_url}
-                      alt={org.login}
+                      src={"/file.svg"}
+                      alt={proj.name}
                       width={32}
                       height={32}
                       className="rounded-full"
                     />
                     <Link
-                      href={`/org/${org.login}`}
+                      href={`/org/${proj.github_handle}`}
                       className="text-lg font-medium hover:underline"
                     >
-                      {org.login}
+                      {proj.name}
                     </Link>
                   </div>
                   <Button
@@ -77,15 +94,15 @@ export function DiscoverView() {
                     size="sm"
                     className="transition-colors"
                   >
-                    <Link href={`/org/${org.login}`}>View Org</Link>
+                    <Link href={`/org/${proj.github_handle}`}>View Org</Link>
                   </Button>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                  {org.description || "No description provided."}
+                  {proj.short_description || "No description provided."}
                 </p>
               </div>
             ))}
-            {/* No pagination for curated orgs */}
+            {/* Projects are from active campaign; no pagination for now */}
           </div>
         </section>
 
@@ -94,89 +111,41 @@ export function DiscoverView() {
             Repositories
           </h2>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(
-              (reposInfinite.data?.pages as
-                | Array<{ items: Repository[] }>
-                | undefined) ?? []
-            )
-              .flatMap((p) => p.items)
-              .map((r: Repository) => (
-                <div
-                  key={r.id}
-                  className="relative rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10 hover:from-accent/10 hover:to-transparent transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 group overflow-hidden"
-                >
-                  <ShineBorder
-                    className="pointer-events-none"
-                    shineColor={["#7c3aed33", "#22d3ee33"]}
-                  />
-                  <div className="flex justify-between items-center gap-3 min-w-0">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={r.owner?.avatar_url}
-                        alt={r.full_name}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div className="min-w-0">
-                        <Link
-                          href={`/org/${r.owner?.login}/repo/${r.name}`}
-                          className="font-medium hover:underline truncate block"
-                        >
-                          {r.full_name}
-                        </Link>
-                        {r.description && (
-                          <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                            {r.description}
-                          </p>
-                        )}
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                          {r.language && (
-                            <Badge
-                              variant="secondary"
-                              className="px-2 py-0.5 text-[10px]"
-                            >
-                              {r.language}
-                            </Badge>
-                          )}
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <Star className="h-3 w-3" /> {r.stargazers_count}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <GitFork className="h-3 w-3" /> {r.forks_count}
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="gap-1 px-2 py-0.5 text-[10px]"
-                          >
-                            <MessageSquare className="h-3 w-3" />{" "}
-                            {r.open_issues_count}
-                          </Badge>
-                        </div>
-                      </div>
+            {(campaign?.repositories ?? []).map((r: Repository) => (
+              <div
+                key={`${r.github_repo_id}`}
+                className="relative rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10 hover:from-accent/10 hover:to-transparent transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 group overflow-hidden"
+              >
+                <ShineBorder
+                  className="pointer-events-none"
+                  shineColor={["#7c3aed33", "#22d3ee33"]}
+                />
+                <div className="flex justify-between items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={"/file.svg"}
+                      alt={r.name}
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                    <div className="min-w-0">
+                      <Link
+                        href={r.github_url}
+                        className="font-medium hover:underline truncate block"
+                      >
+                        {r.name}
+                      </Link>
+                      {r.description && (
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                          {r.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
-            {reposInfinite.hasNextPage && (
-              <div className="flex col-span-full justify-center">
-                <Button
-                  onClick={() => reposInfinite.fetchNextPage()}
-                  disabled={reposInfinite.isFetchingNextPage}
-                  className="cursor-pointer"
-                >
-                  {reposInfinite.isFetchingNextPage
-                    ? "Loading..."
-                    : "Load More"}
-                </Button>
               </div>
-            )}
+            ))}
           </div>
         </section>
       </main>

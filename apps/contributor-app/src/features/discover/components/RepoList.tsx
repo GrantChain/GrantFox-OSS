@@ -2,12 +2,8 @@
 
 import { cn, timeAgo } from "@/lib/utils";
 import { AnimatedList } from "@/components/ui/animated-list";
-import { useQueries } from "@tanstack/react-query";
-import { githubHttp } from "@/lib/http";
-import { GitHubOrgsService } from "@/features/github/services/GitHubOrgsService";
 import Image from "next/image";
-import { Repository } from "@/types/Github";
-import { CURATED_ORG_LOGINS } from "@/config/curation";
+import type { Repository } from "@/types/repositories.type";
 
 interface RepoItemData {
   name: string;
@@ -15,8 +11,6 @@ interface RepoItemData {
   avatarUrl: string;
   time: string;
 }
-
-const orgsService = new GitHubOrgsService(githubHttp);
 
 const Repo = ({ name, description, avatarUrl, time }: RepoItemData) => {
   return (
@@ -52,32 +46,15 @@ const Repo = ({ name, description, avatarUrl, time }: RepoItemData) => {
 
 export function RepoList({
   className,
-  orgLogins,
+  repositories,
 }: {
   className?: string;
-  orgLogins?: string[];
+  repositories: Repository[];
 }) {
-  const fallbacks = CURATED_ORG_LOGINS;
-  const targets = (
-    orgLogins && orgLogins.length > 0 ? orgLogins : fallbacks
-  ).slice(0, 5);
-
-  const queries = useQueries({
-    queries: targets.map((org) => ({
-      queryKey: ["gh", "org-repos", org, { per_page: 40 }],
-      queryFn: () => orgsService.listOrgRepos(org, { per_page: 20 }),
-      staleTime: 60_000,
-    })),
-  });
-
-  const repos: Repository[] = queries
-    .map((q) => (Array.isArray(q.data) ? (q.data as Repository[]) : []))
-    .flat();
-
-  const items: RepoItemData[] = repos.map((r) => ({
-    name: r.full_name ?? r.name,
+  const items: RepoItemData[] = (repositories ?? []).map((r) => ({
+    name: r.name,
     description: r.description ?? "",
-    avatarUrl: r.owner?.avatar_url ?? "/favicon.ico",
+    avatarUrl: "/file.svg",
     time: r.created_at ? timeAgo(r.created_at) : "",
   }));
 
