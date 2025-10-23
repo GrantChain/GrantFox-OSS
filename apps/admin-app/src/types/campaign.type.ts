@@ -2,6 +2,7 @@ import { Repository } from "./repository.type";
 
 export enum CampaignStatus {
   PENDING = "PENDING",
+  UPCOMMING = "UPCOMMING",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
 }

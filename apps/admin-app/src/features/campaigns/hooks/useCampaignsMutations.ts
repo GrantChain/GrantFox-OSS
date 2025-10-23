@@ -3,6 +3,7 @@ import { CampaignService } from "../services/campaign.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CampaignPayload, CampaignStatus } from "@/types/campaign.type";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 
 export const useCampaignsMutations = () => {
   const campaignService = new CampaignService(http);
@@ -19,7 +20,27 @@ export const useCampaignsMutations = () => {
       });
     },
     onError: (err: unknown) => {
-      const message = (err as Error)?.message || "Failed to create campaign";
+      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const apiMessage =
+        (axiosErr as any)?.response?.data?.message ??
+        (err as any)?.cause?.response?.data?.message;
+
+      const text = Array.isArray(apiMessage)
+        ? apiMessage.join(", ")
+        : (apiMessage as string | undefined);
+
+      let message = (err as Error)?.message || "Failed to create campaign";
+      if (text) {
+        const t = String(text);
+        if (/upcom/i.test(t)) {
+          message = "There is already an UPCOMMING campaign";
+        } else if (/active/i.test(t)) {
+          message = "There is already an ACTIVE campaign";
+        } else {
+          message = t;
+        }
+      }
+
       toast.error(message);
     },
   });
@@ -36,8 +57,29 @@ export const useCampaignsMutations = () => {
       toast.success("Campaign updated successfully");
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
     },
-    onError: () => {
-      toast.error("Failed to update campaign");
+    onError: (err: unknown) => {
+      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const apiMessage =
+        (axiosErr as any)?.response?.data?.message ??
+        (err as any)?.cause?.response?.data?.message;
+
+      const text = Array.isArray(apiMessage)
+        ? apiMessage.join(", ")
+        : (apiMessage as string | undefined);
+
+      let message = "Failed to update campaign";
+      if (text) {
+        const t = String(text);
+        if (/upcom/i.test(t)) {
+          message = "Only one ACTIVE or UPCOMING campaign is allowed at a time";
+        } else if (/active/i.test(t)) {
+          message = "Only one ACTIVE or UPCOMING campaign is allowed at a time";
+        } else {
+          message = t;
+        }
+      }
+
+      toast.error(message);
     },
   });
 
@@ -48,8 +90,29 @@ export const useCampaignsMutations = () => {
       toast.success("Campaign status updated");
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
     },
-    onError: () => {
-      toast.error("Failed to update status");
+    onError: (err: unknown) => {
+      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const apiMessage =
+        (axiosErr as any)?.response?.data?.message ??
+        (err as any)?.cause?.response?.data?.message;
+
+      const text = Array.isArray(apiMessage)
+        ? apiMessage.join(", ")
+        : (apiMessage as string | undefined);
+
+      let message = "Failed to update status";
+      if (text) {
+        const t = String(text);
+        if (/upcom/i.test(t)) {
+          message = "Only one ACTIVE or UPCOMING campaign is allowed at a time";
+        } else if (/active/i.test(t)) {
+          message = "Only one ACTIVE or UPCOMING campaign is allowed at a time";
+        } else {
+          message = t;
+        }
+      }
+
+      toast.error(message);
     },
   });
 
