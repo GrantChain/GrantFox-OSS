@@ -20,10 +20,16 @@ export const useCampaignsMutations = () => {
       });
     },
     onError: (err: unknown) => {
-      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const axiosErr =
+        (err as AxiosError) ?? (err as unknown as { cause: AxiosError })?.cause;
       const apiMessage =
-        (axiosErr as any)?.response?.data?.message ??
-        (err as any)?.cause?.response?.data?.message;
+        (axiosErr as unknown as { response: { data: { message: string } } })
+          ?.response?.data?.message ??
+        (
+          err as unknown as {
+            cause: { response: { data: { message: string } } };
+          }
+        )?.cause?.response?.data?.message;
 
       const text = Array.isArray(apiMessage)
         ? apiMessage.join(", ")
@@ -58,10 +64,16 @@ export const useCampaignsMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
     },
     onError: (err: unknown) => {
-      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const axiosErr =
+        (err as AxiosError) ?? (err as unknown as { cause: AxiosError })?.cause;
       const apiMessage =
-        (axiosErr as any)?.response?.data?.message ??
-        (err as any)?.cause?.response?.data?.message;
+        (axiosErr as unknown as { response: { data: { message: string } } })
+          ?.response?.data?.message ??
+        (
+          err as unknown as {
+            cause: { response: { data: { message: string } } };
+          }
+        )?.cause?.response?.data?.message;
 
       const text = Array.isArray(apiMessage)
         ? apiMessage.join(", ")
@@ -91,10 +103,16 @@ export const useCampaignsMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns"] });
     },
     onError: (err: unknown) => {
-      const axiosErr = (err as AxiosError) ?? (err as any)?.cause;
+      const axiosErr =
+        (err as AxiosError) ?? (err as unknown as { cause: AxiosError })?.cause;
       const apiMessage =
-        (axiosErr as any)?.response?.data?.message ??
-        (err as any)?.cause?.response?.data?.message;
+        (axiosErr as unknown as { response: { data: { message: string } } })
+          ?.response?.data?.message ??
+        (
+          err as unknown as {
+            cause: { response: { data: { message: string } } };
+          }
+        )?.cause?.response?.data?.message;
 
       const text = Array.isArray(apiMessage)
         ? apiMessage.join(", ")

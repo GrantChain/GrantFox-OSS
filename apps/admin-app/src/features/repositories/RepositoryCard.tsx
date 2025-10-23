@@ -1,9 +1,5 @@
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { GitHubRepository } from "@/types/github.type";
 import { Repository } from "@/types/repository.type";
-import { GitFork, MessageSquare, Star } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 

@@ -5,28 +5,9 @@ import { Card } from "@/components/ui/card";
 import { FileIcon, Loader2 } from "lucide-react";
 import { ProjectsTable } from "./ProjectsTable";
 import { useProjectsQuery } from "./hooks/useProjectsQuery";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
-import { ProjectStatus } from "@/types/project.type";
 
 export const ProjectsView = () => {
-  const [status, setStatus] = React.useState<ProjectStatus | undefined>(
-    undefined
-  );
-  const { data: projects, isLoading } = useProjectsQuery(status);
-
-  const statuses: ProjectStatus[] = [
-    ProjectStatus.PENDING,
-    ProjectStatus.APPROVED,
-    ProjectStatus.REJECTED,
-    ProjectStatus.CHANGES_REQUESTED,
-  ];
+  const { data: projects, isLoading } = useProjectsQuery();
 
   return (
     <>
