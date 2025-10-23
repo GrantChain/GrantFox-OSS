@@ -1,4 +1,5 @@
 import { Project } from "./project.type";
+import { Repository } from "./repositories.type";
 
 export type Campaign = {
   campaign_id: string;
@@ -12,4 +13,8 @@ export type Campaign = {
   projects: Project[];
   total_projects: number;
   total_repositories: number;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  repositories: Repository[];
 };
