@@ -114,10 +114,10 @@ export const Navbar = () => {
                   } w-full justify-center text-center sm:w-auto`,
                 })}
               >
-                <Link href="/maintainer/campaigns">Campaigns</Link>
+                <Link href="/maintainer/campaigns">Active Campaign</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
-            <NavigationMenuItem className="w-full sm:w-auto">
+            {/* <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
                 asChild
                 className={navigationMenuTriggerStyle({
@@ -128,7 +128,7 @@ export const Navbar = () => {
               >
                 <Link href="/maintainer/financials">Financials</Link>
               </NavigationMenuLink>
-            </NavigationMenuItem>
+            </NavigationMenuItem> */}
           </NavigationMenuList>
         </NavigationMenu>
       )}

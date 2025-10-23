@@ -1,6 +1,6 @@
-import { useState } from "react";
+"use client";
+
 import { useCampaignContext } from "@/context/CampaignContext";
-import { useGithubUsersQuery } from "@/features/users/hooks/useGithubUsers";
 import CampaignHero from "../components/CampaignHero";
 import CampaignTags from "../components/CampaignTags";
 import CampaignTimeRemaining from "../components/CampaignTimeRemaining";
@@ -10,9 +10,8 @@ import { Card } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
 
 export default function CampaignView() {
-  const githubUserService = useGithubUsersQuery();
   const { activeCampaign } = useCampaignContext();
-  const { data } = useCampaignQuery({
+  const { data: contributors } = useCampaignQuery({
     campaignId: activeCampaign?.campaign_id,
   });
 
@@ -29,13 +28,14 @@ export default function CampaignView() {
         <>
           <CampaignHero
             activeCampaign={activeCampaign}
-            contributorsCount={data?.length ?? 0}
+            contributorsCount={contributors?.length ?? 0}
+            contributors={contributors}
           />
           <CampaignTags tags={activeCampaign?.tags ?? []} />
           <CampaignTimeRemaining startDate={activeCampaign?.start_date} />
           <CampaignReposAndContributors
             activeCampaign={activeCampaign ?? null}
-            contributors={githubUserService.data}
+            contributors={contributors}
           />
         </>
       )}

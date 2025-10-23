@@ -12,9 +12,15 @@ export const useCampaignQuery = (options: UseCampaignQueryOptions) => {
 
   const campaignService = new CampaignService(http);
 
+  const isEnabled = typeof campaignId === "string" && campaignId.length > 0;
+
   const query = useQuery<ApiUser[]>({
-    queryKey: ["github-users-by-role"],
-    queryFn: () => campaignService.getContributorsCampaign(campaignId!),
+    queryKey: ["campaign-contributors", campaignId],
+    enabled: isEnabled,
+    queryFn: async () => {
+      if (!isEnabled || !campaignId) return [];
+      return campaignService.getContributorsCampaign(campaignId);
+    },
   });
 
   return query;

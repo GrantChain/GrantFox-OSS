@@ -372,6 +372,10 @@ export const RegisteredRepositories = ({
           register them to a campaign when your project is{" "}
           <strong>APPROVED</strong> by Stellar and GrantFox.
         </p>
+
+        <p className="text-sm text-muted-foreground mt-0">
+          All of your issues should be labeled with the campaign name.
+        </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {displayed.map((repository) => {

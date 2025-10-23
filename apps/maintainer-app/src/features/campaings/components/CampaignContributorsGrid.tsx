@@ -10,17 +10,21 @@ interface CampaignContributorsGridProps {
 const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
   return (
     <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {users.map((user) => (
-        <GithubUserCard
-          key={user.user_id}
-          img={
-            user.avatar_url ??
-            "https://avatars.githubusercontent.com/u/178688063?v=4"
-          }
-          name={user.username ?? "Unknown"}
-          username={user.username ?? "unknown"}
-        />
-      ))}
+      {users.length > 0 ? (
+        users.map((user) => (
+          <GithubUserCard
+            key={user.user_id}
+            img={
+              user.avatar_url ??
+              "https://avatars.githubusercontent.com/u/178688063?v=4"
+            }
+            name={user.username ?? "Unknown"}
+            username={user.username ?? "unknown"}
+          />
+        ))
+      ) : (
+        <p className="text-muted-foreground">No contributors found</p>
+      )}
     </div>
   );
 };
