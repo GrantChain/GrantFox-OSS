@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { UploadsService } from '../uploads/uploads.service';
@@ -26,6 +27,38 @@ export class CampaignsService {
       throw new BadRequestException('End date must be after start date');
     }
 
+    // Check if there's already an ACTIVE or UPCOMING campaign
+    const existingActiveCampaign = await this.prisma.campaign.findFirst({
+      where: {
+        status: {
+          in: ['ACTIVE', 'UPCOMMING'],
+        },
+      },
+    });
+
+    if (existingActiveCampaign) {
+      throw new ConflictException(
+        `There is already an ${existingActiveCampaign.status} campaign: "${existingActiveCampaign.name}". Only one ACTIVE or UPCOMING campaign is allowed at a time.`,
+      );
+    }
+
+    // Validate image BEFORE creating campaign
+    if (imageFile) {
+      // Validate file type
+      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedMimeTypes.includes(imageFile.mimetype)) {
+        throw new BadRequestException(
+          'Invalid file type. Only JPEG, PNG, and WebP are allowed.',
+        );
+      }
+
+      // Validate file size (5MB)
+      const maxSize = 5 * 1024 * 1024;
+      if (imageFile.size > maxSize) {
+        throw new BadRequestException('File size must be less than 5MB');
+      }
+    }
+
     // Create campaign without repositories (maintainers will add them later)
     const campaign = await this.prisma.campaign.create({
       data: {
@@ -46,7 +79,7 @@ export class CampaignsService {
       },
     });
 
-    // Upload image if provided
+    // Upload image if provided (validation already done)
     if (imageFile) {
       const uploadResult = await this.uploadsService.uploadCampaignImage(
         imageFile,
@@ -131,6 +164,24 @@ export class CampaignsService {
   async updateStatus(id: string, dto: UpdateCampaignStatusDto) {
     // Check if campaign exists
     await this.findOne(id);
+
+    // If changing to ACTIVE or UPCOMING, check if there's already one
+    if (dto.status === 'ACTIVE' || dto.status === 'UPCOMMING') {
+      const existingActiveCampaign = await this.prisma.campaign.findFirst({
+        where: {
+          campaign_id: { not: id }, // Exclude current campaign
+          status: {
+            in: ['ACTIVE', 'UPCOMMING'],
+          },
+        },
+      });
+
+      if (existingActiveCampaign) {
+        throw new ConflictException(
+          `Cannot set campaign to ${dto.status}. There is already an ${existingActiveCampaign.status} campaign: "${existingActiveCampaign.name}". Only one ACTIVE or UPCOMING campaign is allowed at a time.`,
+        );
+      }
+    }
 
     const campaign = await this.prisma.campaign.update({
       where: { campaign_id: id },

@@ -30,6 +30,17 @@ export class AuthService {
     }
   }
 
+  async getUsersByRole(role: UserRole): Promise<ApiUser[]> {
+    try {
+      const { data } = await this.httpUnauthorized.get(
+        `/users/by-role/${role}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get users by role", { cause: error });
+    }
+  }
+
   async addRole(user_id: string, role: UserRole): Promise<ApiUser> {
     try {
       const { data } = await this.httpUnauthorized.post(

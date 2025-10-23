@@ -5,6 +5,7 @@ import TanstackProvider from "@/providers/TanstackProvider";
 import UserProvider from "@/context/UserContext";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { NavBar } from "@/components/shared/NavBar";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +32,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TanstackProvider>
-          <UserProvider>
-            <WalletProvider>
-              <NavBar />
-              {children}
-            </WalletProvider>
-          </UserProvider>
-        </TanstackProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TanstackProvider>
+            <UserProvider>
+              <WalletProvider>
+                <NavBar />
+                {children}
+              </WalletProvider>
+            </UserProvider>
+          </TanstackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { flushSync } from "react-dom";
+import { useTheme } from "next-themes";
 
 import { cn } from "@/lib/utils";
 
@@ -26,40 +27,20 @@ export const AnimatedThemeToggler = ({
 }: AnimatedThemeTogglerProps) => {
   const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
-    // Initialize theme from localStorage or system preference
-    const stored = localStorage.getItem("theme");
-    const initialIsDark =
-      stored === "dark" || stored === "light"
-        ? stored === "dark"
-        : getSystemPrefersDark();
-
-    setIsDark(initialIsDark);
-    document.documentElement.classList.toggle("dark", initialIsDark);
-
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    };
-
-    const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
+    setIsDark(resolvedTheme === "dark");
+  }, [resolvedTheme]);
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return;
 
     await document.startViewTransition(() => {
       flushSync(() => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", newTheme ? "dark" : "light");
+        const newTheme = isDark ? "light" : "dark";
+        setTheme(newTheme);
+        setIsDark(newTheme === "dark");
       });
     }).ready;
 

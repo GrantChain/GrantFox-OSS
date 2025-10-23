@@ -21,9 +21,8 @@ import {
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { UpdateProjectStatusDto } from './dto/update-project-status.dto';
-import { AddMaintainerDto } from './dto/add-maintainer.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
+import { AddMaintainerDto } from './dto/add-maintainer.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -123,28 +122,6 @@ export class ProjectsController {
     @CurrentUser() user: any,
   ) {
     return this.projectsService.update(id, dto, user.user_id);
-  }
-
-  @Patch(':id/status')
-  @Roles(UserRole.MAINTAINER)
-  @ApiOperation({
-    summary: 'Update project status (MAINTAINER owner only)',
-    description: 'Changes the project status. Only project owners can update.',
-  })
-  @ApiParam({ name: 'id', type: String, description: 'Project UUID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Project status updated',
-    type: ProjectResponseDto,
-  })
-  @ApiResponse({ status: 403, description: 'Forbidden - Must be project owner' })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateProjectStatusDto,
-    @CurrentUser() user: any,
-  ) {
-    return this.projectsService.updateStatus(id, dto, user.user_id);
   }
 
   @Delete(':id')

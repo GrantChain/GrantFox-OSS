@@ -5,9 +5,9 @@ import { ProjectsService } from "./services/projects.service";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  BadgeCheck,
   CalendarIcon,
   Code2,
-  ExternalLink,
   FileIcon,
   Globe,
   Heart,
@@ -23,9 +23,13 @@ import { formatDate } from "@/lib/format";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProjectTabs } from "./tabs.constant";
 import type { ReactNode } from "react";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { useCampaignContext } from "@/context/CampaignContext";
+import Image from "next/image";
 
 export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
   const projectsService = new ProjectsService(http);
+  const { activeCampaign, upcomingCampaign } = useCampaignContext();
 
   const query = useQuery({
     queryKey: ["project", projectId],
@@ -94,14 +98,14 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* General Info Section */}
-        <Card className="mb-8 border-border/50 bg-card/50 backdrop-blur">
+        <Card className="border-border/50 bg-card/50 backdrop-blur mb-3">
           <CardContent>
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="flex-shrink-0">
-                <img
+                <Image
                   src={organizationData.avatar_url || "/placeholder.svg"}
                   alt={organizationData.name}
                   className="w-24 h-24 rounded-lg border border-border"
@@ -163,7 +167,7 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
         {/* Main Grid */}
         <div className="flex flex-col md:flex-row gap-8">
           {/* Left Column - Stats & Networks */}
-          <div className="space-y-6 w-full md:max-w-3/12">
+          <div className="space-y-3 w-full md:max-w-3/12">
             {/* Stats Card */}
             <Card className="border-border/50 bg-card/50 backdrop-blur">
               <CardHeader>
@@ -219,11 +223,83 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
                 </div>
               </CardContent>
             </Card>
+
+            <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
+              <BorderBeam duration={8} size={100} />
+              <CardHeader>
+                <CardTitle className="text-xl">Active Campaign</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>Name</span>
+                    </div>
+                    <Badge variant="secondary">{activeCampaign?.name}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>Start Date</span>
+                    </div>
+                    <Badge variant="secondary">
+                      {formatDate(activeCampaign?.start_date ?? "")}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>End Date</span>
+                    </div>
+                    <Badge variant="secondary">
+                      {formatDate(activeCampaign?.end_date ?? "")}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="w-full my-3 border-border/50 bg-card/50 backdrop-blur">
+              <BorderBeam duration={8} size={100} />
+              <CardHeader>
+                <CardTitle className="text-xl">Upcoming Campaign</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>Name</span>
+                    </div>
+                    <Badge variant="secondary">{upcomingCampaign?.name}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>Start Date</span>
+                    </div>
+                    <Badge variant="secondary">
+                      {formatDate(upcomingCampaign?.start_date ?? "")}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BadgeCheck className="w-4 h-4" />
+                      <span>End Date</span>
+                    </div>
+                    <Badge variant="secondary">
+                      {formatDate(upcomingCampaign?.end_date ?? "")}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="w-full md:max-w-9/12">
             <Tabs defaultValue="repositories" className="gap-4">
-              <TabsList className="bg-background rounded-none border-b p-0 gap-4">
+              <TabsList className="bg-background rounded-none border-b p-0 sm:gap-4 flex w-full justify-center">
                 {tabs.map((tab: TabDef) => (
                   <TabsTrigger
                     key={tab.value}

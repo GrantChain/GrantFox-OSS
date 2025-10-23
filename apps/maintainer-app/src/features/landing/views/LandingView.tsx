@@ -13,7 +13,7 @@ export function LandingView() {
       </div>
       <main className="relative mx-auto min-h-[calc(100vh-56px)] w-full max-w-6xl px-4 py-10">
         <section className="relative z-10 mt-12 grid grid-cols-1 items-center gap-10 md:grid-cols-2">
-          Landing View Maintainer
+          {/* Landing View Maintainer */}
         </section>
       </main>
     </>

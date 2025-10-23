@@ -23,6 +23,7 @@ import {
 import { RepositoriesService } from './repositories.service';
 import { CampaignsExtendedService } from '../campaigns/campaigns-extended.service';
 import { AddRepositoryDto } from './dto/add-repository.dto';
+import { AddMultipleRepositoriesDto } from './dto/add-multiple-repositories.dto';
 import { RepositoryResponseDto } from './dto/repository-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -60,6 +61,28 @@ export class RepositoriesController {
     @CurrentUser() user: any,
   ) {
     return this.repositoriesService.addToProject(projectId, dto, user.user_id);
+  }
+
+  @Post('project/:projectId/bulk')
+  @Roles(UserRole.MAINTAINER)
+  @ApiOperation({
+    summary: 'Add multiple repositories to project (MAINTAINER owner only)',
+    description:
+      'Adds multiple GitHub repositories to a project at once. Returns summary of created, reactivated, and errors.',
+  })
+  @ApiParam({ name: 'projectId', type: String, description: 'Project UUID' })
+  @ApiResponse({
+    status: 201,
+    description: 'Repositories processed successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden - Must be project owner' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  addMultipleToProject(
+    @Param('projectId') projectId: string,
+    @Body() dto: AddMultipleRepositoriesDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.repositoriesService.addMultipleToProject(projectId, dto, user.user_id);
   }
 
   @Get('project/:projectId')

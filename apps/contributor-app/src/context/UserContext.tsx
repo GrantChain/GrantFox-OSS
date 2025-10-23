@@ -11,6 +11,7 @@ import { supabase, type User } from "@/lib/supabase";
 import { http } from "@/lib/api";
 import { UserRole } from "@/types/user.type";
 import { AuthService } from "@/features/auth/services/auth.service";
+import { setRuntimeGitHubToken } from "@/lib/http";
 
 type UserContextValue = {
   user: User | null;
@@ -64,6 +65,8 @@ export default function UserProvider({
       } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+      // Set GitHub token from user session
+      setRuntimeGitHubToken(session?.provider_token ?? null);
       setLoading(false);
       await syncUserAfterAuth(currentUser);
     };
@@ -76,6 +79,8 @@ export default function UserProvider({
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       const authedUser = session?.user ?? null;
       setUser(authedUser);
+      // Update GitHub token on auth changes
+      setRuntimeGitHubToken(session?.provider_token ?? null);
       setLoading(false);
       // Run sync on LOGIN and TOKEN_REFRESH to ensure roles are up-to-date
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
@@ -95,7 +100,7 @@ export default function UserProvider({
       provider: "github",
       options: {
         redirectTo: `${window.location.origin}/`,
-        scopes: "read:user user:email",
+        scopes: "read:user user:email read:org",
       },
     });
 
