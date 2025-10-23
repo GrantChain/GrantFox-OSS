@@ -297,6 +297,13 @@ export const ProjectsTable = ({ projects }: ProjectsTableProps) => {
                     size="sm"
                     className="cursor-pointer"
                     variant="outline"
+                    onClick={() =>
+                      setReviewDialog({
+                        open: true,
+                        projectId: project.project_id,
+                        action: ProjectStatus.APPROVED,
+                      })
+                    }
                   >
                     Approve
                   </Button>
