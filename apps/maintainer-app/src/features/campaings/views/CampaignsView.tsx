@@ -12,7 +12,7 @@ export default function CampaignView() {
   const githubUserService = useGithubUsersQuery();
   const { activeCampaign } = useCampaignContext();
   const { data } = useCampaignQuery({ campaignId: activeCampaign?.campaign_id});
-  console.log({ activeCampaign })
+
   return (
     <main className="container mx-auto px-4 py-8">
       {!activeCampaign ? (
