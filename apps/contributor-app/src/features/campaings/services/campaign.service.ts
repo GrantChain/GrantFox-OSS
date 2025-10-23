@@ -37,11 +37,9 @@ export class CampaignService {
   }
 
   async registerContributor(campaignId: string, userId: string): Promise<void> {
-    console.log({ campaignId, userId })
     try {
       await this.http.post(`/campaign-contributors/campaign/${campaignId}/register`, { "x-user-id": userId });
     } catch (error) {
-      console.log({ error })
       throw new Error("Failed to register contributor", { cause: error });
     }
   }
