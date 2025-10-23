@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
+import Link from "next/link";
 
 type ProjectFormProps = {
   mode?: "create" | "edit";
@@ -191,9 +192,11 @@ export const ProjectForm = ({
         </Card>
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" className="cursor-pointer">
-            Cancel
-          </Button>
+          <Link href="/maintainer/projects">
+            <Button type="button" variant="outline" className="cursor-pointer">
+              Cancel
+            </Button>
+          </Link>
           <Button type="submit" className="cursor-pointer">
             {form.formState.isSubmitting ? (
               <>

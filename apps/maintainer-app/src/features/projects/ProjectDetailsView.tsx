@@ -92,7 +92,7 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
   ): "default" | "secondary" | "destructive" | "outline" => {
     const s = (status ?? "").toUpperCase();
     if (s === "APPROVED") return "default";
-    if (s === "PENDING") return "secondary";
+    if (s === "PENDING") return "destructive";
     if (s === "REJECTED") return "destructive";
     return "outline";
   };
@@ -106,6 +106,8 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
             <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="flex-shrink-0">
                 <Image
+                  width={96}
+                  height={96}
                   src={organizationData.avatar_url || "/placeholder.svg"}
                   alt={organizationData.name}
                   className="w-24 h-24 rounded-lg border border-border"

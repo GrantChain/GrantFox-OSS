@@ -15,15 +15,6 @@ export const ProjectView = () => {
     enabled: !loading,
   });
 
-  if (projects?.length === 0 && !projects) {
-    return (
-      <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
-        <FileIcon className="size-10" />
-        <span className="text-sm text-muted-foreground">No projects found</span>
-      </Card>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -48,12 +39,19 @@ export const ProjectView = () => {
             Loading projects...
           </span>
         </Card>
-      ) : (
+      ) : projects && projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {projects?.map((project) => (
             <ProjectCard key={project.project_id} project={project} />
           ))}
         </div>
+      ) : (
+        <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+          <FileIcon className="size-10" />
+          <span className="text-sm text-muted-foreground">
+            No projects found
+          </span>
+        </Card>
       )}
     </div>
   );
