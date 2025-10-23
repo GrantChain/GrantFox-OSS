@@ -200,7 +200,7 @@
               "host": ["{{base_url}}"],
               "path": ["campaigns", "{{campaign_id}}", "status"]
             },
-            "description": "🔒 Requiere rol ADMIN\n\nStatus: PENDING | ACTIVE | INACTIVE"
+            "description": "🔒 Requiere rol ADMIN\n\nStatus: PENDING | UPCOMING | ACTIVE | INACTIVE"
           }
         }
       ]

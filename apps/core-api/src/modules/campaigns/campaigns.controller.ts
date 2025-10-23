@@ -141,7 +141,7 @@ export class CampaignsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Update campaign status (ADMIN only)',
-    description: 'Changes the status of a campaign (PENDING, ACTIVE, INACTIVE)',
+    description: 'Changes the status of a campaign (PENDING, UPCOMING, ACTIVE, INACTIVE)',
   })
   @ApiParam({ name: 'id', type: String, description: 'Campaign UUID' })
   @ApiResponse({

@@ -292,7 +292,7 @@ enum ReviewAction {
 
 enum CampaignStatus {
   PENDING
-  UPCOMMING
+  UPCOMING
   ACTIVE
   INACTIVE
 }
