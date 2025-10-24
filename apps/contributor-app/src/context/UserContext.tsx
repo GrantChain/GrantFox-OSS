@@ -96,10 +96,14 @@ export default function UserProvider({
   }
 
   async function signInWithGitHub() {
+    const rawRedirectUrl =
+      process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL ?? `${window.location.origin}`;
+    const redirectUrl = rawRedirectUrl.replace(/\/+$/, "");
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: redirectUrl,
         scopes: "read:user user:email read:org",
       },
     });
