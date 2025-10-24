@@ -8,6 +8,7 @@ import CampaignReposAndContributors from "../components/CampaignReposAndContribu
 import { useCampaignQuery } from "../hooks/useCampaignQuery";
 import { Card } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
+import Image from "next/image";
 
 export default function CampaignView() {
   const { activeCampaign } = useCampaignContext();
@@ -26,13 +27,22 @@ export default function CampaignView() {
         </Card>
       ) : (
         <>
+          <Image
+            src={activeCampaign?.image_url}
+            alt="Banner"
+            width={100}
+            height={100}
+          />
           <CampaignHero
             activeCampaign={activeCampaign}
             contributorsCount={contributors?.length ?? 0}
             contributors={contributors}
           />
           <CampaignTags tags={activeCampaign?.tags ?? []} />
-          <CampaignTimeRemaining startDate={activeCampaign?.start_date} />
+          <CampaignTimeRemaining
+            startDate={activeCampaign?.start_date}
+            endDate={activeCampaign?.end_date}
+          />
           <CampaignReposAndContributors
             activeCampaign={activeCampaign ?? null}
             contributors={contributors}

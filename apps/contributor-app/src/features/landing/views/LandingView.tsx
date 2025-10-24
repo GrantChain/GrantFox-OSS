@@ -16,11 +16,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import type { Repository } from "@/types/repositories.type";
 import { Badge } from "@/components/ui/badge";
-import { Star, GitFork, MessageSquare } from "lucide-react";
+import { Star, GitFork, MessageSquare, Tent } from "lucide-react";
 import Image from "next/image";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Search } from "lucide-react";
 import { getAllApprovedProjects } from "@/features/projects/hooks/useProjects";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const files = [
   {
@@ -108,10 +109,10 @@ export function LandingView() {
               contribution fast.
             </p>
 
-            <Link href="/discover" className="block">
-              <ShimmerButton className="px-4 py-2 text-sm flex items-center gap-2">
-                <Search className="size-3" /> Discover
-              </ShimmerButton>
+            <Link href="/campaigns" className="block">
+              <RainbowButton variant="outline">
+                <Tent className="size-3" /> Campaign
+              </RainbowButton>
             </Link>
           </section>
 
