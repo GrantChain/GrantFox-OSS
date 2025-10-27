@@ -1,6 +1,6 @@
 "use client";
-import CampaignView from "@/features/campaings/views/CampaignsView";
+import { MyApplicationsView } from "@/features/my-applications/MyApplicationsView";
 
-export default function CampaignPage() {
-  return <CampaignView />;
+export default function MyApplicationsPage() {
+  return <MyApplicationsView />;
 }
