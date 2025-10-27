@@ -127,8 +127,15 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Header with repo info */}
-            <RepoHeader repo={data} />
+            {/* Title and Description */}
+            <div>
+              <h1 className="text-3xl font-bold">Repository Information</h1>
+
+              <p className="text-muted-foreground mt-2">
+                Check out the repository and join in by contributing to the
+                issues.
+              </p>
+            </div>
 
             {/* Tabs Section */}
             <Tabs defaultValue="readme" className="w-full">
