@@ -28,6 +28,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { markdownRehypePlugins } from "@/lib/markdown";
 import { GithubUserCard } from "@/components/shared/GithubUserCard";
 
 export function IssueView({
@@ -237,7 +238,10 @@ export function IssueView({
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-foreground">Description</h2>
             <div className="prose prose-invert max-w-none text-foreground whitespace-pre-wrap break-words">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={markdownRehypePlugins}
+              >
                 {issue.body ?? "No description provided"}
               </ReactMarkdown>
             </div>

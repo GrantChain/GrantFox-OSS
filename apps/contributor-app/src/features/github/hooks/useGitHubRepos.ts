@@ -83,3 +83,21 @@ export function useGitHubIssueTimeline(
     staleTime: 60_000,
   });
 }
+
+export function useGitHubContributors(owner: string, repo: string) {
+  return useQuery({
+    queryKey: ["gh", "repo-contributors", owner, repo],
+    queryFn: () => reposService.listContributors(owner, repo),
+    enabled: Boolean(owner && repo),
+    staleTime: 60_000,
+  });
+}
+
+export function useGitHubLanguages(owner: string, repo: string) {
+  return useQuery({
+    queryKey: ["gh", "repo-languages", owner, repo],
+    queryFn: () => reposService.getLanguages(owner, repo),
+    enabled: Boolean(owner && repo),
+    staleTime: 60_000,
+  });
+}

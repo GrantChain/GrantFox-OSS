@@ -20,6 +20,10 @@ export interface Owner {
   site_admin: boolean;
 }
 
+export type Contributor = Owner & {
+  contributions: number;
+};
+
 export interface Repository {
   id: number;
   node_id: string;
@@ -190,3 +194,22 @@ export interface IssueLabel {
   default: boolean;
   description: string;
 }
+
+export type Readme = {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  url: string;
+  html_url: string;
+  git_url: string;
+  download_url: string;
+  type: string;
+  content: string;
+  encoding: string;
+  _links: {
+    self: string;
+    git: string;
+    html: string;
+  };
+};

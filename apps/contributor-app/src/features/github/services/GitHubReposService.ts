@@ -1,4 +1,4 @@
-import { Issue } from "@/types/Github";
+import { Contributor, Issue, Readme } from "@/types/Github";
 import type { AxiosInstance } from "axios";
 
 export class GitHubReposService {
@@ -78,5 +78,25 @@ export class GitHubReposService {
       { params }
     );
     return data;
+  }
+
+  async getREADME(owner: string, repo: string): Promise<Readme> {
+    const { data } = await this.http.get(`/repos/${owner}/${repo}/readme`);
+    return data;
+  }
+
+  async listContributors(owner: string, repo: string): Promise<Contributor[]> {
+    const { data } = await this.http.get(
+      `/repos/${owner}/${repo}/contributors`
+    );
+    return data;
+  }
+
+  async getLanguages(
+    owner: string,
+    repo: string
+  ): Promise<Record<string, number>> {
+    const { data } = await this.http.get(`/repos/${owner}/${repo}/languages`);
+    return data as Record<string, number>;
   }
 }
