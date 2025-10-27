@@ -12,9 +12,10 @@ import {
 } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { Tent } from "lucide-react";
+import { GitFork, Tent } from "lucide-react";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { useUser } from "@/context/UserContext";
+import { Button } from "@/components/ui/button";
 
 const files = [
   {
@@ -49,11 +50,19 @@ export function LandingView() {
             </p>
 
             {user && (
-              <Link href="/campaigns" className="block">
-                <RainbowButton variant="outline">
-                  <Tent className="size-3" /> Campaign
-                </RainbowButton>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/campaigns" className="block">
+                  <RainbowButton variant="outline">
+                    <Tent className="size-3" /> Campaign
+                  </RainbowButton>
+                </Link>
+
+                <Link href="/campaigns" className="block">
+                  <Button variant="outline" className="cursor-pointer">
+                    <GitFork className="size-3" /> My Applications
+                  </Button>
+                </Link>
+              </div>
             )}
           </section>
 

@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { Tent } from "lucide-react";
+import { GitFork, Tent } from "lucide-react";
 import { SearchCommand } from "@/components/shared/SearchCommand";
 import { UserButton } from "@/components/shared/UserButton";
 import { RainbowButton } from "../ui/rainbow-button";
 import { useUser } from "@/context/UserContext";
+import { Button } from "../ui/button";
 
 export const NavBar = () => {
   const { user } = useUser();
@@ -45,11 +46,19 @@ export const NavBar = () => {
         </div>
         <div className="flex items-center gap-3">
           {user && (
-            <Link href="/campaigns" className="hidden sm:block">
-              <RainbowButton variant="outline">
-                <Tent className="size-3" /> Campaign
-              </RainbowButton>
-            </Link>
+            <>
+              <Link href="/campaigns" className="hidden sm:block">
+                <RainbowButton variant="outline">
+                  <Tent className="size-3" /> Campaign
+                </RainbowButton>
+              </Link>
+
+              <Link href="/my-applications" className="hidden sm:block">
+                <Button variant="outline" className="cursor-pointer">
+                  <GitFork className="size-3" /> My Applications
+                </Button>
+              </Link>
+            </>
           )}
 
           <SearchCommand />
