@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Owner } from "@/types/Github";
+import { Maintainer } from "@/types/maintainer.type";
 import { ApiUser } from "@/types/user.type";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +8,7 @@ import Link from "next/link";
 /**
  * Helper function to get the username/login from either Owner or ApiUser
  */
-const getUserIdentifier = (user: Owner | ApiUser): string => {
+const getUserIdentifier = (user: Owner | ApiUser | Maintainer): string => {
   if ("login" in user) {
     return user.login;
   }
@@ -17,7 +18,7 @@ const getUserIdentifier = (user: Owner | ApiUser): string => {
 /**
  * Helper function to get the GitHub profile URL
  */
-const getGitHubUrl = (user: Owner | ApiUser): string => {
+const getGitHubUrl = (user: Owner | ApiUser | Maintainer): string => {
   if ("html_url" in user && user.html_url) {
     return user.html_url;
   }
@@ -26,7 +27,11 @@ const getGitHubUrl = (user: Owner | ApiUser): string => {
   return identifier ? `https://github.com/${identifier}` : "";
 };
 
-export const GithubUserCard = ({ user }: { user: Owner | ApiUser }) => {
+export const GithubUserCard = ({
+  user,
+}: {
+  user: Owner | ApiUser | Maintainer;
+}) => {
   const identifier = getUserIdentifier(user);
   const githubUrl = getGitHubUrl(user);
 

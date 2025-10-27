@@ -1,4 +1,4 @@
-import { OrgView } from "@/features/org/views/OrgView";
+import { OrgView } from "@/features/org/OrgView";
 
 interface OrgPageProps {
   params: { org: string };

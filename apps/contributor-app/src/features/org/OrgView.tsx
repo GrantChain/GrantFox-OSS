@@ -1,9 +1,5 @@
 "use client";
-
-import Link from "next/link";
-
 import { useOrganization } from "@/features/github/hooks/useGitHubOrgs";
-import { ShineBorder } from "@/components/ui/shine-border";
 import {
   Empty,
   EmptyDescription,
@@ -19,14 +15,20 @@ import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "@/features/campaings/services/campaign.service";
 import { http } from "@/lib/api";
 import type { Repository as CampaignRepository } from "@/types/repositories.type";
+import { OrgHeader } from "./OrgHeader";
+import { OrgAside } from "./OrgAside";
+import { RepositoryCard } from "../../components/shared/RepositoryCard";
+import Link from "next/link";
 
-export function OrgView({ org }: { org: string }) {
+export const OrgView = ({ org }: { org: string }) => {
   const { activeCampaign } = useCampaignContext();
+
   const {
     data: orgData,
     isLoading: orgLoading,
     isError: orgError,
   } = useOrganization(org);
+
   const service = new CampaignService(http);
   const { data: campaignWithProjects, isLoading: campaignLoading } = useQuery({
     queryKey: [
@@ -50,7 +52,7 @@ export function OrgView({ org }: { org: string }) {
 
   if (orgLoading) {
     return (
-      <main className="relative mx-auto w-full max-w-6xl px-4 py-10">
+      <main className="relative mx-auto w-full max-w-7xl px-4 py-10">
         <section className="relative z-10 flex justify-center">
           <LoaderCard
             title="Loading organization…"
@@ -78,21 +80,17 @@ export function OrgView({ org }: { org: string }) {
   }
 
   return (
-    <main className="relative mx-auto w-full max-w-6xl px-4 py-10">
+    <main className="relative mx-auto w-full max-w-7xl px-4 py-10">
       <section className="relative z-10">
         <Back />
-        <h1 className="text-3xl font-semibold">
-          <span className="font-medium">Organization:</span> {orgData.login}
-        </h1>
-        <p className="text-muted-foreground">Campaign Repositories</p>
 
         {campaignLoading ? (
-          <section className="relative z-10 mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center">
             <LoaderCard
               title="Loading campaign…"
               subtitle="Fetching campaign repositories for this organization."
             />
-          </section>
+          </div>
         ) : !project ? (
           <Empty>
             <EmptyHeader>
@@ -107,44 +105,62 @@ export function OrgView({ org }: { org: string }) {
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {repos.map((r) => (
-              <div
-                key={r.github_repo_id}
-                className="relative rounded-xl border p-4 hover:bg-accent/40 transition-colors"
-              >
-                <ShineBorder
-                  className="pointer-events-none"
-                  shineColor={["#7c3aed33", "#22d3ee33"]}
-                />
-                <div className="flex justify-between items-center gap-3 min-w-0">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={`https://github.com/${org}.png`}
-                      alt={r.name}
-                      className="size-8 rounded-full"
-                    />
-                    <div className="min-w-0">
-                      <Link
-                        href={`/campaigns/org/${org}/repo/${r.name}`}
-                        className="font-medium hover:underline truncate block"
-                      >
-                        {`${org}/${r.name}`}
-                      </Link>
+          <>
+            <OrgHeader project={project} org={org} />
 
-                      {r.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {r.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+            {/* Main content with sidebar */}
+            <div className="grid gap-8 lg:grid-cols-3">
+              {/* Repositories Grid */}
+              <div className="lg:col-span-2">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold">
+                    Campaign Repositories
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {repos.length} repositor{repos.length !== 1 ? "ies" : "y"}{" "}
+                    in the{" "}
+                    <Link
+                      href="/campaigns"
+                      className="font-bold hover:underline"
+                    >
+                      {activeCampaign?.name}
+                    </Link>{" "}
+                    campaign
+                  </p>
                 </div>
+
+                {repos.length === 0 ? (
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Ban />
+                      </EmptyMedia>
+                      <EmptyTitle>No repositories found</EmptyTitle>
+                      <EmptyDescription>
+                        No repositories have been added to this campaign yet.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {repos.map((r) => (
+                      <RepositoryCard
+                        key={r.github_repo_id}
+                        repo={r}
+                        org={org}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+
+              <aside className="lg:col-span-1">
+                <OrgAside project={project} />
+              </aside>
+            </div>
+          </>
         )}
       </section>
     </main>
   );
-}
+};
