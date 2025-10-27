@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/empty";
 import { Ban } from "lucide-react";
 import { LoaderCard } from "@/components/ui/loader";
-import { Back } from "@/components/shared/Back";
 import { useCampaignContext } from "@/context/CampaignContext";
 import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "@/features/campaings/services/campaign.service";
@@ -80,87 +79,74 @@ export const OrgView = ({ org }: { org: string }) => {
   }
 
   return (
-    <main className="relative mx-auto w-full max-w-7xl px-4 py-10">
-      <section className="relative z-10">
-        <Back />
+    <section className="relative z-10">
+      {campaignLoading ? (
+        <div className="mt-8 flex justify-center">
+          <LoaderCard
+            title="Loading campaign…"
+            subtitle="Fetching campaign repositories for this organization."
+          />
+        </div>
+      ) : !project ? (
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Ban />
+            </EmptyMedia>
+            <EmptyTitle>No repositories in this campaign</EmptyTitle>
+            <EmptyDescription>
+              This organization has no repositories registered for the active
+              campaign.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <>
+          <OrgHeader project={project} org={org} />
 
-        {campaignLoading ? (
-          <div className="mt-8 flex justify-center">
-            <LoaderCard
-              title="Loading campaign…"
-              subtitle="Fetching campaign repositories for this organization."
-            />
-          </div>
-        ) : !project ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Ban />
-              </EmptyMedia>
-              <EmptyTitle>No repositories in this campaign</EmptyTitle>
-              <EmptyDescription>
-                This organization has no repositories registered for the active
-                campaign.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <>
-            <OrgHeader project={project} org={org} />
-
-            {/* Main content with sidebar */}
-            <div className="grid gap-8 lg:grid-cols-3">
-              {/* Repositories Grid */}
-              <div className="lg:col-span-2">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold">
-                    Campaign Repositories
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {repos.length} repositor{repos.length !== 1 ? "ies" : "y"}{" "}
-                    in the{" "}
-                    <Link
-                      href="/campaigns"
-                      className="font-bold hover:underline"
-                    >
-                      {activeCampaign?.name}
-                    </Link>{" "}
-                    campaign
-                  </p>
-                </div>
-
-                {repos.length === 0 ? (
-                  <Empty>
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <Ban />
-                      </EmptyMedia>
-                      <EmptyTitle>No repositories found</EmptyTitle>
-                      <EmptyDescription>
-                        No repositories have been added to this campaign yet.
-                      </EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
-                ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {repos.map((r) => (
-                      <RepositoryCard
-                        key={r.github_repo_id}
-                        repo={r}
-                        org={org}
-                      />
-                    ))}
-                  </div>
-                )}
+          {/* Main content with sidebar */}
+          <div className="grid gap-8 lg:grid-cols-3">
+            {/* Repositories Grid */}
+            <div className="lg:col-span-2">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold">Campaign Repositories</h2>
+                <p className="text-sm text-muted-foreground">
+                  {repos.length} repositor{repos.length !== 1 ? "ies" : "y"} in
+                  the{" "}
+                  <Link href="/campaigns" className="font-bold hover:underline">
+                    {activeCampaign?.name}
+                  </Link>{" "}
+                  campaign
+                </p>
               </div>
 
-              <aside className="lg:col-span-1">
-                <OrgAside project={project} />
-              </aside>
+              {repos.length === 0 ? (
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <Ban />
+                    </EmptyMedia>
+                    <EmptyTitle>No repositories found</EmptyTitle>
+                    <EmptyDescription>
+                      No repositories have been added to this campaign yet.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {repos.map((r) => (
+                    <RepositoryCard key={r.github_repo_id} repo={r} org={org} />
+                  ))}
+                </div>
+              )}
             </div>
-          </>
-        )}
-      </section>
-    </main>
+
+            <aside className="lg:col-span-1">
+              <OrgAside project={project} />
+            </aside>
+          </div>
+        </>
+      )}
+    </section>
   );
 };

@@ -1,4 +1,4 @@
-import { RepoView } from "@/features/repo/views/RepoView";
+import { RepoView } from "@/features/repo/RepoView";
 
 interface RepoPageProps {
   params: { org: string; repo: string };

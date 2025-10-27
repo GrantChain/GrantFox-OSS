@@ -4,6 +4,7 @@ import { useUser } from "@/context/UserContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CampaignProvider } from "@/context/CampaignContext";
+import { Back } from "@/components/shared/Back";
 
 export default function DashboardLayout({
   children,
@@ -25,7 +26,10 @@ export default function DashboardLayout({
 
   return (
     <CampaignProvider>
-      <div className="block p-6">{children}</div>
+      <div className="block container mx-auto p-0 sm:px-4 sm:py-8">
+        <Back />
+        {children}
+      </div>
     </CampaignProvider>
   );
 }
