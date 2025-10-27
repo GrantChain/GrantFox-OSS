@@ -43,11 +43,9 @@ export default function RootLayout({
           <TanstackProvider>
             <UserProvider>
               <WalletProvider>
-                <CampaignProvider>
-                  <NavBar />
-                  {children}
-                  <Toaster />
-                </CampaignProvider>
+                <NavBar />
+                {children}
+                <Toaster />
               </WalletProvider>
             </UserProvider>
           </TanstackProvider>

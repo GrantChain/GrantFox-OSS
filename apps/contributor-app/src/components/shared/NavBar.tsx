@@ -8,8 +8,11 @@ import { Tent } from "lucide-react";
 import { SearchCommand } from "@/components/shared/SearchCommand";
 import { UserButton } from "@/components/shared/UserButton";
 import { RainbowButton } from "../ui/rainbow-button";
+import { useUser } from "@/context/UserContext";
 
 export const NavBar = () => {
+  const { user } = useUser();
+
   return (
     <header className="sticky top-0 z-40 w-full  bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 mt-1">
       <div className="mx-auto flex h-14  items-center justify-between px-4">
@@ -41,11 +44,13 @@ export const NavBar = () => {
           </Link> */}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/campaigns" className="hidden sm:block">
-            <RainbowButton variant="outline">
-              <Tent className="size-3" /> Campaign
-            </RainbowButton>
-          </Link>
+          {user && (
+            <Link href="/campaigns" className="hidden sm:block">
+              <RainbowButton variant="outline">
+                <Tent className="size-3" /> Campaign
+              </RainbowButton>
+            </Link>
+          )}
 
           <SearchCommand />
 
