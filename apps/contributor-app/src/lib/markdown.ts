@@ -1,10 +1,10 @@
 import type { PluggableList } from "unified";
 import rehypeRaw from "rehype-raw";
-import rehypeSanitize, { defaultSchema, type Schema } from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 // Extend the default sanitize schema to allow common GitHub README HTML
 // while keeping a conservative, safe set of tags and attributes.
-const markdownSanitizeSchema: Schema = {
+const markdownSanitizeSchema = {
   ...defaultSchema,
   tagNames: [
     ...(defaultSchema.tagNames ?? []),
