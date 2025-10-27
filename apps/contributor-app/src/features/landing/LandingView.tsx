@@ -57,7 +57,7 @@ export function LandingView() {
                   </RainbowButton>
                 </Link>
 
-                <Link href="/campaigns" className="block">
+                <Link href="/my-applications" className="block">
                   <Button variant="outline" className="cursor-pointer">
                     <GitFork className="size-3" /> My Applications
                   </Button>
