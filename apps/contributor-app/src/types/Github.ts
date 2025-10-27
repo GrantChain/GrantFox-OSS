@@ -140,8 +140,8 @@ export interface Issue {
   user: Owner;
   state: "open" | "closed";
   locked: boolean;
-  assignee: string | null;
-  assignees: string[];
+  assignee: Owner | null;
+  assignees: Owner[];
   milestone: string | null;
   comments: number;
   created_at: string;

@@ -20,7 +20,8 @@ import { Ban } from "lucide-react";
 import { Back } from "@/components/shared/Back";
 import { Issue, IssueLabel } from "@/types/Github";
 import { useCampaignContext } from "@/context/CampaignContext";
-import { Card } from "@/components/ui/card";
+import { GithubUserCard } from "@/components/shared/GithubUserCard";
+import { IssueCard } from "@/components/shared/IssueCard";
 
 export function RepoView({ org, repo }: { org: string; repo: string }) {
   const { activeCampaign } = useCampaignContext();
@@ -66,10 +67,9 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
 
   return (
     <main className="relative mx-auto w-full max-w-6xl px-4 py-10">
-      <DotPattern className="[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]" />
       <section className="relative z-10">
         <Back />
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold">{data.name}</h1>
             <p className="text-muted-foreground">{data.description}</p>
@@ -78,6 +78,7 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
               {data.language}
             </div>
           </div>
+
           <Button asChild>
             <Link
               href={
@@ -118,51 +119,7 @@ export function RepoView({ org, repo }: { org: string; repo: string }) {
               )
             : []
           ).map((issue: Issue) => (
-            <Link
-              key={issue.id}
-              href={`/org/${org}/repo/${repo}/issue/${issue.number}`}
-            >
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium">
-                    #{issue.number} {issue.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    • {issue.comments} comments
-                  </div>
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Opened by {issue.user?.login} on{" "}
-                  {new Date(issue.created_at).toLocaleDateString()}
-                </div>
-
-                {Array.isArray(issue.labels) && issue.labels.length > 0 ? (
-                  <div className="flex flex-wrap gap-2 pt-1 mt-2">
-                    {issue.labels.map((l: IssueLabel, idx: number) => {
-                      const name: string = l.name;
-                      const color =
-                        typeof l === "string" ? undefined : l?.color;
-                      return (
-                        <span
-                          key={idx}
-                          className="rounded-full border px-2 py-0.5 text-xs"
-                          style={
-                            color
-                              ? {
-                                  backgroundColor: `#${color}20`,
-                                  borderColor: `#${color}40`,
-                                }
-                              : undefined
-                          }
-                        >
-                          {name}
-                        </span>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </Card>
-            </Link>
+            <IssueCard key={issue.id} org={org} repo={repo} issue={issue} />
           ))}
           {!campaignLabel && (
             <Empty>

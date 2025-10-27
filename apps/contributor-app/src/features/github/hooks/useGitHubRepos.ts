@@ -68,3 +68,18 @@ export function useGitHubAllIssueComments(
     enabled: Boolean(owner && repo),
   });
 }
+
+export function useGitHubIssueTimeline(
+  owner: string,
+  repo: string,
+  issue_number: number,
+  params?: { per_page?: number; page?: number }
+) {
+  return useQuery({
+    queryKey: ["gh", "issue-timeline", owner, repo, issue_number, params],
+    queryFn: () =>
+      reposService.getIssueTimeline(owner, repo, issue_number, params),
+    enabled: Boolean(owner && repo && issue_number),
+    staleTime: 60_000,
+  });
+}

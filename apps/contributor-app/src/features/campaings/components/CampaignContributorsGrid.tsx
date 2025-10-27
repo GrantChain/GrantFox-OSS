@@ -1,6 +1,6 @@
 "use client";
 
-import { GithubUserCard } from "@/components/shared/GithubUser";
+import { GithubUserCard } from "@/components/shared/GithubUserCard";
 import type { ApiUser } from "@/types/user.type";
 
 interface CampaignContributorsGridProps {
@@ -9,19 +9,9 @@ interface CampaignContributorsGridProps {
 
 const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
   return (
-    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
       {users.length > 0 ? (
-        users.map((user) => (
-          <GithubUserCard
-            key={user.user_id}
-            img={
-              user.avatar_url ??
-              "https://avatars.githubusercontent.com/u/178688063?v=4"
-            }
-            name={user.username ?? "Unknown"}
-            username={user.username ?? "unknown"}
-          />
-        ))
+        users.map((user) => <GithubUserCard user={user} key={user.user_id} />)
       ) : (
         <p className="text-muted-foreground">No contributors found</p>
       )}

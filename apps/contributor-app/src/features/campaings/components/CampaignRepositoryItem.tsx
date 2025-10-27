@@ -28,8 +28,8 @@ const CampaignRepositoryItem = ({ repo }: CampaignRepositoryItemProps) => {
   const parsed = parseGitHubOrgAndRepo(repo.github_url);
   const isInternal = Boolean(parsed);
   const href = parsed
-    ? `/org/${parsed.org}/repo/${parsed.repo}`
-    : repo.github_url;
+    ? `/campaigns/org/${parsed.org}/repo/${parsed.repo}`
+    : `/campaigns/${repo.github_repo_id}`;
 
   return (
     <Link

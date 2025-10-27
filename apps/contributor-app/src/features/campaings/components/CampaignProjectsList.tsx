@@ -16,7 +16,7 @@ const CampaignProjectsList = ({ projects }: CampaignProjectsListProps) => {
       {projects.length > 0 ? (
         projects.map((proj) => (
           <Link
-            href={`/org/${proj.github_handle}`}
+            href={`/campaigns/org/${proj.github_handle}`}
             className="text-lg font-medium"
             key={proj.project_id}
           >

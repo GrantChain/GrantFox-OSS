@@ -1,3 +1,4 @@
+import { Issue } from "@/types/Github";
 import type { AxiosInstance } from "axios";
 
 export class GitHubReposService {
@@ -27,9 +28,29 @@ export class GitHubReposService {
     return data;
   }
 
-  async getIssue(owner: string, repo: string, issue_number: number) {
+  async getIssue(
+    owner: string,
+    repo: string,
+    issue_number: number
+  ): Promise<Issue> {
     const { data } = await this.http.get(
       `/repos/${owner}/${repo}/issues/${issue_number}`
+    );
+    return data;
+  }
+
+  async getIssueTimeline(
+    owner: string,
+    repo: string,
+    issue_number: number,
+    params?: { per_page?: number; page?: number }
+  ) {
+    const { data } = await this.http.get(
+      `/repos/${owner}/${repo}/issues/${issue_number}/timeline`,
+      {
+        params,
+        headers: { Accept: "application/vnd.github.mockingbird-preview+json" },
+      }
     );
     return data;
   }

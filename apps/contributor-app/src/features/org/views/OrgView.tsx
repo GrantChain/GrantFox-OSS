@@ -126,7 +126,7 @@ export function OrgView({ org }: { org: string }) {
                     />
                     <div className="min-w-0">
                       <Link
-                        href={`/org/${org}/repo/${r.name}`}
+                        href={`/campaigns/org/${org}/repo/${r.name}`}
                         className="font-medium hover:underline truncate block"
                       >
                         {`${org}/${r.name}`}
