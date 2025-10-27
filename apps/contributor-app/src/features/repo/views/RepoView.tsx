@@ -246,7 +246,7 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
                           </EmptyMedia>
                           <EmptyTitle>No README found</EmptyTitle>
                           <EmptyDescription>
-                            This repository doesn't have a README file.
+                            This repository does not have a README file.
                           </EmptyDescription>
                         </EmptyHeader>
                       </Empty>
