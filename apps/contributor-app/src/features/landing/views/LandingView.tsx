@@ -15,13 +15,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import type { Repository } from "@/types/repositories.type";
-import { Badge } from "@/components/ui/badge";
-import { Star, GitFork, MessageSquare, Tent } from "lucide-react";
+import { Tent } from "lucide-react";
 import Image from "next/image";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { Search } from "lucide-react";
 import { getAllApprovedProjects } from "@/features/projects/hooks/useProjects";
 import { RainbowButton } from "@/components/ui/rainbow-button";
+import { useUser } from "@/context/UserContext";
 
 const files = [
   {
@@ -40,44 +38,7 @@ const files = [
 
 export function LandingView() {
   const { data: projects } = getAllApprovedProjects();
-
-  // Build project cards for marquee from approved projects without GitHub API calls
-  const projectCards = useMemo(() => {
-    return (projects ?? []).map((p) => {
-      const sources: string[] = (p?.repositories ?? []).map(
-        (r) => r.github_url
-      );
-      if (sources.length === 0 && p.github_handle)
-        sources.push(p.github_handle);
-      let ownerLogin: string | null = null;
-      for (const url of sources) {
-        try {
-          if (url?.startsWith("http")) {
-            const u = new URL(url);
-            const parts = u.pathname.replace(/^\//, "").split("/");
-            if (parts.length >= 1) ownerLogin = parts[0];
-          } else if (url && url.includes("/")) {
-            const parts = url.split("/");
-            ownerLogin = parts[0];
-          }
-          if (ownerLogin) break;
-        } catch {}
-      }
-      // Use GitHub avatar CDN directly (non-API) or fallback to first maintainer
-      const avatarUrl =
-        (ownerLogin
-          ? `https://github.com/${ownerLogin}.png?size=64`
-          : undefined) ??
-        p.maintainers?.[0]?.avatar_url ??
-        "/favicon.ico";
-      return {
-        key: p.project_id,
-        display: p.name,
-        ownerLogin,
-        avatarUrl,
-      };
-    });
-  }, [projects]);
+  const { user } = useUser();
 
   // Flatten repositories from projects; avoid GitHub API calls entirely
   const flatRepositories: Repository[] = useMemo(() => {
@@ -109,11 +70,13 @@ export function LandingView() {
               contribution fast.
             </p>
 
-            <Link href="/campaigns" className="block">
-              <RainbowButton variant="outline">
-                <Tent className="size-3" /> Campaign
-              </RainbowButton>
-            </Link>
+            {user && (
+              <Link href="/campaigns" className="block">
+                <RainbowButton variant="outline">
+                  <Tent className="size-3" /> Campaign
+                </RainbowButton>
+              </Link>
+            )}
           </section>
 
           <div>
