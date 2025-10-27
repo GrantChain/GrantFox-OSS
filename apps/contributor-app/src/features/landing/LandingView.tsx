@@ -5,8 +5,6 @@ import Link from "next/link";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { Marquee } from "@/components/ui/marquee";
-import { useMemo } from "react";
-import { ShineBorder } from "@/components/ui/shine-border";
 import {
   RocketIcon,
   GitHubLogoIcon,
@@ -14,10 +12,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import type { Repository } from "@/types/repositories.type";
 import { Tent } from "lucide-react";
-import Image from "next/image";
-import { getAllApprovedProjects } from "@/features/projects/hooks/useProjects";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { useUser } from "@/context/UserContext";
 
@@ -37,24 +32,7 @@ const files = [
 ];
 
 export function LandingView() {
-  const { data: projects } = getAllApprovedProjects();
   const { user } = useUser();
-
-  // Flatten repositories from projects; avoid GitHub API calls entirely
-  const flatRepositories: Repository[] = useMemo(() => {
-    const list: Repository[] = [];
-    const seen = new Set<string>();
-    for (const p of projects ?? []) {
-      for (const r of p.repositories ?? []) {
-        const key = `${r.github_url}`.toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          list.push(r);
-        }
-      }
-    }
-    return list;
-  }, [projects]);
 
   return (
     <>
@@ -143,74 +121,6 @@ export function LandingView() {
                 }
               />
             </BentoGrid>
-          </div>
-        </section>
-
-        <section className="relative z-10 mt-16 grid grid-cols-1 gap-8">
-          <div className="relative rounded-2xl border p-5 bg-gradient-to-b from-background/40 to-background/10">
-            <ShineBorder
-              className="pointer-events-none"
-              shineColor={["#7c3aed33", "#22d3ee33"]}
-            />
-            <h2 className="text-lg font-semibold">Repositories</h2>
-            <p className="text-sm text-muted-foreground">
-              Most popular repositories from approved projects.
-            </p>
-            <div className="space-y-3 mt-4">
-              {flatRepositories.slice(0, 5).map((r: Repository) => (
-                <div
-                  key={r.github_url}
-                  className="relative rounded-xl border p-4 hover:bg-accent/40 transition-all hover:-translate-y-0.5 shadow-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-2 min-w-0">
-                      <Image
-                        src={(() => {
-                          try {
-                            if (r.github_url?.startsWith("http")) {
-                              const u = new URL(r.github_url);
-                              const parts = u.pathname
-                                .replace(/^\//, "")
-                                .split("/");
-                              if (parts.length >= 1 && parts[0]) {
-                                return `https://github.com/${parts[0]}.png?size=40`;
-                              }
-                            } else if (
-                              r.github_url &&
-                              r.github_url.includes("/")
-                            ) {
-                              const parts = r.github_url.split("/");
-                              if (parts[0])
-                                return `https://github.com/${parts[0]}.png?size=40`;
-                            }
-                          } catch {}
-                          return "/favicon.ico";
-                        })()}
-                        alt={r.name}
-                        width={28}
-                        height={28}
-                        className="rounded"
-                      />
-                      <div className="min-w-0">
-                        <Link
-                          href={r.github_url}
-                          className="font-medium hover:underline truncate block"
-                        >
-                          {r.name}
-                        </Link>
-                        {r.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {r.description}
-                          </p>
-                        )}
-                        {/* No dynamic GH stats to avoid API usage */}
-                      </div>
-                    </div>
-                    <div className="shrink-0 text-xs text-muted-foreground leading-none"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
       </main>

@@ -30,6 +30,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { markdownRehypePlugins } from "@/lib/markdown";
 import { GithubUserCard } from "@/components/shared/GithubUserCard";
+import { Badge } from "@/components/ui/badge";
 
 export function IssueView({
   org,
@@ -117,9 +118,7 @@ export function IssueView({
                 {issue.title}
               </p>
             </div>
-            <span className="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-bold whitespace-nowrap bg-muted text-muted-foreground">
-              {issue.state.toUpperCase()}
-            </span>
+            <Badge variant="outline">{issue.state.toUpperCase()}</Badge>
           </div>
 
           {/* Metadata */}
@@ -165,19 +164,22 @@ export function IssueView({
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-muted/50 p-4 flex gap-4">
-          <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground mb-1">
-              How to apply to this issue
-            </p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              To apply for this issue, <strong>comment on GitHub</strong>{" "}
-              expressing your interest and relevant experience. The maintainers
-              will review your application and assign the issue if approved.
-            </p>
+        {Array.isArray(issue.assignees) && issue.assignees.length === 0 && (
+          <div className="rounded-lg border border-border bg-muted/50 p-4 flex gap-4">
+            <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground mb-1">
+                How to apply to this issue
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                To apply for this issue, <strong>comment on GitHub</strong>{" "}
+                expressing your interest and relevant experience. The
+                maintainers will review your application and assign the issue if
+                approved.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <div className="flex items-center gap-3">

@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, ChevronDown } from "lucide-react";
+import { LogOut, ChevronDown, Projector } from "lucide-react";
 import { useState } from "react";
+import { Separator } from "../ui/separator";
 
 export function UserButton() {
   const { user, loading, signOut } = useUser();
@@ -137,7 +138,18 @@ export function UserButton() {
             >
               <AppWindow className="size-4" /> Maintainer App
             </Link> */}
-            {/* <Separator className="my-2" /> */}
+
+            <Separator className="my-2" />
+
+            <Link
+              href="https://contribute.grantfox.xyz"
+              className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent rounded-lg"
+              role="menuitem"
+              target="_blank"
+            >
+              <Projector className="size-4" /> Contributor App
+            </Link>
+
             <button
               onClick={async () => {
                 await signOut();
