@@ -85,7 +85,7 @@ export function LandingView() {
                 name="Curated Orgs"
                 description="Explore featured organizations with active repositories."
                 Icon={GitHubLogoIcon}
-                href="/discover"
+                href="/campaigns"
                 cta="Explore"
                 className="col-span-2"
                 background={
@@ -122,7 +122,7 @@ export function LandingView() {
                 name="Trending Repos"
                 description="See repos gaining stars and contributions."
                 Icon={StarFilledIcon}
-                href="/discover"
+                href="/campaigns"
                 cta="View"
                 className="col-span-1"
                 background={<div className="absolute inset-0" />}
@@ -131,7 +131,7 @@ export function LandingView() {
                 name="First Issues"
                 description="Good-first issues for quick wins."
                 Icon={RocketIcon}
-                href="/discover"
+                href="/campaigns"
                 cta="Start"
                 className="col-span-1"
                 background={

@@ -17,7 +17,7 @@ export default function CampaignView() {
   });
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto p-0 sm:px-4 sm:py-8">
       {!activeCampaign ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />
@@ -27,12 +27,6 @@ export default function CampaignView() {
         </Card>
       ) : (
         <>
-          <Image
-            src={activeCampaign?.image_url}
-            alt="Banner"
-            width={100}
-            height={100}
-          />
           <CampaignHero
             activeCampaign={activeCampaign}
             contributorsCount={contributors?.length ?? 0}
