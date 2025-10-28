@@ -45,7 +45,8 @@ export function createGitHubHttpClient(
       req.headers = req.headers ?? {};
       req.headers.Authorization = `Bearer ${token}`;
       req.headers["X-GitHub-Api-Version"] = "2022-11-28";
-      if (!req.headers["User-Agent"]) {
+      // The browser forbids setting the User-Agent header. Only set it on the server.
+      if (typeof window === "undefined" && !req.headers["User-Agent"]) {
         req.headers["User-Agent"] = "GrantFox-App";
       }
     }
