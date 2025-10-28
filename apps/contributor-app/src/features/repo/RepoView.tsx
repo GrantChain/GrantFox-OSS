@@ -30,6 +30,14 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { markdownRehypePlugins } from "@/lib/markdown";
 import { RepoAside } from "./RepoAside";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
   const { activeCampaign } = useCampaignContext();
@@ -45,12 +53,13 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
     {
       per_page: 30,
       state: "open",
-      labels: campaignLabel,
     }
   );
 
   const [readme, setReadme] = useState<string | null>(null);
   const [readmeLoading, setReadmeLoading] = useState(false);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [activeOnly, setActiveOnly] = useState<boolean>(Boolean(campaignLabel));
 
   useEffect(() => {
     const fetchReadme = async () => {
@@ -79,6 +88,10 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
     fetchReadme();
   }, [org, repo, data]);
 
+  useEffect(() => {
+    setActiveOnly(Boolean(campaignLabel));
+  }, [campaignLabel]);
+
   if (repoLoading) {
     return (
       <main className="relative mx-auto w-full max-w-7xl px-4 py-10">
@@ -105,11 +118,35 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
     );
   }
 
-  const campaignIssues = campaignLabel
-    ? ((issuesLoading ? [] : issues) ?? []).filter((issue: Issue) =>
-        (issue.labels ?? []).some((l) => l.name === campaignLabel)
-      )
-    : [];
+  const allIssues: Issue[] = ((issuesLoading ? [] : issues) ?? []) as Issue[];
+  const issuesOnly: Issue[] = allIssues.filter(
+    (it: unknown) => !(it as Record<string, unknown>)?.["pull_request"]
+  );
+
+  const availableLabels: string[] = Array.from(
+    new Set(
+      issuesOnly
+        .flatMap((iss) => (Array.isArray(iss.labels) ? iss.labels : []))
+        .map((l) => l.name)
+        .filter(Boolean)
+    )
+  ).sort((a, b) => a.localeCompare(b));
+
+  const filteredIssues: Issue[] = issuesOnly.filter((issue) => {
+    // Filter by active campaign label if enabled and available
+    if (activeOnly && campaignLabel) {
+      const hasCampaign = (issue.labels ?? []).some(
+        (l) => l.name === campaignLabel
+      );
+      if (!hasCampaign) return false;
+    }
+    // Filter by selected labels (OR match)
+    if (selectedLabels.length > 0) {
+      const names = new Set((issue.labels ?? []).map((l) => l.name));
+      if (![...selectedLabels].some((l) => names.has(l))) return false;
+    }
+    return true;
+  });
 
   return (
     <main className="relative">
@@ -136,55 +173,124 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="readme">README</TabsTrigger>
               <TabsTrigger value="issues">
-                Issues ({campaignIssues.length})
+                Issues ({filteredIssues.length})
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="issues" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Campaign Issues</CardTitle>
+                  <CardTitle>Issues</CardTitle>
                   <CardDescription>
-                    {campaignLabel
-                      ? `Issues labeled with "${campaignLabel}"`
-                      : "Select an active campaign to view labeled issues"}
+                    {activeOnly && campaignLabel
+                      ? `Filtered by active campaign: "${campaignLabel}"`
+                      : "Browse and filter open issues"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {campaignLabel && campaignIssues.length === 0 && (
+                  <div className="space-y-4">
+                    {/* Filters */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            Labels ({selectedLabels.length})
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-64">
+                          <div className="space-y-2">
+                            <div className="text-xs text-muted-foreground">
+                              Select labels
+                            </div>
+                            <div className="max-h-56 overflow-auto pr-1 space-y-2">
+                              {availableLabels.length === 0 ? (
+                                <div className="text-xs text-muted-foreground">
+                                  No labels found
+                                </div>
+                              ) : (
+                                availableLabels.map((lbl) => {
+                                  const checked = selectedLabels.includes(lbl);
+                                  const inputId = `lbl-${lbl.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+                                  return (
+                                    <div
+                                      key={lbl}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Checkbox
+                                        id={inputId}
+                                        checked={checked}
+                                        onCheckedChange={(v) => {
+                                          const isChecked = v === true;
+                                          setSelectedLabels((prev) =>
+                                            isChecked
+                                              ? prev.includes(lbl)
+                                                ? prev
+                                                : [...prev, lbl]
+                                              : prev.filter((x) => x !== lbl)
+                                          );
+                                        }}
+                                      />
+                                      <Label htmlFor={inputId}>{lbl}</Label>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="active-only"
+                          checked={activeOnly}
+                          disabled={!campaignLabel}
+                          onCheckedChange={(v) => setActiveOnly(v === true)}
+                        />
+                        <Label htmlFor="active-only">
+                          Active campaign
+                          {campaignLabel ? `: ${campaignLabel}` : " (none)"}
+                        </Label>
+                      </div>
+
+                      {(selectedLabels.length > 0 || activeOnly) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedLabels([]);
+                            setActiveOnly(Boolean(campaignLabel));
+                          }}
+                        >
+                          Clear filters
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Results */}
+                    {filteredIssues.length === 0 ? (
                       <Empty>
                         <EmptyHeader>
                           <EmptyMedia variant="icon">
                             <Ban />
                           </EmptyMedia>
-                          <EmptyTitle>No campaign issues</EmptyTitle>
-                          <EmptyDescription>{`No issues found with label ${campaignLabel}.`}</EmptyDescription>
-                        </EmptyHeader>
-                      </Empty>
-                    )}
-
-                    {campaignIssues.map((issue: Issue) => (
-                      <IssueCard
-                        key={issue.id}
-                        org={org}
-                        repo={repo}
-                        issue={issue}
-                      />
-                    ))}
-
-                    {!campaignLabel && (
-                      <Empty>
-                        <EmptyHeader>
-                          <EmptyMedia variant="icon">
-                            <Ban />
-                          </EmptyMedia>
-                          <EmptyTitle>No active campaign</EmptyTitle>
+                          <EmptyTitle>No issues found</EmptyTitle>
                           <EmptyDescription>
-                            Select an active campaign to view labeled issues.
+                            {availableLabels.length === 0
+                              ? "This repository has no open issues."
+                              : "Try adjusting or clearing the filters."}
                           </EmptyDescription>
                         </EmptyHeader>
                       </Empty>
+                    ) : (
+                      filteredIssues.map((issue: Issue) => (
+                        <IssueCard
+                          key={issue.id}
+                          org={org}
+                          repo={repo}
+                          issue={issue}
+                        />
+                      ))
                     )}
                   </div>
                 </CardContent>
