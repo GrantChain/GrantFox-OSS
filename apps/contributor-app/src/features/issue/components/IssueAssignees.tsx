@@ -1,10 +1,10 @@
 import { GithubUserCard } from "@/components/shared/GithubUserCard";
+import { Owner } from "@/types/Github";
 import { User } from "lucide-react";
 import { memo } from "react";
 
 export interface IssueAssigneesProps {
-  /** Array of GitHub users */
-  assignees: unknown[] | null | undefined;
+  assignees: Owner[];
 }
 
 export const IssueAssignees = memo(function IssueAssignees({
@@ -15,12 +15,13 @@ export const IssueAssignees = memo(function IssueAssignees({
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <User className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm font-semibold text-foreground">Assigned to</span>
+        <span className="text-sm font-semibold text-foreground">
+          Assigned to
+        </span>
       </div>
       {hasAssignees ? (
         <div className="flex flex-wrap gap-2">
-          {assignees!.map((assignee: unknown, idx: number) => (
-            // We don't know exact shape here; GithubUserCard reads it safely
+          {assignees.map((assignee, idx) => (
             <GithubUserCard key={idx} user={assignee} />
           ))}
         </div>
@@ -30,5 +31,3 @@ export const IssueAssignees = memo(function IssueAssignees({
     </div>
   );
 });
-
-

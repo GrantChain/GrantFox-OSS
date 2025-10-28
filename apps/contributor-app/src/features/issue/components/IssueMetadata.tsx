@@ -4,19 +4,14 @@ import { GithubUserCard } from "@/components/shared/GithubUserCard";
 import { Calendar, MessageSquare, GitPullRequest, Github } from "lucide-react";
 import { memo } from "react";
 import type { LinkedPullRequestSummary } from "../hooks/useLinkedPullRequest";
+import { Owner } from "@/types/Github";
 
 export interface IssueMetadataProps {
-  /** GitHub user object */
-  user: unknown;
-  /** ISO date string */
+  user: Owner;
   createdAt: string;
-  /** Comments count */
   commentsCount: number;
-  /** The linked PR, if any */
   linkedPR: LinkedPullRequestSummary;
-  /** Whether the linked PR has been merged */
   isMerged: boolean;
-  /** URL of the issue on GitHub */
   htmlUrl: string;
 }
 
@@ -60,7 +55,11 @@ export const IssueMetadata = memo(function IssueMetadata({
         </Link>
       )}
 
-      <Button asChild size="lg" className="w-full sm:w-auto gap-2 font-semibold">
+      <Button
+        asChild
+        size="lg"
+        className="w-full sm:w-auto gap-2 font-semibold"
+      >
         <Link href={htmlUrl} target="_blank" rel="noreferrer">
           <Github className="w-5 h-5" />
           View on GitHub
@@ -69,5 +68,3 @@ export const IssueMetadata = memo(function IssueMetadata({
     </div>
   );
 });
-
-
