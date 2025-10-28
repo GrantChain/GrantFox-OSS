@@ -6,14 +6,16 @@ interface CampaignTagsProps {
   tags: string[] | undefined;
 }
 
-export default function CampaignTags({ tags }: CampaignTagsProps) {
+export const CampaignTags = ({ tags }: CampaignTagsProps) => {
   return (
     <section className="w-full gap-4 flex justify-between items-center mt-5">
-      {tags?.map((tag) => (
-        <Badge key={tag} variant="outline">
-          {tag}
-        </Badge>
-      ))}
+      <div className="flex gap-2">
+        {tags?.map((tag) => (
+          <Badge key={tag} variant="outline">
+            {tag}
+          </Badge>
+        ))}
+      </div>
 
       <Link href="https://stellar.org" target="_blank">
         <div className="flex items-center gap-2">
@@ -39,4 +41,4 @@ export default function CampaignTags({ tags }: CampaignTagsProps) {
       </Link>
     </section>
   );
-}
+};

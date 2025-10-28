@@ -1,16 +1,15 @@
 "use client";
 
 import { useCampaignContext } from "@/context/CampaignContext";
-import CampaignHero from "../components/CampaignHero";
-import CampaignTags from "../components/CampaignTags";
-import CampaignTimeRemaining from "../components/CampaignTimeRemaining";
-import CampaignReposAndContributors from "../components/CampaignReposAndContributors";
+import { CampaignHero } from "../components/CampaignHero";
+import { CampaignTags } from "../components/CampaignTags";
+import { CampaignTimeRemaining } from "../components/CampaignTimeRemaining";
+import { CampaignReposAndContributors } from "../components/CampaignReposAndContributors";
 import { useCampaignQuery } from "../hooks/useCampaignQuery";
 import { Card } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
-import Image from "next/image";
 
-export default function CampaignView() {
+export const CampaignView = () => {
   const { activeCampaign } = useCampaignContext();
   const { data: contributors } = useCampaignQuery({
     campaignId: activeCampaign?.campaign_id,
@@ -39,10 +38,9 @@ export default function CampaignView() {
           />
           <CampaignReposAndContributors
             activeCampaign={activeCampaign ?? null}
-            contributors={contributors}
           />
         </>
       )}
     </>
   );
-}
+};

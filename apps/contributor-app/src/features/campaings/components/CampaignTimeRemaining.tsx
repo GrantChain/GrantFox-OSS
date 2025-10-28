@@ -7,10 +7,10 @@ interface CampaignTimeRemainingProps {
   endDate: string | undefined;
 }
 
-export default function CampaignTimeRemaining({
+export const CampaignTimeRemaining = ({
   startDate,
   endDate,
-}: CampaignTimeRemainingProps) {
+}: CampaignTimeRemainingProps) => {
   const { remaining, remainingEnds } = useCampaingRemaining(
     startDate || "",
     endDate || ""
@@ -84,4 +84,4 @@ export default function CampaignTimeRemaining({
       </section>
     </div>
   );
-}
+};

@@ -2,10 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { Campaign } from "@/types/campaign.type";
-import type { ApiUser } from "@/types/user.type";
-import CampaignSectionTabs from "./CampaignSectionTabs";
-import CampaignContributorsGrid from "./CampaignContributorsGrid";
-import CampaignProjectsList from "@/features/campaings/components/CampaignProjectsList";
+import { CampaignSectionTabs } from "./CampaignSectionTabs";
+import { CampaignProjectsList } from "@/features/campaings/components/CampaignProjectsList";
 import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "../services/campaign.service";
 import { http } from "@/lib/api";
@@ -13,24 +11,19 @@ import { CampaignRepositoriesList } from "./CampaignRepositoriesList";
 
 interface CampaignReposAndContributorsProps {
   activeCampaign: Campaign | null;
-  contributors: ApiUser[] | undefined;
 }
 
-const CampaignReposAndContributors = ({
+export const CampaignReposAndContributors = ({
   activeCampaign,
-  contributors,
 }: CampaignReposAndContributorsProps) => {
   const [sectionActive, setSectionActive] = useState({
-    repositories: true,
-    contributors: false,
-    projects: false,
+    repositories: false,
+    projects: true,
   });
-  const activeTab: "repositories" | "contributors" | "projects" =
-    useMemo(() => {
-      if (sectionActive.repositories) return "repositories";
-      if (sectionActive.contributors) return "contributors";
-      return "projects";
-    }, [sectionActive]);
+  const activeTab: "repositories" | "projects" = useMemo(() => {
+    if (sectionActive.repositories) return "repositories";
+    return "projects";
+  }, [sectionActive]);
 
   const service = useMemo(() => new CampaignService(http), []);
   const { data: campaignWithProjects } = useQuery({
@@ -55,7 +48,6 @@ const CampaignReposAndContributors = ({
         onChange={(tab) =>
           setSectionActive({
             repositories: tab === "repositories",
-            contributors: tab === "contributors",
             projects: tab === "projects",
           })
         }
@@ -66,9 +58,6 @@ const CampaignReposAndContributors = ({
             repositories={activeCampaign.repositories}
           />
         )}
-        {activeTab === "contributors" && contributors && (
-          <CampaignContributorsGrid users={contributors} />
-        )}
         {activeTab === "projects" && campaignWithProjects?.projects && (
           <CampaignProjectsList projects={campaignWithProjects.projects} />
         )}
@@ -76,5 +65,3 @@ const CampaignReposAndContributors = ({
     </section>
   );
 };
-
-export default CampaignReposAndContributors;

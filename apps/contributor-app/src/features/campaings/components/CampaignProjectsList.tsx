@@ -10,7 +10,9 @@ interface CampaignProjectsListProps {
   projects: Project[];
 }
 
-const CampaignProjectsList = ({ projects }: CampaignProjectsListProps) => {
+export const CampaignProjectsList = ({
+  projects,
+}: CampaignProjectsListProps) => {
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.length > 0 ? (
@@ -50,5 +52,3 @@ const CampaignProjectsList = ({ projects }: CampaignProjectsListProps) => {
     </div>
   );
 };
-
-export default CampaignProjectsList;
