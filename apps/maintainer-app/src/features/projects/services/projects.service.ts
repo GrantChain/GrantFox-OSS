@@ -55,7 +55,7 @@ export class ProjectsService {
     newOwnerId: string
   ): Promise<Project> {
     try {
-      const { data } = await this.http.post(
+      const { data } = await this.http.patch(
         `/project-maintainers/project/${projectId}/transfer-ownership`,
         { new_owner_id: newOwnerId }
       );
