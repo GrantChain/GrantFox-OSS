@@ -1,20 +1,22 @@
 "use client";
 
 import type { Repository } from "@/types/repositories.type";
-import CampaignRepositoryItem from "./CampaignRepositoryItem";
+import { RepositoryCard } from "@/components/shared/RepositoryCard";
 
 interface CampaignRepositoriesListProps {
   repositories: Repository[];
+  org?: string;
 }
 
-const CampaignRepositoriesList = ({
+export const CampaignRepositoriesList = ({
   repositories,
+  org = undefined,
 }: CampaignRepositoriesListProps) => {
   return (
     <div className="w-full flex flex-col gap-8">
       {repositories.length > 0 ? (
         repositories.map((repo) => (
-          <CampaignRepositoryItem key={repo.github_repo_id} repo={repo} />
+          <RepositoryCard key={repo.github_repo_id} repo={repo} org={org} />
         ))
       ) : (
         <p className="text-muted-foreground">No repositories found</p>
@@ -22,5 +24,3 @@ const CampaignRepositoriesList = ({
     </div>
   );
 };
-
-export default CampaignRepositoriesList;

@@ -7,10 +7,12 @@ import Image from "next/image";
 
 interface RepositoryCardProps {
   repo: Repository;
-  org: string;
+  org?: string;
 }
 
 export const RepositoryCard = ({ repo, org }: RepositoryCardProps) => {
+  const organization = org ?? repo.github_url.split("/")[3];
+
   return (
     <div
       key={repo.github_repo_id}
@@ -25,21 +27,25 @@ export const RepositoryCard = ({ repo, org }: RepositoryCardProps) => {
           <Image
             width={32}
             height={32}
-            src={`https://github.com/${org}.png`}
+            src={`https://github.com/${organization}.png`}
             alt={repo.name}
             className="size-8 rounded-full"
           />
           <div className="min-w-0">
             <Link
-              href={`/campaigns/org/${org}/repo/${repo.name}`}
+              href={`/campaigns/org/${organization}/repo/${repo.name}`}
               className="font-medium hover:underline truncate block"
             >
-              {`${org}/${repo.name}`}
+              {`${organization}/${repo.name}`}
             </Link>
 
-            {repo.description && (
+            {repo.description ? (
               <p className="text-xs text-muted-foreground line-clamp-2">
                 {repo.description}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground line-clamp-2">
+                No description provided.
               </p>
             )}
           </div>

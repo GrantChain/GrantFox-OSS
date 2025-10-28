@@ -4,12 +4,12 @@ import { useMemo, useState } from "react";
 import type { Campaign } from "@/types/campaign.type";
 import type { ApiUser } from "@/types/user.type";
 import CampaignSectionTabs from "./CampaignSectionTabs";
-import CampaignRepositoriesList from "./CampaignRepositoriesList";
 import CampaignContributorsGrid from "./CampaignContributorsGrid";
 import CampaignProjectsList from "@/features/campaings/components/CampaignProjectsList";
 import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "../services/campaign.service";
 import { http } from "@/lib/api";
+import { CampaignRepositoriesList } from "./CampaignRepositoriesList";
 
 interface CampaignReposAndContributorsProps {
   activeCampaign: Campaign | null;
