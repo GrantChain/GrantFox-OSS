@@ -10,6 +10,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UpdateProjectStatusDto } from './dto/update-project-status.dto';
 import { AddMaintainerDto } from './dto/add-maintainer.dto';
+import { ValidateGithubHandleDto } from './dto/validate-github-handle.dto';
 import { ProjectStatus } from '@prisma/client';
 
 @Injectable()
@@ -357,6 +358,36 @@ export class ProjectsService {
     });
 
     return this.findOne(projectId);
+  }
+
+  async validateGithubHandle(dto: ValidateGithubHandleDto) {
+    const project = await this.prisma.project.findFirst({
+      where: {
+        github_handle: dto.github_handle,
+      },
+      select: {
+        project_id: true,
+        name: true,
+        status: true,
+      },
+    });
+
+    if (project) {
+      return {
+        exists: true,
+        github_handle: dto.github_handle,
+        project: {
+          project_id: project.project_id,
+          name: project.name,
+          status: project.status,
+        },
+      };
+    }
+
+    return {
+      exists: false,
+      github_handle: dto.github_handle,
+    };
   }
 
   private async verifyOwnership(projectId: string, userId: string) {
