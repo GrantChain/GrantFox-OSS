@@ -15,7 +15,7 @@ export const RepositoryCard = ({
   return (
     <div
       key={repository.id}
-      className="relative rounded-xl border p-4 hover:bg-accent/40 transition-all hover:-translate-y-0.5 shadow-sm"
+      className="relative h-full rounded-xl border p-4 hover:bg-accent/40 transition-all hover:-translate-y-0.5 shadow-sm"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2 min-w-0">
@@ -35,12 +35,14 @@ export const RepositoryCard = ({
             >
               {repository.full_name ?? repository.name}
             </Link>
-            {repository.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2">
+            {repository.description ? (
+              <p className="text-xs text-muted-foreground line-clamp-2 min-h-8">
                 {repository.description}
               </p>
+            ) : (
+              <div className="min-h-8" />
             )}
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2 min-h-[28px]">
               {repository.language && (
                 <Badge variant="secondary" className="px-2 py-0.5 text-[10px]">
                   {repository.language}
