@@ -1,4 +1,10 @@
-import { Contributor, Issue, Readme, PullRequest } from "@/types/Github";
+import {
+  Contributor,
+  Issue,
+  Readme,
+  PullRequest,
+  Comment,
+} from "@/types/Github";
 import type { AxiosInstance } from "axios";
 
 export class GitHubReposService {
@@ -71,7 +77,7 @@ export class GitHubReposService {
     repo: string,
     issue_number: number,
     params?: { per_page?: number; page?: number }
-  ) {
+  ): Promise<Comment[]> {
     const { data } = await this.http.get(
       `/repos/${owner}/${repo}/issues/${issue_number}/comments`,
       { params }
@@ -83,7 +89,7 @@ export class GitHubReposService {
     owner: string,
     repo: string,
     params?: { per_page?: number; page?: number; since?: string }
-  ) {
+  ): Promise<Comment[]> {
     const { data } = await this.http.get(
       `/repos/${owner}/${repo}/issues/comments`,
       { params }

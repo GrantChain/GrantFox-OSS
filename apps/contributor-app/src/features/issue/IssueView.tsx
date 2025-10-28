@@ -16,6 +16,7 @@ import { IssueAssignees } from "@/features/issue/components/IssueAssignees";
 import { IssueLabels } from "@/features/issue/components/IssueLabels";
 import { IssueDescription } from "@/features/issue/components/IssueDescription";
 import { useLinkedPullRequest } from "@/features/issue/hooks/useLinkedPullRequest";
+import { Comments } from "./components/Comments";
 
 export function IssueView({
   org,
@@ -77,7 +78,6 @@ export function IssueView({
         isMerged={isMerged}
         htmlUrl={issue.html_url}
       />
-
       {Array.isArray(issue.assignees) && issue.assignees.length === 0 && (
         <div className="rounded-lg border border-border bg-muted/50 p-4 flex gap-4">
           <AlertCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
@@ -93,14 +93,20 @@ export function IssueView({
           </div>
         </div>
       )}
-
       <IssueAssignees assignees={issue.assignees} />
 
       <IssueLabels labels={issue.labels as unknown as []} />
 
       <hr className="border-border/40" />
 
-      <IssueDescription body={issue.body} />
+      <div className="w-full flex flex-col sm:flex-row gap-4">
+        <div className="w-full sm:w-3/5">
+          <IssueDescription body={issue.body} />
+        </div>
+        <div className="w-full sm:w-2/5">
+          <Comments org={org} repo={repo} issueNumber={issue.number} />
+        </div>
+      </div>
     </section>
   );
 }

@@ -226,3 +226,29 @@ export interface PullRequest {
   state: "open" | "closed";
   merged_at: string | null;
 }
+
+export interface Comment {
+  url: string;
+  html_url: string;
+  issue_url: string;
+  id: number;
+  node_id: string;
+  user: Owner;
+  created_at: string;
+  updated_at: string;
+  author_association: string;
+  body: string;
+  reactions: {
+    url: string;
+    total_count: number;
+    "+1": number;
+    "-1": number;
+    laugh: number;
+    hooray: number;
+    confused: number;
+    heart: number;
+    rocket: number;
+    eyes: number;
+  };
+  performed_via_github_app: string | null;
+}
