@@ -185,6 +185,12 @@ export interface Issue {
   labels: IssueLabel[];
 }
 
+export interface SearchIssuesResponse {
+  total_count: number;
+  incomplete_results: boolean;
+  items: Issue[];
+}
+
 export interface IssueLabel {
   id: number;
   node_id: string;
