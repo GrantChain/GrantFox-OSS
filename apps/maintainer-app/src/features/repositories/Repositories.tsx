@@ -21,7 +21,6 @@ import { EmptyStateCard } from "@/features/repositories/components/EmptyStateCar
 import { RepoGrid } from "@/features/repositories/components/RepoGrid";
 import { useUser } from "@/context/UserContext";
 import { useRemoveRepositoryFromProject } from "@/features/repositories/hooks/useRemoveRepositoryFromProject";
-import { Button } from "@/components/ui/button";
 import { ProjectsService } from "@/features/projects/services/projects.service";
 import { http } from "@/lib/api";
 import {
@@ -52,14 +51,15 @@ export const Repositories = ({
     staleTime: 1000 * 60 * 5,
   });
   const canManageProject = useMemo(() => {
-    const createdBy = projectQuery.data?.created_by;
-    const maintainers = projectQuery.data?.maintainers ?? [];
     const userId = user?.id;
     if (!userId) return false;
-    if (createdBy && userId === createdBy) return true;
-    if (Array.isArray(maintainers) && maintainers.includes(userId)) return true;
-    return false;
-  }, [projectQuery.data?.created_by, projectQuery.data?.maintainers, user?.id]);
+    const maintainers =
+      (projectQuery.data?.maintainers as
+        | { user_id: string; is_owner: boolean }[]
+        | undefined) ?? [];
+    const ownerId = maintainers.find((m) => m.is_owner)?.user_id;
+    return ownerId === userId;
+  }, [projectQuery.data?.maintainers, user?.id]);
 
   const registeredSet = useMemo<Set<number>>(() => {
     return new Set((registeredQuery.data ?? []).map((r) => r.github_repo_id));
@@ -228,18 +228,15 @@ export const RegisteredRepositories = ({
     staleTime: 1000 * 60 * 5,
   });
   const canManageProject = useMemo(() => {
-    const createdBy = projectQuery2.data?.created_by;
-    const maintainers = projectQuery2.data?.maintainers ?? [];
     const userId = user?.id;
     if (!userId) return false;
-    if (createdBy && userId === createdBy) return true;
-    if (Array.isArray(maintainers) && maintainers.includes(userId)) return true;
-    return false;
-  }, [
-    projectQuery2.data?.created_by,
-    projectQuery2.data?.maintainers,
-    user?.id,
-  ]);
+    const maintainers =
+      (projectQuery2.data?.maintainers as
+        | { user_id: string; is_owner: boolean }[]
+        | undefined) ?? [];
+    const ownerId = maintainers.find((m) => m.is_owner)?.user_id;
+    return ownerId === userId;
+  }, [projectQuery2.data?.maintainers, user?.id]);
 
   const [registeringRepo, setRegisteringRepo] = useState<number | null>(null);
   const [removingId, setRemovingId] = useState<number | null>(null);
