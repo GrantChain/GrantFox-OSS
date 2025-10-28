@@ -42,6 +42,16 @@ export class RepositoriesService {
     }
   }
 
+  async removeRepositoryFromProject(repositoryId: string): Promise<void> {
+    try {
+      await this.http.delete(`/repositories/${repositoryId}`);
+    } catch (error) {
+      throw new Error("Failed to remove repository from project", {
+        cause: error,
+      });
+    }
+  }
+
   async addRepositoryToCampaign(
     campaignId: string,
     repository: CampaignRepositoryPayload

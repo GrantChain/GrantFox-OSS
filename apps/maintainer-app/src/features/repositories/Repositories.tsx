@@ -1,7 +1,9 @@
+"use client";
+
 import { useMemo, useEffect, useState } from "react";
-import { GitHubRepository } from "@/types/github.type";
+import { useQuery } from "@tanstack/react-query";
+import type { GitHubRepository } from "@/types/github.type";
 import { RepositoryCard } from "./RepositoryCard";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { AlertTriangle, FileIcon } from "lucide-react";
@@ -17,6 +19,20 @@ import { LoadingCard } from "@/features/repositories/components/LoadingCard";
 import { ErrorCard } from "@/features/repositories/components/ErrorCard";
 import { EmptyStateCard } from "@/features/repositories/components/EmptyStateCard";
 import { RepoGrid } from "@/features/repositories/components/RepoGrid";
+import { useUser } from "@/context/UserContext";
+import { useRemoveRepositoryFromProject } from "@/features/repositories/hooks/useRemoveRepositoryFromProject";
+import { Button } from "@/components/ui/button";
+import { ProjectsService } from "@/features/projects/services/projects.service";
+import { http } from "@/lib/api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Repositories = ({
   orgLogin,
@@ -25,16 +41,41 @@ export const Repositories = ({
   orgLogin: string | undefined;
   projectId: string;
 }) => {
+  const { user } = useUser();
   const { data, isLoading, isError } = useOrgRepositories(orgLogin);
   const registeredQuery = useProjectRepositories(projectId);
+  const projectsService = new ProjectsService(http);
+  const projectQuery = useQuery({
+    queryKey: ["project", projectId],
+    enabled: !!projectId,
+    queryFn: () => projectsService.getProject(projectId),
+    staleTime: 1000 * 60 * 5,
+  });
+  const canManageProject = useMemo(() => {
+    const createdBy = projectQuery.data?.created_by;
+    const maintainers = projectQuery.data?.maintainers ?? [];
+    const userId = user?.id;
+    if (!userId) return false;
+    if (createdBy && userId === createdBy) return true;
+    if (Array.isArray(maintainers) && maintainers.includes(userId)) return true;
+    return false;
+  }, [projectQuery.data?.created_by, projectQuery.data?.maintainers, user?.id]);
 
   const registeredSet = useMemo<Set<number>>(() => {
     return new Set((registeredQuery.data ?? []).map((r) => r.github_repo_id));
   }, [registeredQuery.data]);
 
   const [registeringId, setRegisteringId] = useState<number | null>(null);
+  const [removingProjectId, setRemovingProjectId] = useState<number | null>(
+    null
+  );
+  const [confirmRemoveProjectId, setConfirmRemoveProjectId] = useState<
+    number | null
+  >(null);
   const { mutateAsync: addRepositoryToProject } =
     useRegisterRepositoryToProject(projectId);
+  const { mutateAsync: removeFromProject } =
+    useRemoveRepositoryFromProject(projectId);
 
   if (!orgLogin) {
     return (
@@ -77,32 +118,89 @@ export const Repositories = ({
         items={data}
         renderItem={(repository: GitHubRepository) => {
           const isAlreadyRegistered = registeredSet.has(repository.id);
-          const isBusy = registeringId === repository.id;
+          const isBusy =
+            registeringId === repository.id ||
+            removingProjectId === repository.id;
           return (
             <>
-              <RepositoryCard repository={repository} />
-              <Button
-                variant="outline"
-                className="cursor-pointer"
-                onClick={async () => {
-                  try {
-                    setRegisteringId(repository.id);
-                    await addRepositoryToProject(repository);
-                  } catch (error) {
-                    console.error(error);
-                    toast.error("Failed to register repository to project");
-                  } finally {
-                    setRegisteringId(null);
+              <RepositoryCard
+                repository={repository}
+                action={
+                  canManageProject
+                    ? isAlreadyRegistered
+                      ? "remove"
+                      : "register"
+                    : "none"
+                }
+                actionLabel={
+                  isAlreadyRegistered
+                    ? removingProjectId === repository.id
+                      ? "Removing..."
+                      : "Remove from Project"
+                    : registeringId === repository.id
+                      ? "Registering..."
+                      : "Register to Project"
+                }
+                isLoading={isBusy}
+                isDangerous={isAlreadyRegistered}
+                onAction={() => {
+                  if (!canManageProject) return;
+                  if (isAlreadyRegistered) {
+                    setConfirmRemoveProjectId(repository.id);
+                  } else {
+                    (async () => {
+                      try {
+                        setRegisteringId(repository.id);
+                        await addRepositoryToProject(repository);
+                      } catch (error) {
+                        console.error(error);
+                      } finally {
+                        setRegisteringId(null);
+                      }
+                    })();
                   }
                 }}
-                disabled={isBusy || isAlreadyRegistered}
+              />
+              <AlertDialog
+                open={confirmRemoveProjectId === repository.id}
+                onOpenChange={(open) => {
+                  if (!open) setConfirmRemoveProjectId(null);
+                }}
               >
-                {isAlreadyRegistered
-                  ? "Repository in Project"
-                  : isBusy
-                    ? "Registering..."
-                    : "Register to Project"}
-              </Button>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Remove repository from project?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to remove{" "}
+                      <strong>{repository.name}</strong> from this project? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="flex gap-3 justify-end">
+                    <AlertDialogCancel className="cursor-pointer">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        try {
+                          setRemovingProjectId(repository.id);
+                          await removeFromProject(repository.id);
+                        } catch (error) {
+                          console.error(error);
+                        } finally {
+                          setRemovingProjectId(null);
+                          setConfirmRemoveProjectId(null);
+                        }
+                      }}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer"
+                    >
+                      Remove
+                    </AlertDialogAction>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
             </>
           );
         }}
@@ -118,12 +216,37 @@ export const RegisteredRepositories = ({
   projectId: string;
   projectStatus?: string;
 }) => {
+  const { user } = useUser();
   const { activeCampaign, upcomingCampaign } = useCampaignContext();
   const targetCampaign = activeCampaign ?? upcomingCampaign;
   const { data, isLoading, isError } = useProjectRepositories(projectId);
+  const projectsService2 = new ProjectsService(http);
+  const projectQuery2 = useQuery({
+    queryKey: ["project", projectId],
+    enabled: !!projectId,
+    queryFn: () => projectsService2.getProject(projectId),
+    staleTime: 1000 * 60 * 5,
+  });
+  const canManageProject = useMemo(() => {
+    const createdBy = projectQuery2.data?.created_by;
+    const maintainers = projectQuery2.data?.maintainers ?? [];
+    const userId = user?.id;
+    if (!userId) return false;
+    if (createdBy && userId === createdBy) return true;
+    if (Array.isArray(maintainers) && maintainers.includes(userId)) return true;
+    return false;
+  }, [
+    projectQuery2.data?.created_by,
+    projectQuery2.data?.maintainers,
+    user?.id,
+  ]);
 
   const [registeringRepo, setRegisteringRepo] = useState<number | null>(null);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<number | null>(null);
+  const [confirmRemoveProjectId, setConfirmRemoveProjectId] = useState<
+    number | null
+  >(null);
   const campaignReposQuery = useCampaignRepositories(
     targetCampaign?.campaign_id
   );
@@ -153,6 +276,8 @@ export const RegisteredRepositories = ({
   const { mutateAsync: removeFromCampaign } = useRemoveRepositoryFromCampaign(
     targetCampaign?.campaign_id
   );
+  const { mutateAsync: removeFromProject } =
+    useRemoveRepositoryFromProject(projectId);
 
   const githubReposQuery = useGithubRepositoriesByIds(
     projectId,
@@ -207,6 +332,9 @@ export const RegisteredRepositories = ({
           const isIn = targetCampaign?.campaign_id
             ? isInCampaign(repository.id)
             : false;
+          const isBusy =
+            registeringRepo === repository.id || removingId === repository.id;
+
           return (
             <>
               <RepositoryCard
@@ -218,69 +346,207 @@ export const RegisteredRepositories = ({
                     <Badge variant="outline">In campaign</Badge>
                   ) : null
                 }
-              />
-              {isIn ? (
-                <Button
-                  variant="destructive"
-                  className="cursor-pointer"
-                  onClick={async () => {
-                    try {
-                      setRemovingId(repository.id);
-                      await removeFromCampaign(repository.id);
-                      setCampaignRepoIds((prev) => {
-                        const next = new Set(prev);
-                        next.delete(repository.id);
-                        return next;
-                      });
-                    } catch (error) {
-                      console.error(error);
-                      toast.error("Failed to remove repository from campaign");
-                    } finally {
-                      setRemovingId(null);
-                    }
-                  }}
-                  disabled={removingId === repository.id}
-                >
-                  {removingId === repository.id ? "Removing..." : "Remove"}
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="cursor-pointer"
-                  onClick={async () => {
-                    try {
-                      setRegisteringRepo(repository.id);
-                      const dbRepo = (data ?? []).find(
-                        (d) => d.github_repo_id === repository.id
-                      );
-                      if (!dbRepo) {
-                        toast.error("Repository not found in project DB list");
-                        return;
-                      }
-                      await addRepoToCampaign(dbRepo);
-                      setCampaignRepoIds((prev) =>
-                        new Set(prev).add(repository.id)
-                      );
-                    } catch (error) {
-                      console.error(error);
-                      toast.error("Failed to register repository to campaign");
-                    } finally {
-                      setRegisteringRepo(null);
-                    }
-                  }}
-                  disabled={
-                    registeringRepo === repository.id || !canRegisterToCampaign
+                action={isIn ? "remove" : "register"}
+                actionLabel={
+                  isIn
+                    ? removingId === repository.id
+                      ? "Removing..."
+                      : "Remove from Campaign"
+                    : registeringRepo === repository.id
+                      ? "Registering..."
+                      : "Register to Active Campaign"
+                }
+                isLoading={isBusy}
+                isDangerous={isIn}
+                onAction={() => {
+                  if (isIn) {
+                    setConfirmRemoveId(repository.id);
+                  } else {
+                    handleRegister(repository);
                   }
-                >
-                  {registeringRepo === repository.id
-                    ? "Registering..."
-                    : "Register to Active Campaign"}
-                </Button>
-              )}
+                }}
+              />
+              <AlertDialog
+                open={confirmRemoveId === repository.id}
+                onOpenChange={(open) => {
+                  if (!open) setConfirmRemoveId(null);
+                }}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove from Campaign?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to remove{" "}
+                      <strong>{repository.name}</strong> from the campaign? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="flex gap-3 justify-end">
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        try {
+                          setRemovingId(repository.id);
+                          await removeFromCampaign(repository.id);
+                          setCampaignRepoIds((prev) => {
+                            const next = new Set(prev);
+                            next.delete(repository.id);
+                            return next;
+                          });
+                        } catch (error) {
+                          console.error(error);
+                        } finally {
+                          setRemovingId(null);
+                          setConfirmRemoveId(null);
+                        }
+                      }}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Remove
+                    </AlertDialogAction>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
             </>
           );
         }}
       />
     </div>
   );
+
+  async function handleRegister(repository: GitHubRepository) {
+    try {
+      setRegisteringRepo(repository.id);
+      const dbRepo = (data ?? []).find(
+        (d) => d.github_repo_id === repository.id
+      );
+      if (!dbRepo) {
+        toast.error("Repository not found in project DB list");
+        return;
+      }
+      await addRepoToCampaign(dbRepo);
+      setCampaignRepoIds((prev) => new Set(prev).add(repository.id));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRegisteringRepo(null);
+    }
+  }
+};
+
+export const RepositoryCardExample = ({
+  repositories = [],
+  onRegister,
+  onRemove,
+}: {
+  repositories?: GitHubRepository[];
+  onRegister?: (repo: GitHubRepository) => Promise<void>;
+  onRemove?: (repo: GitHubRepository) => Promise<void>;
+}) => {
+  const [registeringId, setRegisteringId] = useState<number | null>(null);
+  const [removingId, setRemovingId] = useState<number | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<number | null>(null);
+
+  if (!repositories || repositories.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <FileIcon className="size-10 text-muted-foreground mb-4" />
+        <p className="text-muted-foreground">No repositories found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {repositories.map((repository) => {
+        const isBusy =
+          registeringId === repository.id || removingId === repository.id;
+        const isRegistered = false; // Set based on your actual state
+
+        return (
+          <div key={repository.id}>
+            <RepositoryCard
+              repository={repository}
+              action={isRegistered ? "remove" : "register"}
+              actionLabel={
+                isRegistered
+                  ? removingId === repository.id
+                    ? "Removing..."
+                    : "Remove from Campaign"
+                  : registeringId === repository.id
+                    ? "Registering..."
+                    : "Register to Campaign"
+              }
+              isLoading={isBusy}
+              isDangerous={isRegistered}
+              onAction={() => {
+                if (isRegistered) {
+                  setConfirmRemoveId(repository.id);
+                } else {
+                  handleRegister(repository);
+                }
+              }}
+            />
+            <AlertDialog
+              open={confirmRemoveId === repository.id}
+              onOpenChange={(open) => {
+                if (!open) setConfirmRemoveId(null);
+              }}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Remove from Campaign?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to remove{" "}
+                    <strong>{repository.name}</strong> from the campaign? This
+                    action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="flex gap-3 justify-end">
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={async () => {
+                      try {
+                        setRemovingId(repository.id);
+                        if (onRemove) {
+                          await onRemove(repository);
+                        }
+                        toast.success("Repository removed from campaign");
+                      } catch (error) {
+                        console.error(error);
+                        toast.error(
+                          "Failed to remove repository from campaign"
+                        );
+                      } finally {
+                        setRemovingId(null);
+                        setConfirmRemoveId(null);
+                      }
+                    }}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Remove
+                  </AlertDialogAction>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  async function handleRegister(repository: GitHubRepository) {
+    try {
+      setRegisteringId(repository.id);
+      if (onRegister) {
+        await onRegister(repository);
+      }
+      toast.success("Repository registered to campaign");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to register repository to campaign");
+    } finally {
+      setRegisteringId(null);
+    }
+  }
 };
