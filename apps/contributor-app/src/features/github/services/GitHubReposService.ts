@@ -1,4 +1,4 @@
-import { Contributor, Issue, Readme } from "@/types/Github";
+import { Contributor, Issue, Readme, PullRequest } from "@/types/Github";
 import type { AxiosInstance } from "axios";
 
 export class GitHubReposService {
@@ -37,6 +37,17 @@ export class GitHubReposService {
       `/repos/${owner}/${repo}/issues/${issue_number}`
     );
     return data;
+  }
+
+  async getPullRequest(
+    owner: string,
+    repo: string,
+    pull_number: number
+  ): Promise<PullRequest> {
+    const { data } = await this.http.get(
+      `/repos/${owner}/${repo}/pulls/${pull_number}`
+    );
+    return data as PullRequest;
   }
 
   async getIssueTimeline(

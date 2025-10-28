@@ -219,3 +219,10 @@ export type Readme = {
     html: string;
   };
 };
+
+export interface PullRequest {
+  number: number;
+  html_url: string;
+  state: "open" | "closed";
+  merged_at: string | null;
+}

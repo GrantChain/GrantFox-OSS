@@ -101,3 +101,16 @@ export function useGitHubLanguages(owner: string, repo: string) {
     staleTime: 60_000,
   });
 }
+
+export function useGitHubPullRequest(
+  owner: string,
+  repo: string,
+  pull_number: number
+) {
+  return useQuery({
+    queryKey: ["gh", "pull", owner, repo, pull_number],
+    queryFn: () => reposService.getPullRequest(owner, repo, pull_number),
+    enabled: Boolean(owner && repo && pull_number),
+    staleTime: 60_000,
+  });
+}
