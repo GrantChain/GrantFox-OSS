@@ -156,6 +156,7 @@ export const MyApplicationsView = () => {
         issues.map(async (issue) => {
           const parsed = parseOwnerRepo(issue.repository_url);
           let timeline: TimelineEvent[] = [];
+          let appliedAt: string | null = null;
           if (parsed) {
             try {
               timeline = (await reposService.getIssueTimeline(
@@ -165,6 +166,27 @@ export const MyApplicationsView = () => {
               )) as TimelineEvent[];
             } catch {
               timeline = [];
+            }
+            try {
+              const comments = (await reposService.listIssueComments(
+                parsed.owner,
+                parsed.repo,
+                issue.number,
+                { per_page: 100 }
+              )) as Array<{ user: { login: string }; created_at: string }>;
+              const myComments = (comments ?? []).filter(
+                (c) => c.user?.login === username
+              );
+              if (myComments.length > 0) {
+                appliedAt =
+                  myComments
+                    .map((c) => c.created_at)
+                    .sort(
+                      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+                    )[0] ?? null;
+              }
+            } catch {
+              console.error("Error fetching issue comments", issue.number);
             }
           }
           const status = computeStatus(issue, timeline, username);
@@ -179,6 +201,7 @@ export const MyApplicationsView = () => {
             html_url: issue.html_url,
             comments: issue.comments,
             created_at: issue.created_at,
+            applied_at: appliedAt ?? null,
             assignee: issue.assignee?.login ?? null,
             state: issue.state,
             status,

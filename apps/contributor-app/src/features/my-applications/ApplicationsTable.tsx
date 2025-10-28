@@ -18,7 +18,9 @@ import {
   ArrowUpDown,
   ArrowUpRightIcon,
   ChevronDown,
+  CircleCheck,
   GithubIcon,
+  HashIcon,
   MessageSquareIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,6 +65,7 @@ export interface ApplicationRow {
   html_url: string;
   comments: number;
   created_at: string;
+  applied_at: string | null;
   assignee: string | null;
   state: "open" | "closed";
   status: ApplicationStatus;
@@ -73,19 +76,36 @@ export interface ApplicationRow {
 const statusToBadge = (status: ApplicationStatus): React.ReactNode => {
   switch (status) {
     case "AWAITING_ASSIGNMENT":
-      return <Badge variant="secondary">Awaiting assignment</Badge>;
+      return (
+        <Badge className="uppercase" variant="warning">
+          Awaiting assignment
+        </Badge>
+      );
     case "PR_EXPECTED":
-      return <Badge>PR expected</Badge>;
+      return (
+        <Badge className="uppercase" variant="warning">
+          PR expected
+        </Badge>
+      );
     case "IN_REVIEW":
-      return <Badge variant="outline">In review</Badge>;
+      return (
+        <Badge className="uppercase" variant="important">
+          In review
+        </Badge>
+      );
     case "COMPLETED":
       return (
-        <Badge className="bg-emerald-600 text-white hover:bg-emerald-600/90">
+        <Badge className="uppercase" variant="success">
+          <CircleCheck className="size-4" />
           Completed
         </Badge>
       );
     case "ASSIGNED_TO_OTHER":
-      return <Badge variant="destructive">Assigned to another</Badge>;
+      return (
+        <Badge className="uppercase" variant="destructive">
+          Assigned to another
+        </Badge>
+      );
   }
 };
 
@@ -133,26 +153,29 @@ export const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
                 const badgeNumber = showPr
                   ? row.original.prNumber!
                   : row.original.number;
-                const badgeClass = showPr
-                  ? "bg-purple-700 text-white"
-                  : "bg-emerald-600 text-white";
+
                 return (
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${badgeClass}`}
+                  <Badge
+                    className="gap-1"
+                    variant={showPr ? "important" : "success"}
                   >
-                    <span className="inline-block size-1.5 rounded-full bg-white/90" />
-                    #{badgeNumber}
-                  </span>
+                    {showPr ? (
+                      <CircleCheck className="size-4" />
+                    ) : (
+                      <HashIcon className="size-4" />
+                    )}
+                    {badgeNumber}
+                  </Badge>
                 );
               })()}
-              <a
+              <Link
                 href={row.original.html_url}
                 target="_blank"
                 rel="noreferrer"
                 className="font-medium hover:underline"
               >
                 {row.original.title}
-              </a>
+              </Link>
             </div>
             <span className="text-xs text-muted-foreground">
               {row.original.repo}
@@ -203,7 +226,12 @@ export const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
             <ArrowUpDown />
           </Button>
         ),
-        cell: ({ row }) => formatDate(row.original.created_at ?? ""),
+        cell: ({ row }) =>
+          formatDate(
+            row.original.applied_at ?? row.original.created_at ?? "",
+            true,
+            true
+          ),
       },
       {
         id: "actions",
