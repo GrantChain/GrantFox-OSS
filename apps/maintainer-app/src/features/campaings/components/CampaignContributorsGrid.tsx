@@ -10,7 +10,7 @@ interface CampaignContributorsGridProps {
 const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
   return (
     <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {users.length > 0 ? (
+      {/* {users.length > 0 ? (
         users.map((user) => (
           <GithubUserCard
             key={user.user_id}
@@ -24,7 +24,7 @@ const CampaignContributorsGrid = ({ users }: CampaignContributorsGridProps) => {
         ))
       ) : (
         <p className="text-muted-foreground">No contributors found</p>
-      )}
+      )} */}
     </div>
   );
 };
