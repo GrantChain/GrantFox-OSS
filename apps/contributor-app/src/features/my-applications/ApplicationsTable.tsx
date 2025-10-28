@@ -169,9 +169,7 @@ export const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
                 );
               })()}
               <Link
-                href={row.original.html_url}
-                target="_blank"
-                rel="noreferrer"
+                href={`/campaigns/org/${row.original.repo.split("/")[0]}/repo/${row.original.repo.split("/")[1]}/issue/${row.original.number}`}
                 className="font-medium hover:underline"
               >
                 {row.original.title}
