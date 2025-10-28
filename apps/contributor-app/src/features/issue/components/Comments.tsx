@@ -57,7 +57,7 @@ export const Comments = memo(function Comments({
           </EmptyMedia>
           <EmptyTitle>Comments unavailable</EmptyTitle>
           <EmptyDescription>
-            We couldn't load the comments. Please try again later.
+            We couldn&apos;t load the comments. Please try again later.
           </EmptyDescription>
         </EmptyHeader>
       </Empty>

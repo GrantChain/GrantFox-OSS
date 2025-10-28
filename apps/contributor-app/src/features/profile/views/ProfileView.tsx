@@ -9,19 +9,12 @@ import { NumberTicker } from "@/components/ui/number-ticker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Back } from "@/components/shared/Back";
 import {
   Calendar,
   MapPin,
-  Link as LinkIcon,
   Twitter,
   Building,
-  Users,
-  UserCheck,
-  Star,
-  GitFork,
-  Eye,
   Code,
   Globe,
   Mail,
@@ -31,41 +24,7 @@ import Image from "next/image";
 import { formatDate } from "@/lib/format";
 import { githubHttp } from "@/lib/http";
 import { WalletButton } from "@/components/tw-blocks/wallet-kit/WalletButtons";
-
-interface GitHubUser {
-  login: string;
-  id: number;
-  node_id: string;
-  avatar_url: string;
-  gravatar_id: string | null;
-  url: string;
-  html_url: string;
-  followers_url: string;
-  following_url: string;
-  gists_url: string;
-  starred_url: string;
-  subscriptions_url: string;
-  organizations_url: string;
-  repos_url: string;
-  events_url: string;
-  received_events_url: string;
-  type: string;
-  site_admin: boolean;
-  name: string | null;
-  company: string | null;
-  blog: string | null;
-  location: string | null;
-  email: string | null;
-  hireable: boolean | null;
-  bio: string | null;
-  twitter_username: string | null;
-  public_repos: number;
-  public_gists: number;
-  followers: number;
-  following: number;
-  created_at: string;
-  updated_at: string;
-}
+import { GitHubUser } from "@/types/Github";
 
 interface ProfileViewProps {
   username: string;

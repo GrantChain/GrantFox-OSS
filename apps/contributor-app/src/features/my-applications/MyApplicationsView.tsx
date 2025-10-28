@@ -3,17 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { githubHttp } from "@/lib/http";
-import { http } from "@/lib/api";
 import { useUser } from "@/context/UserContext";
 import { useCampaignContext } from "@/context/CampaignContext";
 import { GitHubApplicationsService } from "../github/services/GitHubApplicationsService";
 import { GitHubReposService } from "../github/services/GitHubReposService";
 import type { Issue, SearchIssuesResponse } from "@/types/Github";
-import {
-  ApplicationsTable,
-  type ApplicationRow,
-  type ApplicationStatus,
-} from "./ApplicationsTable";
+import { ApplicationsTable } from "./ApplicationsTable";
 import {
   Select,
   SelectContent,
@@ -22,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { ApplicationRow, ApplicationStatus } from "@/types/applications.type";
 
 const githubApplicationsService = new GitHubApplicationsService(githubHttp);
 const reposService = new GitHubReposService(githubHttp);

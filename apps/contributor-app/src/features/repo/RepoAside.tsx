@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Github, Star } from "lucide-react";
+import { Github } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { Repository } from "@/types/Github";

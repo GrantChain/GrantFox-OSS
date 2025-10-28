@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Star, GitFork, Eye, Code2 } from "lucide-react";
+import { Star, GitFork } from "lucide-react";
 import type { Repository } from "@/types/Github";
 import { Button } from "@/components/ui/button";
 
