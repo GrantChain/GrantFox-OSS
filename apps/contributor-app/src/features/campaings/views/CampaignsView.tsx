@@ -4,10 +4,10 @@ import { useCampaignContext } from "@/context/CampaignContext";
 import { CampaignHero } from "../components/CampaignHero";
 import { CampaignTags } from "../components/CampaignTags";
 import { CampaignTimeRemaining } from "../components/CampaignTimeRemaining";
-import { CampaignReposAndContributors } from "../components/CampaignReposAndContributors";
 import { useCampaignQuery } from "../hooks/useCampaignQuery";
 import { Card } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
+import { CampaignAndRepos } from "../components/CampaignAndRepos";
 
 export const CampaignView = () => {
   const { activeCampaign } = useCampaignContext();
@@ -36,9 +36,7 @@ export const CampaignView = () => {
             startDate={activeCampaign?.start_date}
             endDate={activeCampaign?.end_date}
           />
-          <CampaignReposAndContributors
-            activeCampaign={activeCampaign ?? null}
-          />
+          <CampaignAndRepos activeCampaign={activeCampaign ?? null} />
         </>
       )}
     </>

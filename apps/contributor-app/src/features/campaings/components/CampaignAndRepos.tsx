@@ -9,13 +9,11 @@ import { CampaignService } from "../services/campaign.service";
 import { http } from "@/lib/api";
 import { CampaignRepositoriesList } from "./CampaignRepositoriesList";
 
-interface CampaignReposAndContributorsProps {
+interface CampaignAndReposProps {
   activeCampaign: Campaign | null;
 }
 
-export const CampaignReposAndContributors = ({
-  activeCampaign,
-}: CampaignReposAndContributorsProps) => {
+export const CampaignAndRepos = ({ activeCampaign }: CampaignAndReposProps) => {
   const [sectionActive, setSectionActive] = useState({
     repositories: false,
     projects: true,
@@ -51,6 +49,8 @@ export const CampaignReposAndContributors = ({
             projects: tab === "projects",
           })
         }
+        projectsCount={campaignWithProjects?.projects?.length ?? 0}
+        repositoriesCount={activeCampaign?.repositories?.length ?? 0}
       />
       <div className="relative max-h-[50rem] overflow-hidden overflow-y-auto w-full flex flex-col gap-8 rounded-2xl border-2 p-5 bg-gradient-to-b from-background/40 to-background/10">
         {activeTab === "repositories" && activeCampaign?.repositories && (

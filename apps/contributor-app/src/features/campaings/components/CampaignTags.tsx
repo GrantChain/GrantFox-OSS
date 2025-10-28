@@ -9,7 +9,7 @@ interface CampaignTagsProps {
 export const CampaignTags = ({ tags }: CampaignTagsProps) => {
   return (
     <section className="w-full gap-4 flex justify-between items-center mt-5">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {tags?.map((tag) => (
           <Badge key={tag} variant="outline">
             {tag}

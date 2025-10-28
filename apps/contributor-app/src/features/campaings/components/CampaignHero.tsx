@@ -62,8 +62,8 @@ export const CampaignHero = ({
             </PulsatingButton>
           )}
         </div>
-        <div className="w-full flex justify-between items-center">
-          <p className="w-7/12 text-balance text-muted-foreground text-xl">
+        <div className="w-full flex flex-col sm:flex-row justify-start sm:justify-between items-center gap-4">
+          <p className="w-full sm:w-7/12 text-balance text-muted-foreground text-xl">
             {activeCampaign?.description ?? ""}
           </p>
 
@@ -74,32 +74,6 @@ export const CampaignHero = ({
           </div>
         </div>
       </Card>
-
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        <Card className="p-4 block sm:hidden">
-          <div className="p-2 flex flex-col justify-center items-center">
-            <NumberTicker
-              value={activeCampaign?.repositories.length || 0}
-              className="text-5xl font-bold tracking-tighter whitespace-pre-wrap"
-            />
-            <span className="text-2xl font-medium block bg-clip-text">
-              Repositories
-            </span>
-          </div>
-        </Card>
-
-        <Card className="p-4 block sm:hidden">
-          <div className="p-2 flex flex-col justify-center items-center">
-            <NumberTicker
-              value={contributorsCount}
-              className="text-5xl font-bold tracking-tighter whitespace-pre-wrap"
-            />
-            <span className="text-2xl font-medium block bg-clip-text">
-              Contributors
-            </span>
-          </div>
-        </Card>
-      </div>
     </>
   );
 };
