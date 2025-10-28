@@ -23,6 +23,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
 import { AddMaintainerDto } from './dto/add-maintainer.dto';
+import { GithubHandleValidationResponseDto } from './dto/github-handle-validation-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -84,6 +85,26 @@ export class ProjectsController {
   })
   findByUser(@Param('userId') userId: string) {
     return this.projectsService.findByUser(userId);
+  }
+
+  @Get('validate-github-handle/:githubHandle')
+  @ApiOperation({
+    summary: 'Validate if a project with this GitHub handle exists',
+    description:
+      'Checks if a project with the given GitHub handle already exists in the database. Returns the project info if found.',
+  })
+  @ApiParam({
+    name: 'githubHandle',
+    type: String,
+    description: 'GitHub handle to validate',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Validation result',
+    type: GithubHandleValidationResponseDto,
+  })
+  validateGithubHandle(@Param('githubHandle') githubHandle: string) {
+    return this.projectsService.validateGithubHandle({ github_handle: githubHandle });
   }
 
   @Get(':id')

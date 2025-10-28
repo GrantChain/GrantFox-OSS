@@ -50,6 +50,7 @@ export class AppModule implements NestModule {
         { path: 'projects', method: RequestMethod.GET },
         { path: 'projects/:id', method: RequestMethod.GET },
         { path: 'projects/user/:userId', method: RequestMethod.GET },
+        { path: 'projects/validate-github-handle/:githubHandle', method: RequestMethod.GET },
         // Rutas públicas de repositories (GET)
         { path: 'repositories/project/:projectId', method: RequestMethod.GET },
         { path: 'repositories/:repoId', method: RequestMethod.GET },
