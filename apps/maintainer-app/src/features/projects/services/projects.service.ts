@@ -49,4 +49,21 @@ export class ProjectsService {
       throw new Error("Failed to add maintainer to project", { cause: error });
     }
   }
+
+  async transferOwnership(
+    projectId: string,
+    newOwnerId: string
+  ): Promise<Project> {
+    try {
+      const { data } = await this.http.post(
+        `/project-maintainers/project/${projectId}/transfer-ownership`,
+        { new_owner_id: newOwnerId }
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to transfer ownership of project", {
+        cause: error,
+      });
+    }
+  }
 }

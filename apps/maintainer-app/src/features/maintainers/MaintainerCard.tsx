@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trash2 } from "lucide-react";
+import { Forward } from "lucide-react";
 import { ProjectMaintainer } from "@/types/maintainer.type";
 import {
   Dialog,
@@ -14,18 +15,38 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button as UIButton } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const MaintainerCard = ({
   m,
   onRemoveMaintainer,
   isLoading,
   canManage,
+  onTransferOwnership,
+  isTransferring,
 }: {
   m: ProjectMaintainer;
   onRemoveMaintainer: (m: ProjectMaintainer) => void;
   isLoading: boolean;
   canManage: boolean;
+  onTransferOwnership: (m: ProjectMaintainer) => void;
+  isTransferring: boolean;
 }) => {
   return (
     <Card key={m.id} className="px-3 py-3">
@@ -47,45 +68,95 @@ export const MaintainerCard = ({
             {m.maintainer?.email}
           </p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-destructive hover:text-destructive cursor-pointer"
-              disabled={isLoading || m.is_owner || !canManage}
-              title="Remove maintainer"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Remove maintainer</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to remove{" "}
-                {m.maintainer?.username ?? "this user"} from the project?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <DialogClose asChild>
-                <UIButton variant="outline" className="cursor-pointer">
-                  Cancel
-                </UIButton>
-              </DialogClose>
-              <DialogClose asChild>
-                <UIButton
-                  variant="destructive"
-                  className="cursor-pointer"
-                  onClick={() => onRemoveMaintainer(m)}
-                  disabled={isLoading}
-                >
-                  Remove
-                </UIButton>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-1">
+          <AlertDialog>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="cursor-pointer"
+                    disabled={isTransferring || m.is_owner || !canManage}
+                    title="Transfer ownership"
+                  >
+                    <Forward className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Transfer ownership</TooltipContent>
+            </Tooltip>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Transfer ownership</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to transfer ownership to{" "}
+                  {m.maintainer?.username ?? "this user"}?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel asChild>
+                  <UIButton variant="outline" className="cursor-pointer">
+                    Cancel
+                  </UIButton>
+                </AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <UIButton
+                    className="cursor-pointer"
+                    onClick={() => onTransferOwnership(m)}
+                    disabled={isTransferring}
+                  >
+                    Transfer
+                  </UIButton>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Dialog>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DialogTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive cursor-pointer"
+                    disabled={isLoading || m.is_owner || !canManage}
+                    title="Remove maintainer"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Remove maintainer</TooltipContent>
+            </Tooltip>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Remove maintainer</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to remove{" "}
+                  {m.maintainer?.username ?? "this user"} from the project?
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <UIButton variant="outline" className="cursor-pointer">
+                    Cancel
+                  </UIButton>
+                </DialogClose>
+                <DialogClose asChild>
+                  <UIButton
+                    variant="destructive"
+                    className="cursor-pointer"
+                    onClick={() => onRemoveMaintainer(m)}
+                    disabled={isLoading}
+                  >
+                    Remove
+                  </UIButton>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     </Card>
   );

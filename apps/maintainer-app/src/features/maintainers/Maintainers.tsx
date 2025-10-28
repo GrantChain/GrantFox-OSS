@@ -13,6 +13,8 @@ import { FileIcon, Loader2 } from "lucide-react";
 import { MaintainerCard } from "./MaintainerCard";
 import { ApiUser } from "@/types/user.type";
 import { useUser } from "@/context/UserContext";
+import { ProjectsService } from "@/features/projects/services/projects.service";
+import { http } from "@/lib/api";
 
 export const Maintainers = ({ projectId }: { projectId: string }) => {
   const { user } = useUser();
@@ -24,6 +26,7 @@ export const Maintainers = ({ projectId }: { projectId: string }) => {
     {}
   );
   const maintainerService = new MaintainerService();
+  const projectsService = new ProjectsService(http);
   const queryClient = useQueryClient();
 
   const queryKey = useMemo(
@@ -65,6 +68,16 @@ export const Maintainers = ({ projectId }: { projectId: string }) => {
     onError: () => toast.error("Failed to remove maintainer"),
   });
 
+  const transferOwnershipMutation = useMutation({
+    mutationFn: (newOwnerId: string) =>
+      projectsService.transferOwnership(projectId, newOwnerId),
+    onSuccess: () => {
+      toast.success("Ownership transferred");
+      queryClient.invalidateQueries({ queryKey });
+    },
+    onError: () => toast.error("Failed to transfer ownership"),
+  });
+
   const handleAddMaintainer = async (user: GitHubUser) => {
     if (!canManage) {
       toast.error("Only the owner can add maintainers");
@@ -95,6 +108,23 @@ export const Maintainers = ({ projectId }: { projectId: string }) => {
       return;
     }
     await removeMaintainerMutation.mutateAsync(targetUserId);
+  };
+
+  const handleTransferOwnership = async (pm: ProjectMaintainer) => {
+    if (!canManage) {
+      toast.error("Only the owner can transfer ownership");
+      return;
+    }
+    if (pm.is_owner) {
+      toast.error("This user is already the owner");
+      return;
+    }
+    const targetUserId = pm.maintainer?.user_id ?? pm.maintainer_id;
+    if (!targetUserId) {
+      toast.error("Invalid maintainer id");
+      return;
+    }
+    await transferOwnershipMutation.mutateAsync(targetUserId);
   };
 
   return (
@@ -146,6 +176,8 @@ export const Maintainers = ({ projectId }: { projectId: string }) => {
                   onRemoveMaintainer={handleRemoveMaintainer}
                   isLoading={removeMaintainerMutation.isPending}
                   canManage={canManage}
+                  onTransferOwnership={handleTransferOwnership}
+                  isTransferring={transferOwnershipMutation.isPending}
                 />
               ))}
             </div>
