@@ -74,6 +74,8 @@ export const Maintainers = ({ projectId }: { projectId: string }) => {
     onSuccess: () => {
       toast.success("Ownership transferred");
       queryClient.invalidateQueries({ queryKey });
+      // Also refresh project data used across the app for owner gating
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
     },
     onError: () => toast.error("Failed to transfer ownership"),
   });
