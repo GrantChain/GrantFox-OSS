@@ -85,7 +85,7 @@ export const ProjectManagement = () => {
           <p className="text-muted-foreground mb-4">
             Select the organization you want to create a project for. You can
             see the details of the organization before creating a project.
-            Couldn't find your organization? It might be because one of your
+            Couldnt find your organization? It might be because one of your
             members has already created a project for it.
           </p>
 
