@@ -46,7 +46,9 @@ export default function RootLayout({
               <WalletProvider>
                 <CampaignProvider>
                   <Navbar />
-                  {children}
+
+                  <div className="flex-1 w-full min-h-screen">{children}</div>
+
                   <Footer />
 
                   <Toaster />

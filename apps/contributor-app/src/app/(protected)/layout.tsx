@@ -26,7 +26,7 @@ export default function DashboardLayout({
 
   return (
     <CampaignProvider>
-      <div className="block container mx-auto px-4 py-8">
+      <div className="block container mx-auto px-4 py-8 min-h-[calc(100vh-56px)]">
         <Back />
         {children}
       </div>

@@ -24,7 +24,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-border bg-background text-foreground">
+    <footer className="relative border-t border-border bg-background text-foreground mt-10">
       {/* Main Footer Content */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
