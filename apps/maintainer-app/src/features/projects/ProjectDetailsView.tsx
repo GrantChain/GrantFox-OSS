@@ -79,11 +79,7 @@ export const ProjectDetailsView = ({ projectId }: { projectId: string }) => {
     return null;
   }
 
-  const tabs = getProjectTabs(
-    project?.github_handle ?? undefined,
-    projectId,
-    project?.status
-  );
+  const tabs = getProjectTabs(project?.github_handle ?? undefined, projectId);
 
   type TabDef = { name: string; value: string; content: ReactNode };
 

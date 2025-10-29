@@ -4,11 +4,7 @@ import {
   Repositories,
 } from "../repositories/Repositories";
 
-export const getProjectTabs = (
-  orgLogin?: string,
-  projectId?: string,
-  projectStatus?: string
-) => [
+export const getProjectTabs = (orgLogin?: string, projectId?: string) => [
   {
     name: "All Repositories",
     value: "repositories",
@@ -24,14 +20,7 @@ export const getProjectTabs = (
     name: "Repositories Registered",
     value: "repositories-registered",
     content: (
-      <>
-        {projectId ? (
-          <RegisteredRepositories
-            projectId={projectId}
-            projectStatus={projectStatus}
-          />
-        ) : null}
-      </>
+      <>{projectId ? <RegisteredRepositories projectId={projectId} /> : null}</>
     ),
   },
   {
