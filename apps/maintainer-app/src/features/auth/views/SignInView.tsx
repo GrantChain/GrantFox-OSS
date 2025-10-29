@@ -1,32 +1,36 @@
 "use client";
 
-import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { GithubIcon } from "lucide-react";
 
 export function SignInView() {
   const { signInWithGitHub } = useUser();
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-56px)] w-full max-w-md items-center px-4 py-10">
-      <div className="relative w-full overflow-hidden rounded-2xl border bg-card p-6 shadow-sm">
-        <BorderBeam borderWidth={2} size={120} />
-        <div className="relative z-10">
-          <h1 className="text-2xl font-semibold">Welcome</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Sign in or create an account using GitHub.
+    <Card className="relative w-full max-w-md overflow-hidden border shadow-lg mt-10 sm:mt-30 mx-auto bg-transparent">
+      <BorderBeam borderWidth={2} size={120} />
+      <div className="p-8">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold tracking-tight">Welcome</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in or create an account using GitHub
           </p>
-
-          <div className="mt-6 grid gap-3">
-            <Button
-              className="w-full cursor-pointer"
-              onClick={signInWithGitHub}
-            >
-              Continue with GitHub
-            </Button>
-          </div>
         </div>
+
+        {/* GitHub Button */}
+        <Button
+          onClick={signInWithGitHub}
+          className="w-full h-11 font-medium cursor-pointer"
+          size="lg"
+        >
+          <GithubIcon className="w-4 h-4" />
+          Continue with GitHub
+        </Button>
       </div>
-    </main>
+    </Card>
   );
 }
