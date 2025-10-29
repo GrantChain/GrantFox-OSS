@@ -48,9 +48,7 @@ export const RepositoryCard = ({
           />
           <div className="min-w-0">
             <Link
-              href={repository.html_url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/maintainer/projects/repo/${repository.name}?org=${repository.owner?.login}`}
               className="font-medium hover:underline truncate block"
             >
               {repository.full_name ?? repository.name}

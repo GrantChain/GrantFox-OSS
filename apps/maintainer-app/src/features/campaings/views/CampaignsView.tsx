@@ -1,22 +1,22 @@
 "use client";
 
 import { useCampaignContext } from "@/context/CampaignContext";
-import CampaignHero from "../components/CampaignHero";
-import CampaignTags from "../components/CampaignTags";
-import CampaignTimeRemaining from "../components/CampaignTimeRemaining";
-import CampaignReposAndContributors from "../components/CampaignReposAndContributors";
+import { CampaignHero } from "../components/CampaignHero";
+import { CampaignTags } from "../components/CampaignTags";
+import { CampaignTimeRemaining } from "../components/CampaignTimeRemaining";
 import { useCampaignQuery } from "../hooks/useCampaignQuery";
 import { Card } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
+import { CampaignAndRepos } from "../components/CampaignAndRepos";
 
-export default function CampaignView() {
+export const CampaignView = () => {
   const { activeCampaign } = useCampaignContext();
   const { data: contributors } = useCampaignQuery({
     campaignId: activeCampaign?.campaign_id,
   });
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <>
       {!activeCampaign ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />
@@ -32,13 +32,13 @@ export default function CampaignView() {
             contributors={contributors}
           />
           <CampaignTags tags={activeCampaign?.tags ?? []} />
-          <CampaignTimeRemaining startDate={activeCampaign?.start_date} />
-          <CampaignReposAndContributors
-            activeCampaign={activeCampaign ?? null}
-            contributors={contributors}
+          <CampaignTimeRemaining
+            startDate={activeCampaign?.start_date}
+            endDate={activeCampaign?.end_date}
           />
+          <CampaignAndRepos activeCampaign={activeCampaign ?? null} />
         </>
       )}
-    </main>
+    </>
   );
-}
+};

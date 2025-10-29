@@ -2,38 +2,31 @@
 
 import { useMemo, useState } from "react";
 import type { Campaign } from "@/types/campaign.type";
-import type { ApiUser } from "@/types/user.type";
-import CampaignSectionTabs from "./CampaignSectionTabs";
-import CampaignRepositoriesList from "./CampaignRepositoriesList";
-import CampaignContributorsGrid from "./CampaignContributorsGrid";
-import CampaignProjectsList from "@/features/campaings/components/CampaignProjectsList";
+import { CampaignSectionTabs } from "./CampaignSectionTabs";
+import { CampaignProjectsList } from "@/features/campaings/components/CampaignProjectsList";
 import { useQuery } from "@tanstack/react-query";
 import { CampaignService } from "../services/campaign.service";
 import { http } from "@/lib/api";
+import { CampaignRepositoriesList } from "./CampaignRepositoriesList";
+import Link from "next/link";
+import { PulsatingButton } from "@/components/ui/pulsating-button";
 
-interface CampaignReposAndContributorsProps {
+interface CampaignAndReposProps {
   activeCampaign: Campaign | null;
-  contributors: ApiUser[] | undefined;
 }
 
-const CampaignReposAndContributors = ({
-  activeCampaign,
-  contributors,
-}: CampaignReposAndContributorsProps) => {
+export const CampaignAndRepos = ({ activeCampaign }: CampaignAndReposProps) => {
   const [sectionActive, setSectionActive] = useState({
-    repositories: true,
-    contributors: false,
-    projects: false,
+    repositories: false,
+    projects: true,
   });
-  const activeTab: "repositories" | "contributors" | "projects" =
-    useMemo(() => {
-      if (sectionActive.repositories) return "repositories";
-      if (sectionActive.contributors) return "contributors";
-      return "projects";
-    }, [sectionActive]);
+  const activeTab: "repositories" | "projects" = useMemo(() => {
+    if (sectionActive.repositories) return "repositories";
+    return "projects";
+  }, [sectionActive]);
 
   const service = useMemo(() => new CampaignService(http), []);
-  const { data: campaignWithProjects } = useQuery<Campaign>({
+  const { data: campaignWithProjects } = useQuery({
     queryKey: [
       "campaign",
       "active",
@@ -50,24 +43,31 @@ const CampaignReposAndContributors = ({
 
   return (
     <section className="w-full flex flex-col gap-4 justify-start items-center">
-      <CampaignSectionTabs
-        active={activeTab}
-        onChange={(tab) =>
-          setSectionActive({
-            repositories: tab === "repositories",
-            contributors: tab === "contributors",
-            projects: tab === "projects",
-          })
-        }
-      />
+      <div className="flex flex-col sm:flex-row justify-between sm:items-start w-full gap-6 sm:gap-0">
+        <CampaignSectionTabs
+          active={activeTab}
+          onChange={(tab) =>
+            setSectionActive({
+              repositories: tab === "repositories",
+              projects: tab === "projects",
+            })
+          }
+          projectsCount={campaignWithProjects?.projects?.length ?? 0}
+          repositoriesCount={activeCampaign?.repositories?.length ?? 0}
+        />
+
+        <Link href={`/maintainer/projects`} className="flex-shrink-0">
+          <PulsatingButton className="whitespace-nowrap">
+            Add your Project
+          </PulsatingButton>
+        </Link>
+      </div>
+
       <div className="relative max-h-[50rem] overflow-hidden overflow-y-auto w-full flex flex-col gap-8 rounded-2xl border-2 p-5 bg-gradient-to-b from-background/40 to-background/10">
         {activeTab === "repositories" && activeCampaign?.repositories && (
           <CampaignRepositoriesList
             repositories={activeCampaign.repositories}
           />
-        )}
-        {activeTab === "contributors" && contributors && (
-          <CampaignContributorsGrid users={contributors} />
         )}
         {activeTab === "projects" && campaignWithProjects?.projects && (
           <CampaignProjectsList projects={campaignWithProjects.projects} />
@@ -76,5 +76,3 @@ const CampaignReposAndContributors = ({
     </section>
   );
 };
-
-export default CampaignReposAndContributors;

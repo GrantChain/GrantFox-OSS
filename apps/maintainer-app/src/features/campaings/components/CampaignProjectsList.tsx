@@ -10,15 +10,15 @@ interface CampaignProjectsListProps {
   projects: Project[];
 }
 
-const CampaignProjectsList = ({ projects }: CampaignProjectsListProps) => {
+export const CampaignProjectsList = ({
+  projects,
+}: CampaignProjectsListProps) => {
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {projects.length > 0 ? (
         projects.map((proj) => (
           <Link
-            href={`https://github.com/${proj.github_handle}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/campaigns/org/${proj.github_handle}`}
             className="text-lg font-medium"
             key={proj.project_id}
           >
@@ -52,5 +52,3 @@ const CampaignProjectsList = ({ projects }: CampaignProjectsListProps) => {
     </div>
   );
 };
-
-export default CampaignProjectsList;

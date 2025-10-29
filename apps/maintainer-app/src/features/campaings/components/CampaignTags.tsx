@@ -1,15 +1,44 @@
+import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
+import Link from "next/link";
+
 interface CampaignTagsProps {
   tags: string[] | undefined;
 }
 
-export default function CampaignTags({ tags }: CampaignTagsProps) {
+export const CampaignTags = ({ tags }: CampaignTagsProps) => {
   return (
-    <section className="w-3xl gap-4 flex justify-start items-center mt-5">
-      {tags?.map((tag) => (
-        <div key={tag} className="rounded-2xl border px-4 py-2">
-          {tag}
+    <section className="w-full gap-4 flex justify-between items-center mt-5">
+      <div className="flex flex-wrap gap-2">
+        {tags?.map((tag) => (
+          <Badge key={tag} variant="outline">
+            {tag}
+          </Badge>
+        ))}
+      </div>
+
+      <Link href="https://stellar.org" target="_blank">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground font-bold">
+            Backed by
+          </span>
+
+          <Image
+            src={"/tech/stellar-dark.svg"}
+            className="block dark:hidden"
+            alt="GrantFox Stellar"
+            width={30}
+            height={30}
+          />
+          <Image
+            src={"/tech/stellar-light.svg"}
+            className="hidden dark:block"
+            alt="GrantFox Stellar Light"
+            width={30}
+            height={30}
+          />
         </div>
-      ))}
+      </Link>
     </section>
   );
-}
+};
