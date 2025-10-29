@@ -1,4 +1,8 @@
-import { Project, ProjectPayload } from "@/types/project.type";
+import {
+  Project,
+  ValidateGitHubHandleResponse,
+  ProjectPayload,
+} from "@/types/project.type";
 import { AxiosInstance } from "axios";
 
 export class ProjectsService {
@@ -17,6 +21,21 @@ export class ProjectsService {
     }
   }
 
+  async validateGitHubHandle(
+    githubHandle: string
+  ): Promise<ValidateGitHubHandleResponse> {
+    try {
+      const { data } = await this.http.get(
+        `/projects/validate-github-handle/${githubHandle}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to validate GitHub handle", {
+        cause: error,
+      });
+    }
+  }
+
   async getProject(projectId: string): Promise<Project> {
     try {
       const { data } = await this.http.get(`/projects/${projectId}`);
@@ -32,6 +51,18 @@ export class ProjectsService {
       return data;
     } catch (error) {
       throw new Error("Failed to create project", { cause: error });
+    }
+  }
+
+  async updateProject(
+    projectId: string,
+    project: ProjectPayload
+  ): Promise<Project> {
+    try {
+      const { data } = await this.http.patch(`/projects/${projectId}`, project);
+      return data;
+    } catch (error) {
+      throw new Error("Failed to update project", { cause: error });
     }
   }
 

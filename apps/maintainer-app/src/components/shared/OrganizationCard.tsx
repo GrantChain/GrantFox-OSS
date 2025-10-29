@@ -40,7 +40,7 @@ export const GithubOrgCard = ({ organization }: GithubOrgCardProps) => {
           <div className="relative mb-4">
             <Image
               src={organization.avatar_url || "/placeholder.svg"}
-              alt={organization.name}
+              alt={organization.name || organization.login}
               width={96}
               height={96}
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-card bg-card shadow-lg object-cover"
@@ -53,7 +53,7 @@ export const GithubOrgCard = ({ organization }: GithubOrgCardProps) => {
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground text-center text-balance">
-            {organization.name}
+            {organization.name || organization.login}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             @{organization.login}

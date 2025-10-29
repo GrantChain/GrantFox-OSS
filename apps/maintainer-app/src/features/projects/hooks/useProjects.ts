@@ -34,7 +34,10 @@ export const useProjects = (options?: { mode?: "create" | "edit" }) => {
   const onSubmit = async (values: z.infer<typeof projectSchema>) => {
     try {
       if (isEdit) {
-        // await projectsService.updateProject(project?.id, values);
+        if (!project?.project_id) {
+          throw new Error("Missing project_id for update");
+        }
+        await projectsService.updateProject(project.project_id, values);
       } else {
         const created = await projectsService.createProject(values);
         toast.success("Project created successfully");
@@ -46,9 +49,10 @@ export const useProjects = (options?: { mode?: "create" | "edit" }) => {
       if (project?.project_id) {
         router.push(`/maintainer/projects/${project.project_id}`);
       }
-      // queryClient.invalidateQueries({ queryKey: ["projects"] });
     } catch (error) {
-      toast.error("Failed to create project");
+      toast.error(
+        isEdit ? "Failed to update project" : "Failed to create project"
+      );
       console.error(error);
     }
   };

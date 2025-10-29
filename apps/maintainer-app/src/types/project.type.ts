@@ -15,6 +15,12 @@ export interface Project {
   repositories: string[]; // todo: add repository type
 }
 
+export interface ValidateGitHubHandleResponse {
+  exists: boolean;
+  github_handle: string;
+  project?: Pick<Project, "project_id" | "name" | "status">;
+}
+
 export type ProjectPayload = Pick<
   Project,
   | "name"

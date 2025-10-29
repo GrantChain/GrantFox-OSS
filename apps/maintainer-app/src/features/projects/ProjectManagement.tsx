@@ -2,54 +2,24 @@
 
 import { GithubOrgCard } from "@/components/shared/OrganizationCard";
 import { ProjectForm } from "./ProjectForm";
-import { GithubOrganization, UserOrganization } from "@/types/github.type";
 import { UserOrganizationCard } from "@/components/shared/UserOrganizationCard";
-import { useEffect, useMemo, useState } from "react";
-import { OrganizationsService } from "@/features/github/services/organizations.service";
-
-const orgService = new OrganizationsService();
+import { useMemo, useState } from "react";
+import { useAvailableUserOrganizations } from "./hooks/useAvailableUserOrganizations";
+import { useOrganizationQuery } from "@/features/github/hooks/useOrganizationQuery";
+import { AlertTriangle } from "lucide-react";
+import { Alert } from "@/components/shared/Alert";
 
 export const ProjectManagement = () => {
-  const [organizations, setOrganizations] = useState<UserOrganization[]>([]);
-  const [loadingOrgs, setLoadingOrgs] = useState<boolean>(true);
   const [selectedLogin, setSelectedLogin] = useState<string | null>(null);
-  const [selectedOrganization, setSelectedOrganization] =
-    useState<GithubOrganization | null>(null);
-  const [loadingSelected, setLoadingSelected] = useState<boolean>(false);
+  const orgsQuery = useAvailableUserOrganizations();
+  const orgDetailsQuery = useOrganizationQuery({
+    orgHandle: selectedLogin,
+    enabled: !!selectedLogin,
+  });
 
-  useEffect(() => {
-    const loadOrgs = async () => {
-      setLoadingOrgs(true);
-      try {
-        const data = await orgService.getOrganizationsByAuthenticatedUser();
-        setOrganizations(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoadingOrgs(false);
-      }
-    };
-    loadOrgs();
-  }, []);
-
-  useEffect(() => {
-    const fetchSelected = async () => {
-      if (!selectedLogin) {
-        setSelectedOrganization(null);
-        return;
-      }
-      setLoadingSelected(true);
-      try {
-        const org = await orgService.getOrganization(selectedLogin);
-        setSelectedOrganization(org);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoadingSelected(false);
-      }
-    };
-    fetchSelected();
-  }, [selectedLogin]);
+  const organizations = orgsQuery.data ?? [];
+  const loadingOrgs = orgsQuery.isFetching;
+  const loadingSelected = orgDetailsQuery.isFetching;
 
   const selectedLoginValue = useMemo<string | undefined>(() => {
     return selectedLogin ?? undefined;
@@ -71,16 +41,27 @@ export const ProjectManagement = () => {
         <h2 className="text-lg font-semibold">Select an organization</h2>
         <p className="text-muted-foreground mb-4">
           Select the organization you want to create a project for. You can see
-          the details of the organization before creating a project.
+          the details of the organization before creating a project. Couldn't
+          find your organization? It might be because one of your members has
+          already created a project for it.
         </p>
+
         {loadingOrgs ? (
           <div className="text-sm text-muted-foreground">
             Loading organizations list...
           </div>
         ) : organizations.length === 0 ? (
-          <div className="text-sm text-muted-foreground">
-            No organizations found.
-          </div>
+          <Alert
+            title="Having problems finding your organization?"
+            description="If you can't find your new organization, it's because you only granted access to certain ones when you first logged in. To fix this, go to the link, search for GrantFox, and allow access to your new organization — or simply revoke access and log in again."
+            variant="warning"
+            notFound
+            link="https://github.com/settings/applications"
+          >
+            <p className="text-sm text-muted-foreground">
+              No organizations found.
+            </p>
+          </Alert>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {organizations.map((org) => (
@@ -101,8 +82,8 @@ export const ProjectManagement = () => {
         </div>
 
         <div className="w-full md:w-2/5">
-          {selectedOrganization ? (
-            <GithubOrgCard organization={selectedOrganization} />
+          {orgDetailsQuery.data ? (
+            <GithubOrgCard organization={orgDetailsQuery.data} />
           ) : loadingSelected ? (
             <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground border rounded-md">
               Loading organization details...
