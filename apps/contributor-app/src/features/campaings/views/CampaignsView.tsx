@@ -6,18 +6,25 @@ import { CampaignTags } from "../components/CampaignTags";
 import { CampaignTimeRemaining } from "../components/CampaignTimeRemaining";
 import { useCampaignQuery } from "../hooks/useCampaignQuery";
 import { Card } from "@/components/ui/card";
-import { FileIcon } from "lucide-react";
+import { FileIcon, Loader2 } from "lucide-react";
 import { CampaignAndRepos } from "../components/CampaignAndRepos";
 
 export const CampaignView = () => {
-  const { activeCampaign } = useCampaignContext();
+  const { activeCampaign, isLoading } = useCampaignContext();
   const { data: contributors } = useCampaignQuery({
     campaignId: activeCampaign?.campaign_id,
   });
 
   return (
     <>
-      {!activeCampaign ? (
+      {isLoading ? (
+        <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
+          <Loader2 className="size-10 animate-spin" />
+          <span className="text-sm text-muted-foreground">
+            Loading campaign…
+          </span>
+        </Card>
+      ) : !activeCampaign ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />
           <span className="text-sm text-muted-foreground">

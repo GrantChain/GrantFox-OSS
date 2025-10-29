@@ -17,6 +17,9 @@ export const useCampaignQuery = (options: UseCampaignQueryOptions) => {
   const query = useQuery<ApiUser[]>({
     queryKey: ["campaign-contributors", campaignId],
     enabled: isEnabled,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    placeholderData: (prev) => prev,
     queryFn: async () => {
       if (!isEnabled || !campaignId) return [];
       return campaignService.getContributorsCampaign(campaignId);

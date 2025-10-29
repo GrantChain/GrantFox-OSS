@@ -16,6 +16,7 @@ import { http } from "@/lib/api";
 interface CampaignContextValue {
   activeCampaign: Campaign | null;
   upcomingCampaign: Campaign | null;
+  isLoading: boolean;
   refreshActiveCampaign: () => Promise<void>;
 }
 
@@ -30,11 +31,16 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
     null
   );
   const loadingRef = useRef<boolean>(false);
+  const firstLoadRef = useRef<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const refreshActiveCampaign = useCallback(async () => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     try {
+      if (firstLoadRef.current) {
+        setIsLoading(true);
+      }
       const activeList = await service.getActiveCampaign();
       const active =
         Array.isArray(activeList) && activeList.length > 0
@@ -53,6 +59,10 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       console.error(error);
     } finally {
       loadingRef.current = false;
+      if (firstLoadRef.current) {
+        setIsLoading(false);
+        firstLoadRef.current = false;
+      }
     }
   }, [service]);
 
@@ -77,8 +87,8 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   }, [refreshActiveCampaign]);
 
   const value = useMemo<CampaignContextValue>(
-    () => ({ activeCampaign, upcomingCampaign, refreshActiveCampaign }),
-    [activeCampaign, upcomingCampaign, refreshActiveCampaign]
+    () => ({ activeCampaign, upcomingCampaign, isLoading, refreshActiveCampaign }),
+    [activeCampaign, upcomingCampaign, isLoading, refreshActiveCampaign]
   );
 
   return (

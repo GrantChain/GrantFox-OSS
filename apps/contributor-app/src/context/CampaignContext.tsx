@@ -17,6 +17,7 @@ interface CampaignContextValue {
   activeCampaign: Campaign | null;
   upcomingCampaign: Campaign | null;
   campaigns: Campaign[];
+  isLoading: boolean;
   refreshActiveCampaign: () => Promise<void>;
 }
 
@@ -32,11 +33,16 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   );
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const loadingRef = useRef<boolean>(false);
+  const firstLoadRef = useRef<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const refreshActiveCampaign = useCallback(async () => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     try {
+      if (firstLoadRef.current) {
+        setIsLoading(true);
+      }
       const activeList = await service.getActiveCampaign();
       const active =
         Array.isArray(activeList) && activeList.length > 0
@@ -55,6 +61,10 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       console.error(error);
     } finally {
       loadingRef.current = false;
+      if (firstLoadRef.current) {
+        setIsLoading(false);
+        firstLoadRef.current = false;
+      }
     }
   }, [service]);
 
@@ -80,9 +90,16 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       activeCampaign,
       upcomingCampaign,
       campaigns,
+      isLoading,
       refreshActiveCampaign,
     }),
-    [activeCampaign, upcomingCampaign, campaigns, refreshActiveCampaign]
+    [
+      activeCampaign,
+      upcomingCampaign,
+      campaigns,
+      isLoading,
+      refreshActiveCampaign,
+    ]
   );
 
   return (
