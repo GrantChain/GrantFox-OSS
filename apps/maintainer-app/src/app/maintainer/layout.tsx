@@ -19,11 +19,12 @@ export default function MaintainerLayout({
   const projectsService = useMemo(() => new ProjectsService(http), []);
 
   const projectIdFromPath = useMemo<string | null>(() => {
-    // Match /maintainer/projects/:projectId(/...)? and exclude the static "management" page
-    const match = pathname.match(/^\/maintainer\/projects\/([^\/]+)(?:\/|$)/);
+    // Match /maintainer/projects/:projectId(/...)? but exclude reserved namespaces like "management" and "repo"
+    const match = pathname.match(
+      /^\/maintainer\/projects\/(?!management(?:\/|$)|repo(?:\/|$))([^\/]+)(?:\/|$)/
+    );
     const candidate = match?.[1] ?? null;
-    if (!candidate || candidate.toLowerCase() === "management") return null;
-    return candidate;
+    return candidate ?? null;
   }, [pathname]);
 
   useEffect(() => {
