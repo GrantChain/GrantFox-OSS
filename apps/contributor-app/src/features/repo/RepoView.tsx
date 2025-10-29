@@ -51,7 +51,7 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
     org,
     repo,
     {
-      per_page: 30,
+      per_page: 200,
       state: "open",
     }
   );
@@ -283,14 +283,16 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
                         </EmptyHeader>
                       </Empty>
                     ) : (
-                      filteredIssues.map((issue: Issue) => (
-                        <IssueCard
-                          key={issue.id}
-                          org={org}
-                          repo={repo}
-                          issue={issue}
-                        />
-                      ))
+                      <div className="flex flex-col gap-4">
+                        {filteredIssues.map((issue: Issue) => (
+                          <IssueCard
+                            key={issue.id}
+                            org={org}
+                            repo={repo}
+                            issue={issue}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 </CardContent>
