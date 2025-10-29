@@ -12,7 +12,8 @@ import type { UserOrganization } from "@/types/github.type";
  *
  * Single query, no extra refetching or cascading rerenders.
  */
-export function useAvailableUserOrganizations() {
+export function useAvailableUserOrganizations(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   return useQuery<UserOrganization[], Error>({
     queryKey: ["github", "user-orgs", "available"],
     queryFn: async () => {
@@ -32,6 +33,7 @@ export function useAvailableUserOrganizations() {
       return validations.filter((v) => !v.exists).map((v) => v.org);
     },
     staleTime: 1000 * 60 * 5,
+    enabled,
     refetchOnWindowFocus: false,
   });
 }
