@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { githubHttp } from "@/lib/http";
 import { useUser } from "@/context/UserContext";
 import { useCampaignContext } from "@/context/CampaignContext";
 import { GitHubApplicationsService } from "../github/services/GitHubApplicationsService";
@@ -19,8 +18,8 @@ import {
 import { Card } from "@/components/ui/card";
 import { ApplicationRow, ApplicationStatus } from "@/types/applications.type";
 
-const githubApplicationsService = new GitHubApplicationsService(githubHttp);
-const reposService = new GitHubReposService(githubHttp);
+const githubApplicationsService = new GitHubApplicationsService();
+const reposService = new GitHubReposService();
 
 type TimelineEvent =
   | {

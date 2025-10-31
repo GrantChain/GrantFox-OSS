@@ -1,10 +1,9 @@
 "use client";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { githubHttp } from "@/lib/http";
 import { GitHubSearchService } from "../services/GitHubSearchService";
 
-const searchService = new GitHubSearchService(githubHttp);
+const searchService = new GitHubSearchService();
 
 export function useSearchRepositoriesOnce(params: {
   q: string;

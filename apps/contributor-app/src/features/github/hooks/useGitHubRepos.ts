@@ -1,10 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { githubHttp } from "@/lib/http";
 import { GitHubReposService } from "../services/GitHubReposService";
 
-const reposService = new GitHubReposService(githubHttp);
+const reposService = new GitHubReposService();
 
 export function useGitHubRepo(owner: string, repo: string) {
   return useQuery({

@@ -1,10 +1,9 @@
 "use client";
 
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { githubHttp } from "@/lib/http";
 import { GitHubOrgsService } from "../services/GitHubOrgsService";
 
-const orgsService = new GitHubOrgsService(githubHttp);
+const orgsService = new GitHubOrgsService();
 
 export function useOrganizations(params?: {
   per_page?: number;
