@@ -9,6 +9,7 @@ import { CampaignProvider } from "@/context/CampaignContext";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { Footer } from "@/components/shared/Footer";
+import { PostHogProvider } from "@/providers/PostHogProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,28 +36,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ReactQueryClientProvider>
-            <UserProvider>
-              <WalletProvider>
-                <CampaignProvider>
-                  <Navbar />
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ReactQueryClientProvider>
+              <UserProvider>
+                <WalletProvider>
+                  <CampaignProvider>
+                    <Navbar />
 
-                  <div className="flex-1 w-full min-h-screen">{children}</div>
+                    <div className="flex-1 w-full min-h-screen">{children}</div>
 
-                  <Footer />
+                    <Footer />
 
-                  <Toaster />
-                </CampaignProvider>
-              </WalletProvider>
-            </UserProvider>
-          </ReactQueryClientProvider>
-        </ThemeProvider>
+                    <Toaster />
+                  </CampaignProvider>
+                </WalletProvider>
+              </UserProvider>
+            </ReactQueryClientProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
