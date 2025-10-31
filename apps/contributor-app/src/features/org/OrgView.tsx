@@ -29,7 +29,11 @@ export const OrgView = ({ org }: { org: string }) => {
   } = useOrganization(org);
 
   const service = new CampaignService(http);
-  const { data: campaignWithProjects, isLoading: campaignLoading } = useQuery({
+  const {
+    data: campaignWithProjects,
+    isLoading: campaignLoading,
+    isFetched: campaignFetched,
+  } = useQuery({
     queryKey: [
       "campaign",
       "active",
@@ -80,7 +84,7 @@ export const OrgView = ({ org }: { org: string }) => {
 
   return (
     <section className="relative z-10">
-      {campaignLoading ? (
+      {!activeCampaign?.campaign_id || campaignLoading || !campaignFetched ? (
         <div className="mt-8 flex justify-center">
           <LoaderCard
             title="Loading campaign…"
