@@ -1,13 +1,8 @@
-import type { AxiosInstance } from "axios";
+import { githubHttp } from "@/lib/http";
 
 export class GitHubUsersService {
-  private readonly http: AxiosInstance;
-  constructor(http: AxiosInstance) {
-    this.http = http;
-  }
-
   async getUser(username: string) {
-    const { data } = await this.http.get(`/users/${username}`);
+    const { data } = await githubHttp.get(`/users/${username}`);
     return data;
   }
 }

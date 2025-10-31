@@ -1,18 +1,13 @@
-import type { AxiosInstance } from "axios";
+import { githubHttp } from "@/lib/http";
 
 export class GitHubOrgsService {
-  private readonly http: AxiosInstance;
-  constructor(http: AxiosInstance) {
-    this.http = http;
-  }
-
   async listOrganizations(params?: { per_page?: number; since?: number }) {
-    const { data } = await this.http.get("/organizations", { params });
+    const { data } = await githubHttp.get("/organizations", { params });
     return data;
   }
 
   async getOrganization(org: string) {
-    const { data } = await this.http.get(`/orgs/${org}`);
+    const { data } = await githubHttp.get(`/orgs/${org}`);
     return data;
   }
 
@@ -20,7 +15,9 @@ export class GitHubOrgsService {
     username: string,
     params?: { per_page?: number; page?: number }
   ) {
-    const { data } = await this.http.get(`/users/${username}/orgs`, { params });
+    const { data } = await githubHttp.get(`/users/${username}/orgs`, {
+      params,
+    });
     return data;
   }
 
@@ -28,7 +25,7 @@ export class GitHubOrgsService {
     org: string,
     params?: { per_page?: number; page?: number; sort?: string; type?: string }
   ) {
-    const { data } = await this.http.get(`/orgs/${org}/repos`, { params });
+    const { data } = await githubHttp.get(`/orgs/${org}/repos`, { params });
     return data;
   }
 }

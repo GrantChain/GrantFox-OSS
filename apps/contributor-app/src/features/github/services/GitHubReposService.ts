@@ -1,3 +1,4 @@
+import { githubHttp } from "@/lib/http";
 import {
   Contributor,
   Issue,
@@ -5,16 +6,10 @@ import {
   PullRequest,
   Comment,
 } from "@/types/Github";
-import type { AxiosInstance } from "axios";
 
 export class GitHubReposService {
-  private readonly http: AxiosInstance;
-  constructor(http: AxiosInstance) {
-    this.http = http;
-  }
-
   async getRepo(owner: string, repo: string) {
-    const { data } = await this.http.get(`/repos/${owner}/${repo}`);
+    const { data } = await githubHttp.get(`/repos/${owner}/${repo}`);
     return data;
   }
 
@@ -28,7 +23,7 @@ export class GitHubReposService {
       labels?: string;
     }
   ) {
-    const { data } = await this.http.get(`/repos/${owner}/${repo}/issues`, {
+    const { data } = await githubHttp.get(`/repos/${owner}/${repo}/issues`, {
       params,
     });
     return data;
@@ -39,7 +34,7 @@ export class GitHubReposService {
     repo: string,
     issue_number: number
   ): Promise<Issue> {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/issues/${issue_number}`
     );
     return data;
@@ -50,7 +45,7 @@ export class GitHubReposService {
     repo: string,
     pull_number: number
   ): Promise<PullRequest> {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/pulls/${pull_number}`
     );
     return data as PullRequest;
@@ -62,7 +57,7 @@ export class GitHubReposService {
     issue_number: number,
     params?: { per_page?: number; page?: number }
   ) {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/issues/${issue_number}/timeline`,
       {
         params,
@@ -78,7 +73,7 @@ export class GitHubReposService {
     issue_number: number,
     params?: { per_page?: number; page?: number }
   ): Promise<Comment[]> {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/issues/${issue_number}/comments`,
       { params }
     );
@@ -90,7 +85,7 @@ export class GitHubReposService {
     repo: string,
     params?: { per_page?: number; page?: number; since?: string }
   ): Promise<Comment[]> {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/issues/comments`,
       { params }
     );
@@ -98,12 +93,12 @@ export class GitHubReposService {
   }
 
   async getREADME(owner: string, repo: string): Promise<Readme> {
-    const { data } = await this.http.get(`/repos/${owner}/${repo}/readme`);
+    const { data } = await githubHttp.get(`/repos/${owner}/${repo}/readme`);
     return data;
   }
 
   async listContributors(owner: string, repo: string): Promise<Contributor[]> {
-    const { data } = await this.http.get(
+    const { data } = await githubHttp.get(
       `/repos/${owner}/${repo}/contributors`
     );
     return data;
@@ -113,7 +108,7 @@ export class GitHubReposService {
     owner: string,
     repo: string
   ): Promise<Record<string, number>> {
-    const { data } = await this.http.get(`/repos/${owner}/${repo}/languages`);
+    const { data } = await githubHttp.get(`/repos/${owner}/${repo}/languages`);
     return data as Record<string, number>;
   }
 }

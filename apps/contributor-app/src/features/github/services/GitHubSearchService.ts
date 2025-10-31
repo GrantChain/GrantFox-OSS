@@ -1,11 +1,6 @@
-import type { AxiosInstance } from "axios";
+import { githubHttp } from "@/lib/http";
 
 export class GitHubSearchService {
-  private readonly http: AxiosInstance;
-  constructor(http: AxiosInstance) {
-    this.http = http;
-  }
-
   async searchRepositories(params: {
     q: string;
     sort?: "stars" | "forks" | "updated";
@@ -13,12 +8,12 @@ export class GitHubSearchService {
     per_page?: number;
     page?: number;
   }) {
-    const { data } = await this.http.get("/search/repositories", { params });
+    const { data } = await githubHttp.get("/search/repositories", { params });
     return data;
   }
 
   async searchUsers(params: { q: string; per_page?: number; page?: number }) {
-    const { data } = await this.http.get("/search/users", { params });
+    const { data } = await githubHttp.get("/search/users", { params });
     return data;
   }
 }

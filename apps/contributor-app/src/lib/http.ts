@@ -31,6 +31,7 @@ export function createGitHubHttpClient(
         const {
           data: { session },
         } = await supabase.auth.getSession();
+        console.log(session);
         token = session?.provider_token ?? null;
         if (token) {
           runtimeGitHubToken = token;
@@ -45,8 +46,8 @@ export function createGitHubHttpClient(
       req.headers = req.headers ?? {};
       req.headers.Authorization = `Bearer ${token}`;
       req.headers["X-GitHub-Api-Version"] = "2022-11-28";
-      // The browser forbids setting the User-Agent header. Only set it on the server.
-      if (typeof window === "undefined" && !req.headers["User-Agent"]) {
+      // Some GitHub endpoints require a User-Agent
+      if (!req.headers["User-Agent"]) {
         req.headers["User-Agent"] = "GrantFox-App";
       }
     }
