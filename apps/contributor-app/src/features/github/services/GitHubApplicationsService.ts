@@ -12,7 +12,7 @@ export class GitHubApplicationsService {
     state: "open" | "closed";
   }): Promise<SearchIssuesResponse> {
     const { data } = await githubHttp.get(
-      `/search/issues?q=label:${label}+is:issue+commenter:${username}+state:${state}`
+      `/search/issues?q=label:${label}+is:issue+commenter:${username}+state:${state}+-author:${username}`
     );
     return data;
   }
