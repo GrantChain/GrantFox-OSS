@@ -15,7 +15,9 @@ export interface IssueCardProps {
 
 export function IssueCard({ org, repo, issue }: IssueCardProps) {
   return (
-    <Link href={`/campaigns/org/${org}/repo/${repo}/issue/${issue.number}`}>
+    <Link
+      href={`/maintainer/projects/repo/${repo}/issue/${issue.number}?org=${org}`}
+    >
       <Card className="p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="font-medium">

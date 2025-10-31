@@ -51,7 +51,7 @@ export const RepoView = ({ org, repo }: { org: string; repo: string }) => {
     org,
     repo,
     {
-      per_page: 30,
+      per_page: 200,
       state: "open",
     }
   );
