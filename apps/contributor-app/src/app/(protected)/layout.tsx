@@ -1,8 +1,5 @@
 "use client";
 
-import { useUser } from "@/context/UserContext";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { CampaignProvider } from "@/context/CampaignContext";
 import { Back } from "@/components/shared/Back";
 
@@ -11,18 +8,18 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, loading } = useUser();
-  const router = useRouter();
+  // const { user, loading } = useUser();
+  // const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/signin");
-    }
-  }, [loading, user, router]);
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.replace("/signin");
+  //   }
+  // }, [loading, user, router]);
 
-  if (loading || !user) {
-    return null;
-  }
+  // if (loading || !user) {
+  //   return null;
+  // }
 
   return (
     <CampaignProvider>
