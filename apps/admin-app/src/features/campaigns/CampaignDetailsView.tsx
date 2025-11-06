@@ -1,31 +1,22 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useProjectsQuery } from "../projects/hooks/useProjectsQuery";
+import { useCampaignDetailsQuery } from "./hooks/useCampaignDetailsQuery";
 import { FileIcon, Loader2 } from "lucide-react";
+import { Details } from "./Details";
 
-export const DashboardView = () => {
-  const { data: projects, isLoading } = useProjectsQuery();
+export const CampaignDetailsView = ({ campaignId }: { campaignId: string }) => {
+  const { data, isLoading } = useCampaignDetailsQuery(campaignId);
 
   return (
     <>
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold">Dashboard</h2>
-          <p className="text-muted-foreground">
-            View the dashboard to see the projects and campaigns.
-          </p>
-        </div>
-        <div />
-      </div>
-
       {isLoading ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <Loader2 className="size-10 animate-spin" />
           <span className="text-sm text-muted-foreground">Loading data...</span>
         </Card>
-      ) : projects && projects.length > 0 ? (
-        <p>charts</p>
+      ) : data ? (
+        <Details data={data} />
       ) : (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />

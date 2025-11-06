@@ -32,10 +32,24 @@ export function NavMain({
             <SidebarMenuButton asChild>
               <Link
                 href={item.url}
-                className={cn(pathname === item.url ? "bg-muted/90" : "")}
+                className={cn(
+                  (
+                    item.url === "/dashboard"
+                      ? pathname === item.url
+                      : pathname === item.url ||
+                        pathname.startsWith(item.url + "/")
+                  )
+                    ? "bg-muted/90"
+                    : ""
+                )}
               >
                 <item.icon
-                  className={cn(pathname === item.url && "text-orange-700")}
+                  className={cn(
+                    (item.url === "/dashboard"
+                      ? pathname === item.url
+                      : pathname === item.url ||
+                        pathname.startsWith(item.url + "/")) && "text-primary"
+                  )}
                 />
                 <span>{item.name}</span>
               </Link>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "../../components/ui/button";
 import { ArrowRightIcon, ChevronDown, Edit } from "lucide-react";
 import { Campaign, CampaignStatus } from "@/types/campaign.type";
-import { Details } from "./Details";
+import { DetailsSheet } from "./DetailsSheet";
 import { useCampaignContext } from "@/context/CampaignContext";
 import { CampaignSheetForm } from "./CampaignSheetForm";
 import {
@@ -202,7 +202,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
       </CardContent>
 
       {/** View Sheet */}
-      {campaign && openDetails && <Details />}
+      {campaign && openDetails && <DetailsSheet />}
 
       {/** Edit Sheet */}
       {campaign && openEdit && <CampaignSheetForm mode="edit" />}

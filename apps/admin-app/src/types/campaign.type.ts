@@ -1,4 +1,6 @@
+import { Project } from "./project.type";
 import { Repository } from "./repository.type";
+import { Maintainer } from "./maintainer.type";
 
 export enum CampaignStatus {
   PENDING = "PENDING",
@@ -21,6 +23,27 @@ export interface Campaign {
   updated_at: string;
   repositories: Repository[];
 }
+
+export type CampaignProject = Omit<
+  Project,
+  | "created_by"
+  | "created_at"
+  | "updated_at"
+  | "reviewed_at"
+  | "status"
+  | "maintainers"
+  | "repositories"
+> & {
+  maintainers: Omit<Maintainer, "email" | "joined_at">[];
+  repositories: Repository[];
+};
+
+export type CampaignWithProjectsAndRepos = {
+  campaign: Campaign;
+  projects: CampaignProject[];
+  total_projects: number;
+  total_repositories: number;
+};
 
 export type CampaignPayload = Pick<
   Campaign,

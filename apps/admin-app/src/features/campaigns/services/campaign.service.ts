@@ -2,6 +2,7 @@ import {
   Campaign,
   CampaignStatus,
   CampaignPayload,
+  CampaignWithProjectsAndRepos,
 } from "@/types/campaign.type";
 import { AxiosInstance } from "axios";
 
@@ -78,7 +79,9 @@ export class CampaignService {
     }
   }
 
-  async getCampaignWithProjectsAndRepos(id: string): Promise<Campaign> {
+  async getCampaignWithProjectsAndRepos(
+    id: string
+  ): Promise<CampaignWithProjectsAndRepos> {
     try {
       const { data } = await this.http.get(
         `/campaigns/${id}/projects-with-repos`
