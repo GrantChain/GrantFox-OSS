@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CircleDollarSign, Folder, Tent } from "lucide-react";
+import { CircleDollarSign, Folder, Home, Tent } from "lucide-react";
 import { NavUser } from "@/components/ui/nav-user";
 import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
@@ -17,6 +17,11 @@ import { WalletButton } from "../tw-blocks/wallet-kit/WalletButtons";
 // This is sample data.
 const data = {
   items: [
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: Home,
+    },
     {
       name: "Project Submissions",
       url: "/dashboard/projects",

@@ -51,7 +51,7 @@ export const useAuth = () => {
         toast.error(error.message);
       }
 
-      if (data?.session && !error) router.push("/dashboard/projects");
+      if (data?.session && !error) router.push("/dashboard");
     } catch (error) {
       if (error) console.error(error);
       toast.error("Failed to sign in");
