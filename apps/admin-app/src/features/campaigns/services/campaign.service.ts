@@ -31,6 +31,15 @@ export class CampaignService {
     }
   }
 
+  async getActiveCampaign(): Promise<Campaign[]> {
+    try {
+      const { data } = await this.http.get("/campaigns?status=ACTIVE");
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get active campaign", { cause: error });
+    }
+  }
+
   async createCampaign(campaign: CampaignPayload | FormData) {
     try {
       const isForm =

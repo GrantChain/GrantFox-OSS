@@ -1,11 +1,17 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useProjectsQuery } from "../projects/hooks/useProjectsQuery";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileIcon, Loader2 } from "lucide-react";
+import { DashboardCharts } from "./DashboardChart";
+import { useCampaignDetailsQuery } from "../campaigns/hooks/useCampaignDetailsQuery";
+import { useCampaignContext } from "@/context/CampaignContext";
 
 export const DashboardView = () => {
-  const { data: projects, isLoading } = useProjectsQuery();
+  const { activeCampaign } = useCampaignContext();
+  const { data, isLoading } = useCampaignDetailsQuery(
+    activeCampaign?.campaign_id
+  );
 
   return (
     <>
@@ -24,8 +30,36 @@ export const DashboardView = () => {
           <Loader2 className="size-10 animate-spin" />
           <span className="text-sm text-muted-foreground">Loading data...</span>
         </Card>
-      ) : projects && projects.length > 0 ? (
-        <p>charts</p>
+      ) : data ? (
+        <Tabs defaultValue="activeCampaign" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="activeCampaign">Active Campaign</TabsTrigger>
+            {/* <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="contributors">Contributors</TabsTrigger>
+            <TabsTrigger value="maintainers">Maintainers</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger> */}
+          </TabsList>
+
+          <TabsContent value="activeCampaign">
+            <DashboardCharts data={data} />
+          </TabsContent>
+
+          {/* <TabsContent value="general">
+            <Card className="p-4">General</Card>
+          </TabsContent>
+
+          <TabsContent value="contributors">
+            <Card className="p-4">Contributors</Card>
+          </TabsContent>
+
+          <TabsContent value="maintainers">
+            <Card className="p-4">Maintainers</Card>
+          </TabsContent>
+
+          <TabsContent value="projects">
+            <Card className="p-4">Projects</Card>
+          </TabsContent> */}
+        </Tabs>
       ) : (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />
