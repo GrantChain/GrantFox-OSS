@@ -73,7 +73,10 @@ export function useDashboardMetrics(
 
     const categoryMap = new Map<string, number>();
     data.projects.forEach((project) => {
-      categoryMap.set(project.category, (categoryMap.get(project.category) || 0) + 1);
+      categoryMap.set(
+        project.category,
+        (categoryMap.get(project.category) || 0) + 1
+      );
     });
     const categoryData: CategoryPoint[] = Array.from(categoryMap.entries()).map(
       ([category, count], index) => ({
@@ -99,10 +102,15 @@ export function useDashboardMetrics(
       .sort((a, b) => b.maintainers - a.maintainers)
       .slice(0, 6);
 
-    const totalMaintainers = data.projects.reduce(
-      (sum, project) => sum + project.maintainers.length,
-      0
-    );
+    const uniqueMaintainerUsernames = new Set<string>();
+    data.projects.forEach((project) => {
+      project.maintainers.forEach((maintainer) => {
+        if (maintainer.username) {
+          uniqueMaintainerUsernames.add(maintainer.username);
+        }
+      });
+    });
+    const totalMaintainers = uniqueMaintainerUsernames.size;
 
     return {
       repositoryGrowth,
@@ -114,5 +122,3 @@ export function useDashboardMetrics(
     };
   }, [data]);
 }
-
-

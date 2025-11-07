@@ -43,7 +43,7 @@ export function StatsOverview({
         </CardHeader>
         <CardContent>
           <div className="text-4xl font-bold">{totalMaintainers}</div>
-          <p className="text-xs text-muted-foreground">Active contributors</p>
+          <p className="text-xs text-muted-foreground">Total maintainers</p>
         </CardContent>
       </Card>
     </div>

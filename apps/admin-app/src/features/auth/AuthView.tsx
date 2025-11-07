@@ -1,6 +1,5 @@
 import { LoginForm } from "@/features/auth/LoginForm";
 import Image from "next/image";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
@@ -12,9 +11,6 @@ export const AuthView = ({ variant = "login" }: AuthViewProps) => {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex items-center justify-end gap-2">
-          <AnimatedThemeToggler />
-        </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
             <>
@@ -42,7 +38,7 @@ export const AuthView = ({ variant = "login" }: AuthViewProps) => {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden sm:flex items-center justify-center p-10">
+      <div className="border-l-2 relative hidden sm:flex items-center justify-center p-10">
         <div className="relative w-full max-w-2xl aspect-square">
           <Image
             src="/assets/grantfox-stellar-light.svg"
