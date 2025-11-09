@@ -90,7 +90,7 @@ export class ProjectsService {
       },
     });
 
-    return projects.map((project) => this.formatProjectResponse(project));
+    return Promise.all(projects.map((project) => this.formatProjectResponse(project)));
   }
 
   async findOne(id: string) {
@@ -118,7 +118,7 @@ export class ProjectsService {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
-    return this.formatProjectResponse(project);
+    return await this.formatProjectResponse(project);
   }
 
   async findByUser(userId: string) {
@@ -152,7 +152,7 @@ export class ProjectsService {
       },
     });
 
-    return projects.map((project) => this.formatProjectResponse(project));
+    return Promise.all(projects.map((project) => this.formatProjectResponse(project)));
   }
 
   async update(id: string, dto: UpdateProjectDto, userId: string) {
@@ -183,7 +183,7 @@ export class ProjectsService {
       },
     });
 
-    return this.formatProjectResponse(project);
+    return await this.formatProjectResponse(project);
   }
 
   async updateStatus(id: string, dto: UpdateProjectStatusDto, userId: string) {
@@ -214,7 +214,7 @@ export class ProjectsService {
       },
     });
 
-    return this.formatProjectResponse(project);
+    return await this.formatProjectResponse(project);
   }
 
   async remove(id: string, userId: string) {
@@ -251,7 +251,7 @@ export class ProjectsService {
       },
     });
 
-    return this.formatProjectResponse(project);
+    return await this.formatProjectResponse(project);
   }
 
   async addMaintainer(projectId: string, dto: AddMaintainerDto, userId: string) {
@@ -405,11 +405,58 @@ export class ProjectsService {
     }
   }
 
-  private formatProjectResponse(project: any) {
+  /**
+   * Obtiene el avatar de una organización de GitHub
+   */
+  private async getOrganizationAvatar(githubHandle: string): Promise<string | null> {
+    try {
+      // Preparar headers con token si existe
+      const headers: Record<string, string> = {
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'GrantFox-API',
+      };
+
+      // Agregar token si está configurado
+      if (process.env.GITHUB_TOKEN) {
+        headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+      }
+
+      // Intentar primero con el endpoint de organizaciones
+      let response = await fetch(
+        `https://api.github.com/orgs/${githubHandle}`,
+        { headers },
+      );
+
+      // Si falla (404), intentar con el endpoint de usuarios (puede ser un usuario individual)
+      if (!response.ok && response.status === 404) {
+        response = await fetch(
+          `https://api.github.com/users/${githubHandle}`,
+          { headers },
+        );
+      }
+
+      if (!response.ok) {
+        console.error(`GitHub API error: ${response.status} for ${githubHandle}`);
+        return null;
+      }
+
+      const data = await response.json();
+      return data.avatar_url || null;
+    } catch (error) {
+      console.error('Error fetching GitHub organization avatar:', error);
+      return null;
+    }
+  }
+
+  private async formatProjectResponse(project: any) {
+    // Obtener avatar de la organización
+    const organizationAvatarUrl = await this.getOrganizationAvatar(project.github_handle);
+
     return {
       project_id: project.project_id,
       name: project.name,
       github_handle: project.github_handle,
+      organization_avatar_url: organizationAvatarUrl,
       short_description: project.short_description,
       description: project.description,
       tech_stack: project.tech_stack,
