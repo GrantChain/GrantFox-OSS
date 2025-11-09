@@ -11,6 +11,9 @@ export class ProjectResponseDto {
   @ApiProperty()
   github_handle: string;
 
+  @ApiProperty({ required: false })
+  organization_avatar_url?: string;
+
   @ApiProperty()
   short_description: string;
 
