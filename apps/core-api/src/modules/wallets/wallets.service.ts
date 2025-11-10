@@ -70,16 +70,15 @@ export class WalletsService {
     return wallets;
   }
 
-  async findOne(walletId: string) {
+  async validateAddress(address: string) {
     const wallet = await this.prisma.wallet.findUnique({
-      where: { wallet_id: walletId },
+      where: { address },
     });
 
-    if (!wallet) {
-      throw new NotFoundException(`Wallet with ID ${walletId} not found`);
-    }
-
-    return wallet;
+    return {
+      exists: !!wallet,
+      address,
+    };
   }
 
   async setPrimary(userId: string, walletId: string) {
