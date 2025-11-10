@@ -141,6 +141,7 @@ export class CampaignsExtendedService {
       projects: Array.from(projectsMap.values()),
       total_projects: projectsMap.size,
       total_repositories: campaignRepos.length,
+      total_contributors: campaign.contributors.length,
     };
   }
 
