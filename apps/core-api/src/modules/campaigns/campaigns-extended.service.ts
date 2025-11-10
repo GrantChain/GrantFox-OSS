@@ -23,6 +23,20 @@ export class CampaignsExtendedService {
     // Verificar que la campaña existe
     const campaign = await this.prisma.campaign.findUnique({
       where: { campaign_id: campaignId },
+      include: {
+        contributors: {
+          include: {
+            contributor: {
+              select: {
+                user_id: true,
+                email: true,
+                username: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!campaign) {
@@ -51,6 +65,7 @@ export class CampaignsExtendedService {
                     maintainer: {
                       select: {
                         user_id: true,
+                        email: true,
                         username: true,
                         avatar_url: true,
                       },
@@ -85,6 +100,7 @@ export class CampaignsExtendedService {
           category: project.category,
           maintainers: project.maintainers.map((m) => ({
             user_id: m.maintainer.user_id,
+            email: m.maintainer.email,
             username: m.maintainer.username,
             avatar_url: m.maintainer.avatar_url,
             is_owner: m.is_owner,
@@ -114,10 +130,18 @@ export class CampaignsExtendedService {
         end_date: campaign.end_date,
         status: campaign.status,
         image_url: campaign.image_url,
+        contributors: campaign.contributors.map((c) => ({
+          user_id: c.contributor.user_id,
+          email: c.contributor.email,
+          username: c.contributor.username,
+          avatar_url: c.contributor.avatar_url,
+          registered_at: c.registered_at,
+        })),
       },
       projects: Array.from(projectsMap.values()),
       total_projects: projectsMap.size,
       total_repositories: campaignRepos.length,
+      total_contributors: campaign.contributors.length,
     };
   }
 
