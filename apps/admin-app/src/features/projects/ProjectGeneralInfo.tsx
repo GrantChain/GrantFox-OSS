@@ -18,18 +18,20 @@ export const ProjectGeneralInfo = ({
               width={96}
               height={96}
               src={organization.avatar_url || "/placeholder.svg"}
-              alt={organization.name}
+              alt={organization.name || organization.login}
               className="w-24 h-24 rounded-lg border border-border"
             />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h2 className="text-2xl font-bold text-foreground">
-                {organization.name}
+                {organization.name || organization.login}
               </h2>
             </div>
             <p className="text-muted-foreground mb-4">
-              {organization.description}
+              {organization.description ||
+                organization.description == null ||
+                "No description provided."}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {organization.location && (
@@ -45,7 +47,7 @@ export const ProjectGeneralInfo = ({
                     href={organization.blog}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1"
+                    className="hover:underline flex items-center gap-1"
                   >
                     Website
                   </Link>
@@ -58,7 +60,7 @@ export const ProjectGeneralInfo = ({
                     href={`https://twitter.com/${organization.twitter_username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline"
+                    className="hover:underline"
                   >
                     @{organization.twitter_username}
                   </Link>
@@ -71,7 +73,7 @@ export const ProjectGeneralInfo = ({
                     href={organization.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1"
+                    className="hover:underline flex items-center gap-1"
                   >
                     GitHub
                   </Link>
