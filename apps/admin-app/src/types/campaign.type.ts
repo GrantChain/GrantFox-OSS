@@ -43,6 +43,7 @@ export type CampaignWithProjectsAndRepos = {
   projects: CampaignProject[];
   total_projects: number;
   total_repositories: number;
+  total_contributors: number;
 };
 
 export type CampaignPayload = Pick<

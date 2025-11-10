@@ -34,6 +34,7 @@ export type DashboardMetrics = {
   reposPerProject: ReposPerProjectPoint[];
   maintainersPerProject: MaintainersPerProjectPoint[];
   totalMaintainers: number;
+  totalContributors: number;
 };
 
 export function useDashboardMetrics(
@@ -119,6 +120,7 @@ export function useDashboardMetrics(
       reposPerProject,
       maintainersPerProject,
       totalMaintainers,
+      totalContributors: data.total_contributors,
     };
   }, [data]);
 }
