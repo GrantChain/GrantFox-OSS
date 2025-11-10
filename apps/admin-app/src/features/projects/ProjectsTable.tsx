@@ -55,46 +55,14 @@ type ProjectsTableProps = {
   projects: Project[];
 };
 
-type OrgCache = Record<string, GithubOrganization | null>;
-
 const OrgAvatarCell: React.FC<{
   handle?: string | null;
-  orgService: OrganizationsService;
-  orgCache: OrgCache;
-  setOrgCache: React.Dispatch<React.SetStateAction<OrgCache>>;
-}> = ({ handle, orgService, orgCache, setOrgCache }) => {
-  React.useEffect(() => {
-    if (!handle) return;
-    if (typeof orgCache[handle] !== "undefined") return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await orgService.getOrganization(handle);
-        if (cancelled) return;
-        setOrgCache((prev) =>
-          typeof prev[handle] === "undefined"
-            ? { ...prev, [handle]: data }
-            : prev
-        );
-      } catch {
-        if (cancelled) return;
-        setOrgCache((prev) =>
-          typeof prev[handle] === "undefined"
-            ? { ...prev, [handle]: null }
-            : prev
-        );
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [handle, orgCache, orgService, setOrgCache]);
-
-  const avatarUrl = handle ? orgCache[handle]?.avatar_url : undefined;
+}> = ({ handle }) => {
+  const avatarUrl = handle ? `https://github.com/${handle}.png` : undefined;
   const fallback = handle?.charAt(0).toUpperCase() ?? "?";
   return (
     <Avatar className="size-8">
-      <AvatarImage src={avatarUrl ?? ""} alt={handle ?? "org"} />
+      <AvatarImage src={avatarUrl} alt={handle ?? "org"} />
       <AvatarFallback>{fallback}</AvatarFallback>
     </Avatar>
   );
@@ -168,12 +136,7 @@ export const ProjectsTable = ({ projects }: ProjectsTableProps) => {
         id: "org",
         header: "Org",
         cell: ({ row }) => (
-          <OrgAvatarCell
-            handle={row.original.github_handle}
-            orgService={orgService}
-            orgCache={orgCache}
-            setOrgCache={setOrgCache}
-          />
+          <OrgAvatarCell handle={row.original.github_handle} />
         ),
         enableSorting: false,
         enableHiding: false,
@@ -389,32 +352,38 @@ export const ProjectsTable = ({ projects }: ProjectsTableProps) => {
             </SelectItem>
           </SelectContent>
         </Select>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-end gap-2 ml-auto">
+          <Button variant="outline">
+            <span className="font-bold">Total:</span>{" "}
+            {table.getFilteredRowModel().rows.length}
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
