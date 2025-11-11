@@ -4,13 +4,22 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ProjectStatus, ReviewAction } from '@prisma/client';
+import {
+  ProjectApprovedEvent,
+  ProjectRejectedEvent,
+  ProjectChangesRequestedEvent,
+} from '../notifications/events';
 
 @Injectable()
 export class ProjectReviewsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async createReview(
     projectId: string,
@@ -58,6 +67,19 @@ export class ProjectReviewsService {
         throw new BadRequestException(`Invalid review action: ${dto.action}`);
     }
 
+    // Obtener maintainers del proyecto para notificar
+    const maintainers = await this.prisma.projectMaintainer.findMany({
+      where: {
+        project_id: projectId,
+        is_active: true,
+      },
+      select: {
+        maintainer_id: true,
+      },
+    });
+
+    const maintainerIds = maintainers.map((m) => m.maintainer_id);
+
     // Crear review y actualizar proyecto en transacción
     const result = await this.prisma.$transaction(async (tx) => {
       // Crear review
@@ -97,6 +119,34 @@ export class ProjectReviewsService {
 
       return review;
     });
+
+    // Emitir eventos según la acción de review
+    if (dto.action === ReviewAction.APPROVED) {
+      this.eventEmitter.emit(
+        'project.approved',
+        new ProjectApprovedEvent(projectId, project.name, maintainerIds),
+      );
+    } else if (dto.action === ReviewAction.REJECTED) {
+      this.eventEmitter.emit(
+        'project.rejected',
+        new ProjectRejectedEvent(
+          projectId,
+          project.name,
+          maintainerIds,
+          dto.reason,
+        ),
+      );
+    } else if (dto.action === ReviewAction.CHANGES_REQUESTED) {
+      this.eventEmitter.emit(
+        'project.changes-requested',
+        new ProjectChangesRequestedEvent(
+          projectId,
+          project.name,
+          maintainerIds,
+          dto.reason,
+        ),
+      );
+    }
 
     return result;
   }

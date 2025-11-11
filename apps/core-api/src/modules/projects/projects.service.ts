@@ -5,6 +5,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -12,10 +13,14 @@ import { UpdateProjectStatusDto } from './dto/update-project-status.dto';
 import { AddMaintainerDto } from './dto/add-maintainer.dto';
 import { ValidateGithubHandleDto } from './dto/validate-github-handle.dto';
 import { ProjectStatus } from '@prisma/client';
+import { MaintainerAddedEvent } from '../notifications/events';
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async create(dto: CreateProjectDto, createdBy: string) {
     // Verificar que el usuario existe y es MAINTAINER
@@ -256,10 +261,16 @@ export class ProjectsService {
 
   async addMaintainer(projectId: string, dto: AddMaintainerDto, userId: string) {
     // Verificar que el proyecto existe
-    await this.findOne(projectId);
+    const project = await this.findOne(projectId);
 
     // Verificar que el usuario es owner del proyecto
     await this.verifyOwnership(projectId, userId);
+
+    // Obtener información del usuario que está agregando
+    const addedByUser = await this.prisma.user.findUnique({
+      where: { user_id: userId },
+      select: { username: true },
+    });
 
     // Verificar que el maintainer existe y tiene rol MAINTAINER
     const maintainer = await this.prisma.user.findUnique({
@@ -284,6 +295,8 @@ export class ProjectsService {
       },
     });
 
+    let isNewMaintainer = false;
+
     if (existing) {
       if (!existing.is_active) {
         // Reactivar si estaba inactivo
@@ -296,6 +309,7 @@ export class ProjectsService {
           },
           data: { is_active: true },
         });
+        isNewMaintainer = true;
       } else {
         throw new ConflictException('Maintainer already added to this project');
       }
@@ -308,6 +322,21 @@ export class ProjectsService {
           is_owner: dto.is_owner ?? false,
         },
       });
+      isNewMaintainer = true;
+    }
+
+    // Emitir evento si se agregó un nuevo maintainer
+    if (isNewMaintainer) {
+      this.eventEmitter.emit(
+        'maintainer.added',
+        new MaintainerAddedEvent(
+          projectId,
+          project.name,
+          dto.maintainer_id,
+          userId,
+          addedByUser?.username ?? undefined,
+        ),
+      );
     }
 
     return this.findOne(projectId);

@@ -1,5 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DatabaseModule } from './database';
 import { UsersModule } from './modules/users/users.module';
 import { ProfilesModule } from './modules/profiles/profiles.module';
@@ -13,6 +14,7 @@ import { CampaignRepositoriesModule } from './modules/campaign-repositories/camp
 import { CampaignContributorsModule } from './modules/campaign-contributors/campaign-contributors.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { EscrowsModule } from './modules/escrows/escrows.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware';
 
 @Module({
@@ -21,6 +23,7 @@ import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware
       isGlobal: true,
       envFilePath: '.env',
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     UsersModule,
     ProfilesModule,
@@ -34,6 +37,7 @@ import { SimpleAuthMiddleware } from './common/middleware/simple-auth.middleware
     CampaignContributorsModule,
     UploadsModule,
     EscrowsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -80,6 +84,10 @@ export class AppModule implements NestModule {
         // Rutas públicas de campaign-contributors (GET)
         { path: 'campaign-contributors/campaign/:campaignId', method: RequestMethod.GET },
         { path: 'campaign-contributors/contributor/:contributorId', method: RequestMethod.GET },
+        // Rutas públicas de notifications (GET - solo lectura)
+        { path: 'notifications/user/:userId', method: RequestMethod.GET },
+        { path: 'notifications/user/:userId/unread-count', method: RequestMethod.GET },
+        { path: 'notifications/:id', method: RequestMethod.GET },
       )
       .forRoutes(
         // Campaigns protegidos (ADMIN)
@@ -111,6 +119,11 @@ export class AppModule implements NestModule {
         { path: 'escrows/:id', method: RequestMethod.PATCH },
         // Campaign-contributors protegidos (CONTRIBUTOR)
         { path: 'campaign-contributors/campaign/:campaignId/register', method: RequestMethod.POST },
+        // Notifications protegidos (USER - requiere auth para modificar/eliminar)
+        { path: 'notifications/:id/read', method: RequestMethod.PATCH },
+        { path: 'notifications/user/:userId/read-all', method: RequestMethod.PATCH },
+        { path: 'notifications/:id', method: RequestMethod.DELETE },
+        { path: 'notifications/user/:userId/all', method: RequestMethod.DELETE },
       );
   }
 }
