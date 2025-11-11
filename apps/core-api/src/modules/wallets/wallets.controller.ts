@@ -58,20 +58,33 @@ export class WalletsController {
     return this.walletsService.findAllByUser(userId);
   }
 
-  @Get(':walletId')
+  @Get('validate/:address')
   @ApiOperation({
-    summary: 'Get a wallet by ID',
-    description: 'Returns a single wallet by its ID',
+    summary: 'Validate if a wallet address exists',
+    description:
+      'Checks if a wallet address is already registered in the system. Useful for validation before creating a new wallet.',
   })
-  @ApiParam({ name: 'walletId', type: String, description: 'Wallet UUID' })
+  @ApiParam({
+    name: 'address',
+    type: String,
+    description: 'Stellar wallet address',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Wallet found',
-    type: WalletResponseDto,
+    description: 'Validation result',
+    schema: {
+      type: 'object',
+      properties: {
+        exists: {
+          type: 'boolean',
+          description: 'Whether the address is already registered',
+        },
+        address: { type: 'string', description: 'The validated address' },
+      },
+    },
   })
-  @ApiResponse({ status: 404, description: 'Wallet not found' })
-  findOne(@Param('walletId') walletId: string) {
-    return this.walletsService.findOne(walletId);
+  validateAddress(@Param('address') address: string) {
+    return this.walletsService.validateAddress(address);
   }
 
   @Patch('user/:userId/:walletId/set-primary')
