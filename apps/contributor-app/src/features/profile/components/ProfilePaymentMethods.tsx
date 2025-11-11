@@ -13,6 +13,14 @@ import { ShineBorder } from "@/components/ui/shine-border";
 import { Loader2, FileIcon } from "lucide-react";
 import { WalletsTable } from "./WalletsTable";
 import { usePaymentMethods } from "@/features/profile/hooks/usePaymentMethods";
+import { z } from "zod";
+import { isValidWallet } from "@/components/tw-blocks/wallet-kit/validators";
+
+const walletSchema = z
+  .string()
+  .trim()
+  .min(1, "Address is required")
+  .refine(isValidWallet, "Invalid wallet address");
 
 export const ProfilePaymentMethods = () => {
   const { user } = useUser();
@@ -22,6 +30,7 @@ export const ProfilePaymentMethods = () => {
     isLoading,
     addressInput,
     setAddressInput,
+    setError,
     error,
     isAdding,
     addWallet,
@@ -45,14 +54,30 @@ export const ProfilePaymentMethods = () => {
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <Input
             value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setAddressInput(value);
+              const result = walletSchema.safeParse(value);
+              setError(
+                result.success
+                  ? null
+                  : (result.error.issues[0]?.message ??
+                      "Invalid wallet address")
+              );
+            }}
             placeholder="Paste your wallet address"
             className="flex-1"
             disabled={isAdding || isLoading}
+            aria-invalid={Boolean(error)}
           />
           <Button
             onClick={() => addWallet(addressInput)}
-            disabled={isAdding || isLoading || !user?.id}
+            disabled={
+              isAdding ||
+              isLoading ||
+              !user?.id ||
+              !walletSchema.safeParse(addressInput).success
+            }
             className="shrink-0"
           >
             {isAdding ? "Adding..." : "Add wallet"}
@@ -87,5 +112,3 @@ export const ProfilePaymentMethods = () => {
     </Card>
   );
 };
-
-
