@@ -33,7 +33,7 @@ export const WalletButton = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (_) {
-      // noop
+      if (_) console.error(_);
     }
   };
 

@@ -196,13 +196,13 @@ export function ProfileView({ username }: ProfileViewProps) {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
                     <span>
-                      Joined in GitHub on {formatDate(githubUser.created_at)}
+                      Joined GitHub on {formatDate(githubUser.created_at)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
                     <span>
-                      Joined in GrantFox on {formatDate(user?.created_at ?? "")}
+                      Joined GrantFox on {formatDate(user?.created_at ?? "")}
                     </span>
                   </div>
                 </div>

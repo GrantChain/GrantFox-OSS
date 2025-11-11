@@ -6,6 +6,7 @@ import { ProfileHeader } from "@/features/profile/components/ProfileHeader";
 import { ProfileStats } from "@/features/profile/components/ProfileStats";
 import { useGithubProfile } from "@/features/profile/hooks/useGithubProfile";
 import { useUser } from "@/context/UserContext";
+import { ProfilePaymentMethods } from "../components/ProfilePaymentMethods";
 
 interface ProfileViewProps {
   username: string;
@@ -55,11 +56,15 @@ export function ProfileView({ username }: ProfileViewProps) {
           grantfoxJoinedAt={user?.created_at ?? null}
         />
 
-        <ProfileStats
-          publicRepos={githubUser.public_repos}
-          followers={githubUser.followers}
-          following={githubUser.following}
-        />
+        <div className="flex flex-col md:flex-row gap-4">
+          <ProfileStats
+            publicRepos={githubUser.public_repos}
+            followers={githubUser.followers}
+            following={githubUser.following}
+          />
+
+          <ProfilePaymentMethods />
+        </div>
       </div>
     </main>
   );

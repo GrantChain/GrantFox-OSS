@@ -1,3 +1,5 @@
+import { Wallet } from "./wallets.type";
+
 export enum UserRole {
   ADMIN = "ADMIN",
   MAINTAINER = "MAINTAINER",
@@ -32,6 +34,16 @@ export interface ApiUser {
   avatar_url: string | null;
   roles: UserRole[];
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  wallets?: Wallet[];
+}
+
+export interface AddWalletResponse {
+  wallet_id: string;
+  user_id: string;
+  address: string;
+  is_primary: boolean;
   created_at: string;
   updated_at: string;
 }

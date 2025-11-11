@@ -5,8 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { WalletButton } from "@/components/tw-blocks/wallet-kit/WalletButtons";
 import { formatDate } from "@/lib/format";
 import { GitHubUser } from "@/types/Github";
 import {
@@ -25,7 +23,10 @@ export interface ProfileHeaderProps {
   grantfoxJoinedAt: string | null;
 }
 
-export function ProfileHeader({ githubUser, grantfoxJoinedAt }: ProfileHeaderProps) {
+export function ProfileHeader({
+  githubUser,
+  grantfoxJoinedAt,
+}: ProfileHeaderProps) {
   return (
     <Card className="relative overflow-hidden p-6 mb-6">
       <BorderBeam borderWidth={2} size={120} />
@@ -47,8 +48,12 @@ export function ProfileHeader({ githubUser, grantfoxJoinedAt }: ProfileHeaderPro
                 <h1 className="text-3xl font-bold">
                   {githubUser.name || githubUser.login}
                 </h1>
-                <p className="text-lg text-muted-foreground">@{githubUser.login}</p>
-                {githubUser.bio && <p className="mt-2 text-sm">{githubUser.bio}</p>}
+                <p className="text-lg text-muted-foreground">
+                  @{githubUser.login}
+                </p>
+                {githubUser.bio && (
+                  <p className="mt-2 text-sm">{githubUser.bio}</p>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -119,12 +124,14 @@ export function ProfileHeader({ githubUser, grantfoxJoinedAt }: ProfileHeaderPro
               )}
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span>Joined in GitHub on {formatDate(githubUser.created_at)}</span>
+                <span>
+                  Joined GitHub on {formatDate(githubUser.created_at)}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span>
-                  Joined in GrantFox on {formatDate(grantfoxJoinedAt ?? "")}
+                  Joined GrantFox on {formatDate(grantfoxJoinedAt ?? "")}
                 </span>
               </div>
             </div>
@@ -132,18 +139,16 @@ export function ProfileHeader({ githubUser, grantfoxJoinedAt }: ProfileHeaderPro
 
           <Button
             variant="outline"
-            className="justify-start"
+            className="justify-start cursor-pointer"
             onClick={() => window.open(githubUser.html_url, "_blank")}
           >
             <Code className="w-4 h-4 mr-2" />
             View on GitHub
           </Button>
 
-          <WalletButton />
+          {/* <WalletButton /> */}
         </div>
       </div>
     </Card>
   );
 }
-
-
