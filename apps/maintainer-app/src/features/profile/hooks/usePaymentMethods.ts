@@ -10,8 +10,6 @@ import { toast } from "sonner";
 type UsePaymentMethodsReturn = {
   wallets: Wallet[];
   isLoading: boolean;
-  addressInput: string;
-  setAddressInput: (value: string) => void;
   isAdding: boolean;
   addWallet: (rawAddress: string) => Promise<void>;
 };
@@ -35,7 +33,6 @@ export function usePaymentMethods(
     },
   });
 
-  const [addressInput, setAddressInput] = React.useState<string>("");
   const [isAdding, setIsAdding] = React.useState<boolean>(false);
 
   const addWallet = React.useCallback(
@@ -46,8 +43,8 @@ export function usePaymentMethods(
       setIsAdding(true);
       try {
         const validation = await authService.walletExists(address, userId);
-        if (validation.exists) {
-          toast.error("Wallet already exists");
+        if (!validation.canUse) {
+          toast.error(validation.reason);
           return;
         }
 
@@ -70,7 +67,6 @@ export function usePaymentMethods(
             );
           }
         );
-        setAddressInput("");
         toast.success("Wallet added successfully");
       } catch {
         toast.error("Failed to add wallet");
@@ -84,8 +80,6 @@ export function usePaymentMethods(
   return {
     wallets,
     isLoading,
-    addressInput,
-    setAddressInput,
     isAdding,
     addWallet,
   };

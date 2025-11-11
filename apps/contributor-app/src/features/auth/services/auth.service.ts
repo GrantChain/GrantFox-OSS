@@ -3,7 +3,9 @@ import {
   ApiUser,
   UserPayload,
   UserRole,
+  WalletValidationResponse,
 } from "@/types/user.type";
+import { Wallet } from "@/types/wallets.type";
 import { AxiosError, AxiosInstance } from "axios";
 
 export class AuthService {
@@ -46,11 +48,25 @@ export class AuthService {
     }
   }
 
-  async walletExists(
-    address: string
-  ): Promise<{ exists: boolean; address: string }> {
+  async getWallets(user_id: string): Promise<Wallet[]> {
     try {
-      const { data } = await this.http.get(`/wallets/validate/${address}`);
+      const { data } = await this.http.get(
+        `/wallets/user/${user_id}?role=${UserRole.CONTRIBUTOR}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get wallets", { cause: error });
+    }
+  }
+
+  async walletExists(
+    address: string,
+    user_id: string
+  ): Promise<WalletValidationResponse> {
+    try {
+      const { data } = await this.http.get(
+        `/wallets/validate/${address}?userId=${user_id}&role=${UserRole.CONTRIBUTOR}`
+      );
       return data;
     } catch (error) {
       throw new Error("Failed to check if wallet exists", { cause: error });
@@ -66,6 +82,7 @@ export class AuthService {
       const { data } = await this.http.post(`/wallets/user/${user_id}`, {
         address,
         is_primary,
+        role: UserRole.CONTRIBUTOR,
       });
       return data;
     } catch (error) {
@@ -83,6 +100,17 @@ export class AuthService {
       );
     } catch (error) {
       throw new Error("Failed to set primary wallet", { cause: error });
+    }
+  }
+
+  async getPrimaryWallet(user_id: string): Promise<Wallet | null> {
+    try {
+      const { data } = await this.http.get(
+        `/wallets/user/${user_id}/primary?role=${UserRole.CONTRIBUTOR}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get primary wallet", { cause: error });
     }
   }
 }

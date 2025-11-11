@@ -1,7 +1,5 @@
 import React from "react";
 import { useUser } from "@/context/UserContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -13,34 +11,20 @@ import { ShineBorder } from "@/components/ui/shine-border";
 import { Loader2, FileIcon, InfoIcon } from "lucide-react";
 import { WalletsTable } from "./WalletsTable";
 import { usePaymentMethods } from "@/features/profile/hooks/usePaymentMethods";
-import { z } from "zod";
-import { isValidWallet } from "@/components/tw-blocks/wallet-kit/validators";
 import {
   Tooltip,
-  TooltipContent,
   TooltipTrigger,
+  TooltipContent,
 } from "@/components/ui/tooltip";
-
-const walletSchema = z
-  .string()
-  .trim()
-  .min(1, "Address is required")
-  .refine(
-    isValidWallet,
-    "Invalid wallet. It must be a valid Stellar wallet address."
-  );
+import { WalletButton } from "@/components/tw-blocks/wallet-kit/WalletButtons";
 
 export const ProfilePaymentMethods = () => {
   const { user } = useUser();
+  // const { walletAddress } = useWalletContext();
 
-  const {
-    wallets,
-    isLoading,
-    addressInput,
-    setAddressInput,
-    isAdding,
-    addWallet,
-  } = usePaymentMethods(user?.id);
+  const { wallets, isLoading, isAdding, addWallet } = usePaymentMethods(
+    user?.id
+  );
 
   return (
     <Card className="relative overflow-hidden group w-full md:w-3/4">
@@ -64,37 +48,29 @@ export const ProfilePaymentMethods = () => {
           </Tooltip>
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Manage your payment methods here. As a contributor, your rewards are
+          Manage your payment methods here. As a maintainer, your rewards are
           sent to the wallet that's set as primary at the time the reward is
-          issued — even if you change it later. Make sure your primary wallet is
-          set correctly.
+          issued — even if you change it later. You'll also need your primary
+          wallet to sign contributor rewards, so make sure it's set correctly.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <Input
-            value={addressInput}
-            onChange={(e) => {
-              const value = e.target.value;
-              setAddressInput(value);
+        <div className="flex flex-col sm:flex-row w-full gap-2 sm:items-center">
+          <WalletButton
+            onConnected={(address) => {
+              if (!user?.id || isAdding || isLoading) return;
+              void addWallet(address);
             }}
-            placeholder="Paste your wallet address"
-            className="flex-1"
-            disabled={isAdding || isLoading}
           />
-          <Button
-            onClick={() => addWallet(addressInput)}
-            disabled={
-              isAdding ||
-              isLoading ||
-              !user?.id ||
-              !walletSchema.safeParse(addressInput).success
-            }
-            className="shrink-0 cursor-pointer"
-          >
-            {isAdding ? "Adding..." : "Add wallet"}
-          </Button>
+
+          {/* {!walletAddress && (
+            <Alert
+              title="No wallet connected"
+              description="Connect your wallet to add payment methods"
+              variant="warning"
+            />
+          )} */}
         </div>
 
         <div className="mt-4">
