@@ -9,7 +9,7 @@ export const MarqueeContributors = ({
 }) => {
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-      <Marquee pauseOnHover className="[--duration:20s]">
+      <Marquee pauseOnHover className="[--duration:60s]">
         {contributors.map((contributor) => (
           <GithubUserCard key={contributor.username} user={contributor} />
         ))}
