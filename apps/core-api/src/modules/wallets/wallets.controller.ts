@@ -58,6 +58,22 @@ export class WalletsController {
     return this.walletsService.findAllByUser(userId);
   }
 
+  @Get('user/:userId/primary')
+  @ApiOperation({
+    summary: 'Get primary wallet for a user',
+    description: 'Returns the primary wallet associated with a user.',
+  })
+  @ApiParam({ name: 'userId', type: String, description: 'User UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Primary wallet found',
+    type: WalletResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'User not found or no primary wallet found' })
+  findPrimaryByUser(@Param('userId') userId: string) {
+    return this.walletsService.findPrimaryByUser(userId);
+  }
+
   @Get('validate/:address')
   @ApiOperation({
     summary: 'Validate if a wallet address exists',

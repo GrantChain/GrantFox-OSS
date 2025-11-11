@@ -189,6 +189,7 @@ export class UsersService {
 
   /**
    * Add a role to a user (doesn't overwrite existing roles)
+   * Uses a Set to ensure no duplicate roles even with concurrent requests
    */
   async addRole(userId: string, dto: AddRoleDto) {
     const user = await this.prisma.user.findUnique({
@@ -204,13 +205,14 @@ export class UsersService {
       throw new BadRequestException('User already has this role');
     }
 
-    // Add the new role to the existing roles array
+    // Use Set to prevent duplicates even with race conditions
+    const uniqueRoles = Array.from(new Set([...user.roles, dto.role]));
+
+    // Update with the complete unique roles array
     return await this.prisma.user.update({
       where: { user_id: userId },
       data: {
-        roles: {
-          push: dto.role,
-        },
+        roles: uniqueRoles,
       },
     });
   }
@@ -309,5 +311,34 @@ export class UsersService {
       },
       orderBy: { created_at: 'desc' },
     });
+  }
+
+  /**
+   * Clean duplicate roles from a user
+   * This is a utility method to fix existing data issues
+   */
+  async cleanDuplicateRoles(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Remove duplicates using Set
+    const uniqueRoles = Array.from(new Set(user.roles));
+
+    // Only update if there were duplicates
+    if (uniqueRoles.length !== user.roles.length) {
+      return await this.prisma.user.update({
+        where: { user_id: userId },
+        data: {
+          roles: uniqueRoles,
+        },
+      });
+    }
+
+    return user;
   }
 }

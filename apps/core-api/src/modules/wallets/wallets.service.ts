@@ -81,6 +81,33 @@ export class WalletsService {
     };
   }
 
+  async findPrimaryByUser(userId: string) {
+    // Verificar que el usuario existe
+    const user = await this.prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    // Obtener la wallet primaria del usuario
+    const primaryWallet = await this.prisma.wallet.findFirst({
+      where: {
+        user_id: userId,
+        is_primary: true,
+      },
+    });
+
+    if (!primaryWallet) {
+      throw new NotFoundException(
+        `No primary wallet found for user ${userId}`,
+      );
+    }
+
+    return primaryWallet;
+  }
+
   async setPrimary(userId: string, walletId: string) {
     // Verificar que la wallet existe y pertenece al usuario
     const wallet = await this.prisma.wallet.findUnique({
