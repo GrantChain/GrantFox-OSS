@@ -41,7 +41,7 @@ export const ProfilePaymentMethods = () => {
               <InfoIcon className="size-4" />
             </TooltipTrigger>
             <TooltipContent>
-              If you're both a maintainer and contributor, your wallets are
+              If you&apos;re both a maintainer and contributor, your wallets are
               shared across roles — but you can choose a different primary
               wallet for each app.
             </TooltipContent>
@@ -49,9 +49,10 @@ export const ProfilePaymentMethods = () => {
         </CardTitle>
         <CardDescription className="text-muted-foreground">
           Manage your payment methods here. As a maintainer, your rewards are
-          sent to the wallet that's set as primary at the time the reward is
-          issued — even if you change it later. You'll also need your primary
-          wallet to sign contributor rewards, so make sure it's set correctly.
+          sent to the wallet that&apos;s set as primary at the time the reward
+          is issued — even if you change it later. You&apos;ll also need your
+          primary wallet to sign contributor rewards, so make sure it&apos;s set
+          correctly.
         </CardDescription>
       </CardHeader>
 
