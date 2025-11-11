@@ -238,4 +238,22 @@ export class UsersController {
   reactivate(@Param('id') id: string) {
     return this.usersService.reactivate(id);
   }
+
+  @Patch(':id/clean-roles')
+  @ApiOperation({
+    summary: 'Clean duplicate roles from a user',
+    description:
+      'Removes duplicate roles from a user. Useful for fixing data inconsistencies.',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'User UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Duplicate roles cleaned successfully',
+    type: UserResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @HttpCode(HttpStatus.OK)
+  cleanDuplicateRoles(@Param('id') id: string) {
+    return this.usersService.cleanDuplicateRoles(id);
+  }
 }
