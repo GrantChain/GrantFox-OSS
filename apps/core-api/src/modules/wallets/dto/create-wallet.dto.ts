@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
+import { UserRole } from '@prisma/client';
 
 export class CreateWalletDto {
   @ApiProperty({
@@ -11,7 +18,17 @@ export class CreateWalletDto {
   address: string;
 
   @ApiProperty({
-    description: 'Set as primary wallet',
+    description: 'User role for which this wallet will be used',
+    enum: UserRole,
+    example: UserRole.CONTRIBUTOR,
+  })
+  @IsEnum(UserRole)
+  @IsNotEmpty()
+  role: UserRole;
+
+  @ApiProperty({
+    description:
+      'Set as primary wallet for this role. Each role can have its own primary wallet.',
     example: false,
     required: false,
     default: false,

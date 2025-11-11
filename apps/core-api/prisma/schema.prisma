@@ -82,15 +82,18 @@ model AdminProfile {
 model Wallet {
   wallet_id  String   @id @default(uuid()) @db.Uuid
   user_id    String   @db.Uuid
-  address    String   @unique
+  address    String
+  role       UserRole
   is_primary Boolean  @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
+  @@unique([user_id, address, role]) 
   @@index([user_id])
   @@index([address])
+  @@index([user_id, role])
   @@map("wallet")
 }
 
