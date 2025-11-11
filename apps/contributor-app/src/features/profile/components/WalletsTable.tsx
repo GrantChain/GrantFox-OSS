@@ -51,7 +51,7 @@ export const WalletsTable: React.FC<WalletsTableProps> = ({ wallets }) => {
           const explorerUrl = `https://stellar.expert/explorer/public/account/${addr}`;
           return (
             <div className="flex items-center gap-2 max-w-[260px] md:max-w-[420px]">
-              <span className="truncate font-mono text-sm">
+              <span className="font-mono text-sm">
                 {formatAddress(addr, 20)}
               </span>
               <div className="flex items-center gap-1 shrink-0">
