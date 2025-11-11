@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { formatDate } from "@/lib/format";
-import { GitHubUser } from "@/types/Github";
+import { GitHubUser } from "@/types/github.type";
 import {
   Building,
   Calendar,

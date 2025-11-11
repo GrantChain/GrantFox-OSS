@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { githubHttp } from "@/lib/http";
-import { GitHubUser } from "@/types/Github";
 import { useQuery } from "@tanstack/react-query";
+import { GitHubUser } from "@/types/github.type";
 
 export interface UseGithubProfileResult {
   githubUser: GitHubUser | null;
