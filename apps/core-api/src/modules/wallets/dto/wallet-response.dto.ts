@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '@prisma/client';
 
 export class WalletResponseDto {
   @ApiProperty()
@@ -9,6 +10,9 @@ export class WalletResponseDto {
 
   @ApiProperty()
   address: string;
+
+  @ApiProperty({ enum: UserRole })
+  role: UserRole;
 
   @ApiProperty()
   is_primary: boolean;
