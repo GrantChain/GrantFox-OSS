@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
 import { UserRole } from '@prisma/client';
+import { PrimaryWalletDto } from './dto/primary-wallet.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,28 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly uploadsService: UploadsService,
   ) {}
+
+  /**
+   * Helper method to get primary wallets for a user
+   * Returns an array of primary wallets grouped by role
+   */
+  private async getPrimaryWallets(userId: string): Promise<PrimaryWalletDto[]> {
+    const primaryWallets = await this.prisma.wallet.findMany({
+      where: {
+        user_id: userId,
+        is_primary: true,
+      },
+      select: {
+        role: true,
+        address: true,
+      },
+    });
+
+    return primaryWallets.map((wallet) => ({
+      role: wallet.role,
+      primaryWallet: wallet.address,
+    }));
+  }
 
   /**
    * Create a new user with a specific role and optional avatar
@@ -119,7 +142,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(userId);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
   }
 
   /**
@@ -139,7 +167,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(user.user_id);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
   }
 
   /**
@@ -154,7 +187,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(user.user_id);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
   }
 
   /**
