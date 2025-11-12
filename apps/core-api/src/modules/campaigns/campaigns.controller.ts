@@ -29,6 +29,7 @@ import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { UpdateCampaignStatusDto } from './dto/update-campaign-status.dto';
 import { CampaignResponseDto } from './dto/campaign-response.dto';
+import { CampaignResultsResponseDto } from './dto/campaign-results.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -213,6 +214,28 @@ export class CampaignsController {
   @ApiResponse({ status: 404, description: 'Campaign not found' })
   getCampaignWithProjectsAndRepos(@Param('id') id: string) {
     return this.campaignsExtendedService.getCampaignWithProjectsAndRepos(id);
+  }
+
+  @Get(':campaignId/projects/:projectId/results')
+  @ApiOperation({
+    summary: 'Get campaign results for a specific project',
+    description:
+      'Returns all completed issues (with merged PRs) for a FINISHED campaign, including contributor validation and wallet information.',
+  })
+  @ApiParam({ name: 'campaignId', type: String, description: 'Campaign UUID' })
+  @ApiParam({ name: 'projectId', type: String, description: 'Project UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Campaign results with contributor information',
+    type: CampaignResultsResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Campaign is not FINISHED' })
+  @ApiResponse({ status: 404, description: 'Campaign or Project not found' })
+  getCampaignResults(
+    @Param('campaignId') campaignId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.campaignsExtendedService.getCampaignResults(campaignId, projectId);
   }
 }
 
