@@ -141,7 +141,10 @@ export class CampaignsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Update campaign status (ADMIN only)',
-    description: 'Changes the status of a campaign (PENDING, UPCOMING, ACTIVE, INACTIVE)',
+    description: `Changes the status of a campaign. Business rules:
+    - Only 1 ACTIVE campaign allowed at a time
+    - Only 1 UPCOMING campaign allowed at a time
+    - Only 1 FINISHED campaign allowed at a time (most recent finished campaign for rewards release)`,
   })
   @ApiParam({ name: 'id', type: String, description: 'Campaign UUID' })
   @ApiResponse({
@@ -151,6 +154,10 @@ export class CampaignsController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
   @ApiResponse({ status: 404, description: 'Campaign not found' })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Conflict - Another campaign already has the requested status (ACTIVE/UPCOMING/FINISHED)' 
+  })
   updateStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateCampaignStatusDto,
