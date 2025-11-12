@@ -298,6 +298,7 @@ enum CampaignStatus {
   UPCOMING
   ACTIVE
   INACTIVE
+  FINISHED
 }
 
 enum EscrowType {
