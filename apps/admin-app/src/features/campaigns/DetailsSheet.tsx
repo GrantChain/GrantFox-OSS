@@ -9,7 +9,7 @@ import { useCampaignContext } from "@/context/CampaignContext";
 import { useCampaignDetailsQuery } from "./hooks/useCampaignDetailsQuery";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { formatDate } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import {
   CalendarIcon,
   Folder,
@@ -140,8 +140,8 @@ export const DetailsSheet = () => {
               Date Range:
             </TextAnimate>
             <span className="text-muted-foreground">
-              {campaign?.start_date && formatDate(campaign?.start_date)} →{" "}
-              {campaign?.end_date && formatDate(campaign?.end_date ?? "")}
+              {campaign?.start_date && formatDateTime(campaign?.start_date)} →{" "}
+              {campaign?.end_date && formatDateTime(campaign?.end_date ?? "")}
             </span>
           </Card>
 

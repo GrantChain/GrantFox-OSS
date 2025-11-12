@@ -18,6 +18,7 @@ import { Button as UIButton } from "@/components/ui/button";
 import { useCampaignsMutations } from "./hooks/useCampaignsMutations";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { formatDateTime } from "@/lib/format";
 
 interface CardTransform {
   rotateX: number;
@@ -215,6 +216,11 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          <span className="text-muted-foreground text-sm text-center font-semibold">
+            {campaign?.start_date && formatDateTime(campaign?.start_date)} →{" "}
+            {campaign?.end_date && formatDateTime(campaign?.end_date ?? "")}
+          </span>
         </div>
       </CardContent>
 
