@@ -136,11 +136,11 @@ export const Repositories = ({
                 actionLabel={
                   isAlreadyRegistered
                     ? removingProjectId === repository.id
-                      ? "Removing..."
-                      : "Remove from Project"
+                      ? "Processing..."
+                      : "Unlink from Project"
                     : registeringId === repository.id
-                      ? "Registering..."
-                      : "Register to Project"
+                      ? "Processing..."
+                      : "Link to Project"
                 }
                 isLoading={isBusy}
                 isDangerous={isAlreadyRegistered}
