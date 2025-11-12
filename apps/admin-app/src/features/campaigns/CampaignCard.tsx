@@ -37,7 +37,13 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
     const card = cardRef.current;
     const image = imageRef.current;
 
-    if (!card || !image) return;
+    // Only enable 3D hover on devices with a fine pointer (e.g., mouse)
+    const isFinePointer =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(pointer: fine)").matches;
+
+    if (!card || !image || !isFinePointer) return;
 
     let rect: DOMRect;
     let centerX: number;
@@ -123,7 +129,7 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
   }, []);
 
   return (
-    <Card ref={cardRef} className="max-w-md">
+    <Card ref={cardRef} className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
           <CardTitle>{campaign.name}</CardTitle>
@@ -144,37 +150,43 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
 
         <p>{campaign.description}</p>
 
-        <div className="flex flex-col sm:flex-row gap-2 justify-between">
+        <div className="flex flex-col gap-3">
           <Button
             variant="outline"
-            className="cursor-pointer"
+            className="cursor-pointer w-full min-h-[44px] text-sm md:text-base flex items-center justify-center gap-2"
             onClick={() => {
               setCampaign(campaign);
               setOpenDetails(true);
             }}
           >
-            View Campaign <ArrowRightIcon />
+            View Campaign
+            <ArrowRightIcon className="size-4" />
           </Button>
 
           <div className="flex gap-2 items-center">
             <Button
               variant="outline"
-              className="cursor-pointer"
+              className="cursor-pointer flex-1 min-h-[44px] text-sm md:text-base flex items-center justify-center gap-2"
               onClick={() => {
                 setCampaign(campaign);
                 setOpenEdit(true);
               }}
             >
               <Edit className="size-4" />
+              <span className="hidden sm:inline">Edit</span>
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <UIButton variant="outline" className="cursor-pointer">
-                  {campaign.status} <ChevronDown className="size-4" />
+                <UIButton
+                  variant="outline"
+                  className="cursor-pointer flex-1 min-h-[44px] text-sm md:text-base flex items-center justify-center gap-2"
+                >
+                  <span className="truncate">{campaign.status}</span>
+                  <ChevronDown className="size-4 flex-shrink-0" />
                 </UIButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="end" className="w-[180px]">
                 <StatusItem
                   campaignId={campaign.campaign_id}
                   current={campaign.status}
@@ -184,6 +196,11 @@ export const CampaignCard = ({ campaign }: { campaign: Campaign }) => {
                   campaignId={campaign.campaign_id}
                   current={campaign.status}
                   target={CampaignStatus.UPCOMING}
+                />
+                <StatusItem
+                  campaignId={campaign.campaign_id}
+                  current={campaign.status}
+                  target={CampaignStatus.FINISHED}
                 />
                 <StatusItem
                   campaignId={campaign.campaign_id}

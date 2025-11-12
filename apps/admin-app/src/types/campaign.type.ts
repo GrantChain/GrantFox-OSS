@@ -8,6 +8,7 @@ export enum CampaignStatus {
   UPCOMING = "UPCOMING",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
+  FINISHED = "FINISHED",
 }
 
 export interface Campaign {
