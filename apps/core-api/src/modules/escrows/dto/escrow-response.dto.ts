@@ -22,8 +22,14 @@ export class EscrowResponseDto {
   campaign_id: string;
 
   @ApiProperty({
-    description: 'User ID who created the escrow',
+    description: 'Project ID',
     example: 'c2ggdd99-9d2c-4cg0-bb8d-7bb0ce491c33',
+  })
+  project_id: string;
+
+  @ApiProperty({
+    description: 'User ID who created the escrow',
+    example: 'd3hhee00-0e3d-5dh1-cc9e-8cc1df502d44',
   })
   created_by: string;
 
@@ -49,5 +55,17 @@ export class EscrowResponseDto {
     description: string;
     status: string;
     repositories?: any[];
+  };
+
+  @ApiProperty({
+    description: 'Project details',
+    required: false,
+  })
+  project?: {
+    project_id: string;
+    name: string;
+    github_handle: string;
+    short_description: string;
+    status: string;
   };
 }

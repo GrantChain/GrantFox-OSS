@@ -27,4 +27,12 @@ export class CreateEscrowDto {
   @IsUUID()
   @IsNotEmpty()
   campaign_id: string;
+
+  @ApiProperty({
+    description: 'Project ID',
+    example: 'c2ggdd99-9d2c-4cg0-bb8d-7bb0ce491c33',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  project_id: string;
 }
