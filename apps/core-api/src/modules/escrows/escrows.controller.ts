@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { EscrowsService } from './escrows.service';
 import { CreateEscrowDto } from './dto/create-escrow.dto';
@@ -29,9 +31,9 @@ export class EscrowsController {
   constructor(private readonly escrowsService: EscrowsService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.MAINTAINER)
   @ApiOperation({
-    summary: 'Create a new escrow (ADMIN only)',
+    summary: 'Create a new escrow (ADMIN or MAINTAINER)',
     description:
       'Creates a new escrow linked to a campaign. Escrow ID comes from Stellar blockchain.',
   })
@@ -43,15 +45,53 @@ export class EscrowsController {
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   @ApiResponse({ status: 404, description: 'Campaign not found' })
   @ApiResponse({ status: 409, description: 'Escrow ID already exists' })
-  @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
+  @ApiResponse({ status: 403, description: 'Forbidden - ADMIN or MAINTAINER role required' })
   create(@Body() dto: CreateEscrowDto, @CurrentUser() user: any) {
     return this.escrowsService.create(dto, user.user_id);
+  }
+
+  @Get('check')
+  @ApiOperation({
+    summary: 'Check if escrow exists for campaign and project',
+    description:
+      'Validates if an escrow already exists for a specific campaign and project combination',
+  })
+  @ApiQuery({
+    name: 'campaign_id',
+    type: String,
+    description: 'Campaign UUID',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'project_id',
+    type: String,
+    description: 'Project UUID',
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Validation result',
+    schema: {
+      type: 'object',
+      properties: {
+        exists: { type: 'boolean' },
+        escrow_id: { type: 'string', nullable: true },
+        message: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Missing required parameters' })
+  checkExists(
+    @Query('campaign_id') campaignId: string,
+    @Query('project_id') projectId: string,
+  ) {
+    return this.escrowsService.checkEscrowExists(campaignId, projectId);
   }
 
   @Get()
   @ApiOperation({
     summary: 'Get all escrows',
-    description: 'Returns all escrows with campaign and repository details',
+    description: 'Returns all escrows with campaign, project and repository details',
   })
   @ApiResponse({
     status: 200,
@@ -65,7 +105,7 @@ export class EscrowsController {
   @Get(':id')
   @ApiOperation({
     summary: 'Get escrow by ID',
-    description: 'Returns a single escrow with campaign and repository details',
+    description: 'Returns a single escrow with campaign, project and repository details',
   })
   @ApiParam({ name: 'id', type: String, description: 'Escrow UUID' })
   @ApiResponse({
@@ -82,7 +122,7 @@ export class EscrowsController {
   @ApiOperation({
     summary: 'Get escrows by campaign ID',
     description:
-      'Returns all escrows for a specific campaign with repository details',
+      'Returns all escrows for a specific campaign with project and repository details',
   })
   @ApiParam({ name: 'campaignId', type: String, description: 'Campaign UUID' })
   @ApiResponse({
