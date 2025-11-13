@@ -245,7 +245,7 @@ model CampaignContributor {
 // =============================================
 
 model Escrow {
-  escrow_id   String     @id @db.Uuid
+  escrow_id   String     @id
   escrow_type EscrowType
   campaign_id String     @db.Uuid
   project_id  String     @db.Uuid
