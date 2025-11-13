@@ -135,6 +135,23 @@ export class EscrowsController {
     return this.escrowsService.findByCampaign(campaignId);
   }
 
+  @Get('project/:projectId')
+  @ApiOperation({
+    summary: 'Get escrows by project ID',
+    description:
+      'Returns all escrows for a specific project across all campaigns',
+  })
+  @ApiParam({ name: 'projectId', type: String, description: 'Project UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of escrows for the project',
+    type: [EscrowResponseDto],
+  })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  findByProject(@Param('projectId') projectId: string) {
+    return this.escrowsService.findByProject(projectId);
+  }
+
   @Patch(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({

@@ -197,6 +197,40 @@ export class EscrowsService {
   }
 
   /**
+   * Get escrows by project ID (across all campaigns)
+   */
+  async findByProject(projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { project_id: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    const escrows = await this.prisma.escrow.findMany({
+      where: { project_id: projectId },
+      include: {
+        campaign: {
+          include: {
+            repositories: {
+              include: {
+                repository: true,
+              },
+            },
+          },
+        },
+        project: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    return escrows.map((escrow) => this.formatEscrowResponse(escrow));
+  }
+
+  /**
    * Update escrow
    */
   async update(escrowId: string, dto: UpdateEscrowDto) {
