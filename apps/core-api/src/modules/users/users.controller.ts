@@ -134,6 +134,27 @@ export class UsersController {
     return this.usersService.findByUsername(username);
   }
 
+  @Get('by-wallet/:address')
+  @ApiOperation({
+    summary: 'Get a user by wallet address',
+    description:
+      'Finds a user by their wallet address, regardless of role or primary status',
+  })
+  @ApiParam({
+    name: 'address',
+    type: String,
+    description: 'Stellar wallet address',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User found',
+    type: UserResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Wallet not found' })
+  findByWallet(@Param('address') address: string) {
+    return this.usersService.findByWallet(address);
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get a user by ID',
