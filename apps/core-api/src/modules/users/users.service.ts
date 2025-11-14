@@ -196,6 +196,36 @@ export class UsersService {
   }
 
   /**
+   * Get user by wallet address
+   * Searches across all wallets regardless of role or is_primary status
+   */
+  async findByWallet(address: string) {
+    const wallet = await this.prisma.wallet.findFirst({
+      where: { address },
+      include: {
+        user: {
+          include: {
+            maintainer_profile: true,
+            contributor_profile: true,
+            admin_profile: true,
+          },
+        },
+      },
+    });
+
+    if (!wallet) {
+      throw new NotFoundException('Wallet not found');
+    }
+
+    const primaryWallets = await this.getPrimaryWallets(wallet.user.user_id);
+
+    return {
+      ...wallet.user,
+      primaryWallets,
+    };
+  }
+
+  /**
    * Update user basic information
    */
   async update(userId: string, dto: UpdateUserDto) {
