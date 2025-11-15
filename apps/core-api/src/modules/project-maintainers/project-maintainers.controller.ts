@@ -22,10 +22,11 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('project-maintainers')
 @Controller('project-maintainers')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class ProjectMaintainersController {
   constructor(
     private readonly projectMaintainersService: ProjectMaintainersService,

@@ -34,10 +34,11 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole, CampaignStatus } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('campaigns')
 @Controller('campaigns')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)  // SupabaseAuthGuard PRIMERO, luego RolesGuard
 export class CampaignsController {
   constructor(
     private readonly campaignsService: CampaignsService,
