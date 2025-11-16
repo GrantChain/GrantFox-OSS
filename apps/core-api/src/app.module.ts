@@ -15,35 +15,16 @@ import { CampaignContributorsModule } from './modules/campaign-contributors/camp
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { EscrowsModule } from './modules/escrows/escrows.module';
 
-/**
- * AppModule - Módulo raíz de la aplicación
- * 
- * CAMBIO IMPORTANTE:
- * - Ya NO usamos middleware para autenticación
- * - Ahora usamos Guards en cada controlador: @UseGuards(SupabaseAuthGuard, RolesGuard)
- * - AuthModule proporciona la estrategia Passport para verificar JWTs
- * 
- * VENTAJAS:
- * - Más declarativo (se ve en cada endpoint qué guards usa)
- * - Mejor para testing (puedes mockear guards fácilmente)
- * - Approach estándar de NestJS con Passport
- * - Los endpoints públicos simplemente NO usan @UseGuards
- */
+
 @Module({
   imports: [
-    // ConfigModule: Variables de entorno (.env)
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    
-    // DatabaseModule: Prisma + PostgreSQL
+
     DatabaseModule,
-    
-    // AuthModule: Passport Strategy para JWT de Supabase
     AuthModule,
-    
-    // Feature Modules
     UsersModule,
     ProfilesModule,
     CampaignsModule,
