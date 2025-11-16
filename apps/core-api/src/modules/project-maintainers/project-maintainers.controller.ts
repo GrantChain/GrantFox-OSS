@@ -19,18 +19,20 @@ import { TransferOwnershipDto } from './dto/transfer-ownership.dto';
 import { MaintainerStatsDto } from './dto/maintainer-stats.dto';
 import { ProjectMaintainerResponseDto } from './dto/project-maintainer-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('project-maintainers')
 @Controller('project-maintainers')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class ProjectMaintainersController {
   constructor(
     private readonly projectMaintainersService: ProjectMaintainersService,
   ) {}
 
+  @Public()  
   @Get('user/:userId/projects')
   @ApiOperation({
     summary: 'Get all projects for a maintainer',
@@ -47,6 +49,7 @@ export class ProjectMaintainersController {
     return this.projectMaintainersService.getProjectsByMaintainer(userId);
   }
 
+  @Public()  
   @Get('project/:projectId/maintainers')
   @ApiOperation({
     summary: 'Get all maintainers for a project',
@@ -95,6 +98,7 @@ export class ProjectMaintainersController {
     );
   }
 
+  @Public()  
   @Get('user/:userId/stats')
   @ApiOperation({
     summary: 'Get maintainer statistics',
