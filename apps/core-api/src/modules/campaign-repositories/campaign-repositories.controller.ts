@@ -15,6 +15,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CampaignRepositoriesService } from './campaign-repositories.service';
 import { AddRepositoriesToCampaignDto } from './dto/add-repositories-to-campaign.dto';
@@ -28,6 +29,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('campaign-repositories')
 @Controller('campaign-repositories')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class CampaignRepositoriesController {
   constructor(
     private readonly campaignRepositoriesService: CampaignRepositoriesService,

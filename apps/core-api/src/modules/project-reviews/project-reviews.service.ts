@@ -11,7 +11,6 @@ import { ProjectStatus, ReviewAction } from '@prisma/client';
 import {
   ProjectApprovedEvent,
   ProjectRejectedEvent,
-  ProjectChangesRequestedEvent,
 } from '../notifications/events';
 
 @Injectable()
@@ -130,16 +129,6 @@ export class ProjectReviewsService {
       this.eventEmitter.emit(
         'project.rejected',
         new ProjectRejectedEvent(
-          projectId,
-          project.name,
-          maintainerIds,
-          dto.reason,
-        ),
-      );
-    } else if (dto.action === ReviewAction.CHANGES_REQUESTED) {
-      this.eventEmitter.emit(
-        'project.changes-requested',
-        new ProjectChangesRequestedEvent(
           projectId,
           project.name,
           maintainerIds,

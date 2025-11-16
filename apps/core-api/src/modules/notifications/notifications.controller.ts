@@ -6,14 +6,20 @@ import {
   Param,
   Query,
   ParseBoolPipe,
+  UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { NotificationResponseDto } from './dto/notification-response.dto';
 import { UnreadCountResponseDto } from './dto/unread-count-response.dto';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @Controller('notifications')
 @ApiTags('notifications')
+@UseGuards(SupabaseAuthGuard)
+@ApiBearerAuth()
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
@@ -31,11 +37,17 @@ export class NotificationsController {
     description: 'Returns all notifications for the user',
     type: [NotificationResponseDto],
   })
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only access own notifications' })
   async getUserNotifications(
     @Param('userId') userId: string,
     @Query('unread', new ParseBoolPipe({ optional: true }))
     unreadOnly?: boolean,
+    @CurrentUser() currentUser?: any,
   ): Promise<NotificationResponseDto[]> {
+    // Validate that user can only access their own notifications
+    if (currentUser.user_id !== userId) {
+      throw new ForbiddenException('You can only access your own notifications');
+    }
     return this.notificationsService.findByUser(userId, unreadOnly);
   }
 
@@ -47,9 +59,15 @@ export class NotificationsController {
     description: 'Returns the count of unread notifications',
     type: UnreadCountResponseDto,
   })
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only access own notifications' })
   async getUnreadCount(
     @Param('userId') userId: string,
+    @CurrentUser() currentUser?: any,
   ): Promise<UnreadCountResponseDto> {
+    // Validate that user can only access their own notifications
+    if (currentUser.user_id !== userId) {
+      throw new ForbiddenException('You can only access your own notifications');
+    }
     const count = await this.notificationsService.getUnreadCount(userId);
     return { count };
   }
@@ -63,10 +81,19 @@ export class NotificationsController {
     type: NotificationResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Notification not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only access own notifications' })
   async getNotification(
     @Param('id') id: string,
+    @CurrentUser() currentUser?: any,
   ): Promise<NotificationResponseDto> {
-    return this.notificationsService.findOne(id);
+    const notification = await this.notificationsService.findOne(id);
+    
+    // Validate ownership
+    if (notification.user_id !== currentUser.user_id) {
+      throw new ForbiddenException('You can only access your own notifications');
+    }
+    
+    return notification;
   }
 
   @Patch(':id/read')
@@ -77,7 +104,17 @@ export class NotificationsController {
     description: 'Notification marked as read',
     type: NotificationResponseDto,
   })
-  async markAsRead(@Param('id') id: string): Promise<NotificationResponseDto> {
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only modify own notifications' })
+  async markAsRead(
+    @Param('id') id: string,
+    @CurrentUser() currentUser?: any,
+  ): Promise<NotificationResponseDto> {
+    // Verify ownership before marking as read
+    const notification = await this.notificationsService.findOne(id);
+    if (notification.user_id !== currentUser.user_id) {
+      throw new ForbiddenException('You can only modify your own notifications');
+    }
+    
     return this.notificationsService.markAsRead(id);
   }
 
@@ -94,9 +131,15 @@ export class NotificationsController {
       },
     },
   })
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only modify own notifications' })
   async markAllAsRead(
     @Param('userId') userId: string,
+    @CurrentUser() currentUser?: any,
   ): Promise<{ count: number }> {
+    // Validate that user can only mark their own notifications as read
+    if (currentUser.user_id !== userId) {
+      throw new ForbiddenException('You can only modify your own notifications');
+    }
     return this.notificationsService.markAllAsRead(userId);
   }
 
@@ -104,7 +147,17 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Delete a notification' })
   @ApiParam({ name: 'id', description: 'Notification ID' })
   @ApiResponse({ status: 200, description: 'Notification deleted' })
-  async deleteNotification(@Param('id') id: string): Promise<void> {
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own notifications' })
+  async deleteNotification(
+    @Param('id') id: string,
+    @CurrentUser() currentUser?: any,
+  ): Promise<void> {
+    // Verify ownership before deleting
+    const notification = await this.notificationsService.findOne(id);
+    if (notification.user_id !== currentUser.user_id) {
+      throw new ForbiddenException('You can only delete your own notifications');
+    }
+    
     return this.notificationsService.delete(id);
   }
 
@@ -121,9 +174,15 @@ export class NotificationsController {
       },
     },
   })
+  @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own notifications' })
   async deleteAllForUser(
     @Param('userId') userId: string,
+    @CurrentUser() currentUser?: any,
   ): Promise<{ count: number }> {
+    // Validate that user can only delete their own notifications
+    if (currentUser.user_id !== userId) {
+      throw new ForbiddenException('You can only delete your own notifications');
+    }
     return this.notificationsService.deleteAllForUser(userId);
   }
 }

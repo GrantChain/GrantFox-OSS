@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EscrowsService } from './escrows.service';
 import { CreateEscrowDto } from './dto/create-escrow.dto';
@@ -28,6 +29,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('escrows')
 @Controller('escrows')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class EscrowsController {
   constructor(private readonly escrowsService: EscrowsService) {}
 

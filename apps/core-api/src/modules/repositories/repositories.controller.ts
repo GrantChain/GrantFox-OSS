@@ -19,6 +19,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { RepositoriesService } from './repositories.service';
 import { CampaignsExtendedService } from '../campaigns/campaigns-extended.service';
@@ -34,6 +35,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('repositories')
 @Controller('repositories')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class RepositoriesController {
   constructor(
     private readonly repositoriesService: RepositoriesService,
