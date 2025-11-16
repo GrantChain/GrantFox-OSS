@@ -10,6 +10,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CampaignContributorsService } from './campaign-contributors.service';
 import { CampaignContributorResponseDto } from './dto/campaign-contributor-response.dto';
@@ -22,6 +23,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('campaign-contributors')
 @Controller('campaign-contributors')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class CampaignContributorsController {
   constructor(
     private readonly campaignContributorsService: CampaignContributorsService,

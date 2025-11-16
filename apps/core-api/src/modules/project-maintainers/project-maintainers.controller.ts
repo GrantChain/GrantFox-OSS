@@ -13,6 +13,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProjectMaintainersService } from './project-maintainers.service';
 import { TransferOwnershipDto } from './dto/transfer-ownership.dto';
@@ -27,6 +28,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('project-maintainers')
 @Controller('project-maintainers')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class ProjectMaintainersController {
   constructor(
     private readonly projectMaintainersService: ProjectMaintainersService,
