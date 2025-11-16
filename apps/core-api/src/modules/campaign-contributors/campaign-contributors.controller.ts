@@ -14,7 +14,7 @@ import {
 import { CampaignContributorsService } from './campaign-contributors.service';
 import { CampaignContributorResponseDto } from './dto/campaign-contributor-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
 import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
@@ -60,6 +60,7 @@ export class CampaignContributorsController {
     );
   }
 
+  @Public()  
   @Get('campaign/:campaignId')
   @ApiOperation({
     summary: 'Get contributors by campaign',
@@ -77,6 +78,7 @@ export class CampaignContributorsController {
     );
   }
 
+  @Public()  
   @Get('contributor/:contributorId')
   @ApiOperation({
     summary: 'Get campaigns by contributor',

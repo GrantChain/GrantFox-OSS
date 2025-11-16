@@ -11,9 +11,18 @@ export class SupabaseStrategy extends PassportStrategy(
   'supabase',
 ) {
   constructor(private prisma: PrismaService) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error(
+        'Missing Supabase credentials. Check SUPABASE_URL and SUPABASE_ANON_KEY in .env'
+      );
+    }
+    
     super({
-      supabaseUrl: process.env.SUPABASE_URL!,
-      supabaseKey: process.env.SUPABASE_ANON_KEY!,
+      supabaseUrl,
+      supabaseKey,
       supabaseOptions: {},
       extractor: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
@@ -50,8 +59,30 @@ export class SupabaseStrategy extends PassportStrategy(
     return dbUser;
   }
 
-  authenticate(req: any) {
-    super.authenticate(req);
+  authenticate(req: any): void {
+    const idToken = (this as any).extractor(req);
+    
+    if (!idToken) {
+      this.fail('Unauthorized', 401);
+      return;
+    }
+    
+    const supabase = (this as any).supabase;
+    
+    if (!supabase) {
+      this.fail('Supabase client not initialized', 500);
+      return;
+    }
+    
+    supabase.auth
+      .getUser(idToken)
+      .then(async ({ data: { user } }: any) => {
+        const dbUser = await this.validate(user);
+        this.success(dbUser, {});
+      })
+      .catch((err: any) => {
+        this.fail(err.message, 401);
+      });
   }
 }
 

@@ -19,7 +19,7 @@ import { ProjectReviewsService } from './project-reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewResponseDto } from './dto/review-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
 import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
@@ -63,6 +63,7 @@ export class ProjectReviewsController {
     );
   }
 
+  @Public()  
   @Get('project/:projectId')
   @ApiOperation({
     summary: 'Get all reviews for a project',
@@ -80,6 +81,7 @@ export class ProjectReviewsController {
     return this.projectReviewsService.getReviewsByProject(projectId);
   }
 
+  @Public()  
   @Get('project/:projectId/latest')
   @ApiOperation({
     summary: 'Get the latest review for a project',
@@ -123,6 +125,7 @@ export class ProjectReviewsController {
     return this.projectReviewsService.resubmitProject(projectId, user.user_id);
   }
 
+  @Public()  
   @Get('stats')
   @ApiOperation({
     summary: 'Get review statistics',

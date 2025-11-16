@@ -20,7 +20,7 @@ import { CreateEscrowDto } from './dto/create-escrow.dto';
 import { UpdateEscrowDto } from './dto/update-escrow.dto';
 import { EscrowResponseDto } from './dto/escrow-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
 import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
@@ -89,6 +89,7 @@ export class EscrowsController {
     return this.escrowsService.checkEscrowExists(campaignId, projectId);
   }
 
+  @Public()  
   @Get()
   @ApiOperation({
     summary: 'Get all escrows',
@@ -103,6 +104,7 @@ export class EscrowsController {
     return this.escrowsService.findAll();
   }
 
+  @Public()  
   @Get(':id')
   @ApiOperation({
     summary: 'Get escrow by ID',
@@ -119,6 +121,7 @@ export class EscrowsController {
     return this.escrowsService.findOne(id);
   }
 
+  @Public()  
   @Get('campaign/:campaignId')
   @ApiOperation({
     summary: 'Get escrows by campaign ID',

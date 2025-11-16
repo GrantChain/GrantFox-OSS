@@ -31,7 +31,7 @@ import { UpdateCampaignStatusDto } from './dto/update-campaign-status.dto';
 import { CampaignResponseDto } from './dto/campaign-response.dto';
 import { CampaignResultsResponseDto } from './dto/campaign-results.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole, CampaignStatus } from '@prisma/client';
 import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
@@ -83,6 +83,7 @@ export class CampaignsController {
     return this.campaignsService.create(createCampaignDto, user.user_id, image);
   }
 
+  @Public()  
   @Get()
   @ApiOperation({
     summary: 'Get all campaigns',
@@ -103,6 +104,7 @@ export class CampaignsController {
     return this.campaignsService.findAll(status);
   }
 
+  @Public()  
   @Get(':id')
   @ApiOperation({
     summary: 'Get a campaign by ID',
@@ -187,6 +189,7 @@ export class CampaignsController {
     return this.campaignsService.remove(id);
   }
 
+  @Public()  
   @Get('active/with-projects')
   @ApiOperation({
     summary: 'Get all active campaigns with projects and repositories',
@@ -201,6 +204,7 @@ export class CampaignsController {
     return this.campaignsExtendedService.getActiveCampaignsWithProjects();
   }
 
+  @Public()  
   @Get(':id/projects-with-repos')
   @ApiOperation({
     summary: 'Get campaign with all projects and repositories',

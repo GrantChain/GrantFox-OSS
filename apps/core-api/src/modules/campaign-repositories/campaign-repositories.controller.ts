@@ -20,7 +20,7 @@ import { CampaignRepositoriesService } from './campaign-repositories.service';
 import { AddRepositoriesToCampaignDto } from './dto/add-repositories-to-campaign.dto';
 import { CampaignRepositoryResponseDto } from './dto/campaign-repository-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
 import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
@@ -70,6 +70,7 @@ export class CampaignRepositoriesController {
     );
   }
 
+  @Public()  
   @Get('campaign/:campaignId/repositories')
   @ApiOperation({
     summary: 'Get all repositories in a campaign',
@@ -89,6 +90,7 @@ export class CampaignRepositoriesController {
     );
   }
 
+  @Public()  
   @Get('repository/:repoId/campaigns')
   @ApiOperation({
     summary: 'Get all campaigns for a repository',
@@ -109,6 +111,7 @@ export class CampaignRepositoriesController {
     return this.campaignRepositoriesService.getCampaignsByRepository(repoId);
   }
 
+  @Public()  
   @Get('repository/:repoId/active-campaign')
   @ApiOperation({
     summary: 'Get active campaign for a repository',
@@ -131,6 +134,7 @@ export class CampaignRepositoriesController {
     );
   }
 
+  @Public()  
   @Get('campaign/:campaignId/repositories/:repoId/check')
   @ApiOperation({
     summary: 'Check if repository is in campaign',

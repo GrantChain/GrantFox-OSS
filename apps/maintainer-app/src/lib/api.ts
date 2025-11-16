@@ -28,7 +28,12 @@ http.interceptors.request.use(
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
-        config.headers["x-user-id"] = parsed?.user?.id;
+        
+        const accessToken = parsed?.access_token;
+        if (accessToken) {
+          config.headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+        
       } catch (error) {
         console.error(error);
       }
