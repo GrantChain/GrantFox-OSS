@@ -4,15 +4,17 @@ import { Campaign } from "@/types/campaign.type";
 import { ApiUser } from "@/types/user.type";
 import { Card } from "@/components/ui/card";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
+import { Clock } from "lucide-react";
 
 interface CampaignHeroProps {
   activeCampaign: Campaign | null;
-  contributorsCount: number;
   contributors?: ApiUser[];
+  isUpcoming: boolean;
 }
 
 export const CampaignHero = ({
   activeCampaign,
+  isUpcoming,
   contributors,
 }: CampaignHeroProps) => {
   const topCount = Math.min(contributors?.length ?? 0, 10);
@@ -37,7 +39,13 @@ export const CampaignHero = ({
           squaresClassName="hover:fill-gray-500"
         />
         <div className="w-full flex justify-between items-center">
-          <h1 className="text-3xl font-bold">{activeCampaign?.name}</h1>
+          <h1 className="text-3xl font-semibold">
+            <span className="font-bold flex items-center gap-2 ml-4 mb-4">
+              {isUpcoming && <Clock className="size-6 text-yellow-500" />}
+              {isUpcoming && "Upcoming Campaign: "}
+            </span>
+            {activeCampaign?.name}
+          </h1>
         </div>
         <div className="w-full flex flex-col sm:flex-row justify-start sm:justify-between items-center gap-4">
           <p className="w-full sm:w-7/12 text-balance text-muted-foreground text-xl">

@@ -15,7 +15,11 @@ import { Check, Copy, LogOut, ChevronDown, Wallet } from "lucide-react";
  * Wallet connection/disconnection button component
  * Shows different states based on wallet connection status
  */
-export const WalletButton = () => {
+type WalletButtonProps = {
+  onConnected?: (address: string, name: string) => void;
+};
+
+export const WalletButton = ({ onConnected }: WalletButtonProps) => {
   const { handleConnect, handleDisconnect } = useWallet();
   const { walletAddress, walletName } = useWalletContext();
   const [copied, setCopied] = React.useState(false);
@@ -111,7 +115,7 @@ export const WalletButton = () => {
   return (
     <Button
       className="h-10 px-6 gap-2 font-medium cursor-pointer"
-      onClick={handleConnect}
+      onClick={() => handleConnect(onConnected)}
     >
       <Wallet className="h-4 w-4" />
       Connect Wallet

@@ -1,4 +1,4 @@
-import { Campaign } from "@/types/campaign.type";
+import { Campaign, FinishedCampaignResults } from "@/types/campaign.type";
 import { ApiUser, UserRole } from "@/types/user.type";
 import { AxiosInstance } from "axios";
 
@@ -80,6 +80,22 @@ export class CampaignService {
       );
     } catch (error) {
       throw new Error("Failed to register contributor", { cause: error });
+    }
+  }
+
+  async getMergedIssuesInFinishedCampaign(
+    campaignId: string,
+    projectId: string
+  ): Promise<FinishedCampaignResults[]> {
+    try {
+      const { data } = await this.http.get(
+        `/campaigns/${campaignId}/projects/${projectId}/results`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get merged issues in finished campaign", {
+        cause: error,
+      });
     }
   }
 }

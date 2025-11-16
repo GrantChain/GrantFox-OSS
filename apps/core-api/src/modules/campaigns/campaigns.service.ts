@@ -154,8 +154,9 @@ export class CampaignsService {
     // Check if campaign exists
     await this.findOne(id);
 
-    // If changing to ACTIVE or UPCOMING, check if there's already one with the SAME status
-    if (dto.status === 'ACTIVE' || dto.status === 'UPCOMING') {
+    // If changing to ACTIVE, UPCOMING or FINISHED, check if there's already one with the SAME status
+    // Business Rule: Only 1 ACTIVE, 1 UPCOMING and 1 FINISHED campaign allowed at a time
+    if (dto.status === CampaignStatus.ACTIVE || dto.status === CampaignStatus.UPCOMING || dto.status === CampaignStatus.FINISHED) {
       const existingCampaignWithSameStatus = await this.prisma.campaign.findFirst({
         where: {
           campaign_id: { not: id }, // Exclude current campaign

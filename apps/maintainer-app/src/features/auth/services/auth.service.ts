@@ -1,4 +1,11 @@
-import { ApiUser, UserPayload, UserRole } from "@/types/user.type";
+import {
+  AddWalletResponse,
+  ApiUser,
+  UserPayload,
+  UserRole,
+  WalletValidationResponse,
+} from "@/types/user.type";
+import { Wallet } from "@/types/wallets.type";
 import { AxiosError, AxiosInstance } from "axios";
 
 export class AuthService {
@@ -50,6 +57,75 @@ export class AuthService {
       return data;
     } catch (error) {
       throw new Error("Failed to add role to user", { cause: error });
+    }
+  }
+
+  async getWallets(user_id: string): Promise<Wallet[]> {
+    try {
+      const { data } = await this.httpUnauthorized.get(
+        `/wallets/user/${user_id}?role=${UserRole.MAINTAINER}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get wallets", { cause: error });
+    }
+  }
+
+  async walletExists(
+    address: string,
+    user_id: string
+  ): Promise<WalletValidationResponse> {
+    try {
+      const { data } = await this.httpUnauthorized.get(
+        `/wallets/validate/${address}?userId=${user_id}&role=${UserRole.MAINTAINER}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to check if wallet exists", { cause: error });
+    }
+  }
+
+  async addWallet(
+    user_id: string,
+    address: string,
+    is_primary: boolean = true
+  ): Promise<AddWalletResponse> {
+    try {
+      const { data } = await this.httpUnauthorized.post(
+        `/wallets/user/${user_id}`,
+        {
+          address,
+          is_primary,
+          role: UserRole.MAINTAINER,
+        }
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to add wallet", { cause: error });
+    }
+  }
+
+  async setPrimaryWallet(user_id: string, wallet_id: string): Promise<void> {
+    try {
+      await this.httpUnauthorized.patch(
+        `/wallets/user/${user_id}/${wallet_id}/set-primary`,
+        {
+          wallet_id,
+        }
+      );
+    } catch (error) {
+      throw new Error("Failed to set primary wallet", { cause: error });
+    }
+  }
+
+  async getPrimaryWallet(user_id: string): Promise<Wallet | null> {
+    try {
+      const { data } = await this.httpUnauthorized.get(
+        `/wallets/user/${user_id}/primary?role=${UserRole.MAINTAINER}`
+      );
+      return data;
+    } catch (error) {
+      throw new Error("Failed to get primary wallet", { cause: error });
     }
   }
 }

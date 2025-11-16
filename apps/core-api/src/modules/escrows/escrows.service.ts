@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateEscrowDto } from './dto/create-escrow.dto';
@@ -26,14 +27,58 @@ export class EscrowsService {
       );
     }
 
+    // Verify project exists
+    const project = await this.prisma.project.findUnique({
+      where: { project_id: dto.project_id },
+    });
+
+    if (!project) {
+      throw new NotFoundException(
+        `Project with ID ${dto.project_id} not found`,
+      );
+    }
+
+    // Verify that the project belongs to the campaign
+    // Check if any repository of this project is part of the campaign
+    const projectInCampaign = await this.prisma.campaignRepository.findFirst({
+      where: {
+        campaign_id: dto.campaign_id,
+        repository: {
+          project_id: dto.project_id,
+        },
+      },
+    });
+
+    if (!projectInCampaign) {
+      throw new BadRequestException(
+        `Project ${dto.project_id} is not part of campaign ${dto.campaign_id}`,
+      );
+    }
+
     // Check if escrow_id already exists
-    const existingEscrow = await this.prisma.escrow.findUnique({
+    const existingEscrowById = await this.prisma.escrow.findUnique({
       where: { escrow_id: dto.escrow_id },
+    });
+
+    if (existingEscrowById) {
+      throw new ConflictException(
+        `Escrow with ID ${dto.escrow_id} already exists`,
+      );
+    }
+
+    // Check if an escrow already exists for this campaign + project combination
+    const existingEscrow = await this.prisma.escrow.findUnique({
+      where: {
+        campaign_id_project_id: {
+          campaign_id: dto.campaign_id,
+          project_id: dto.project_id,
+        },
+      },
     });
 
     if (existingEscrow) {
       throw new ConflictException(
-        `Escrow with ID ${dto.escrow_id} already exists`,
+        `An escrow already exists for campaign ${dto.campaign_id} and project ${dto.project_id}`,
       );
     }
 
@@ -43,6 +88,7 @@ export class EscrowsService {
         escrow_id: dto.escrow_id,
         escrow_type: dto.escrow_type,
         campaign_id: dto.campaign_id,
+        project_id: dto.project_id,
         created_by: createdBy,
       },
       include: {
@@ -55,6 +101,7 @@ export class EscrowsService {
             },
           },
         },
+        project: true,
       },
     });
 
@@ -76,6 +123,7 @@ export class EscrowsService {
             },
           },
         },
+        project: true,
       },
       orderBy: {
         created_at: 'desc',
@@ -101,6 +149,7 @@ export class EscrowsService {
             },
           },
         },
+        project: true,
       },
     });
 
@@ -137,6 +186,41 @@ export class EscrowsService {
             },
           },
         },
+        project: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    return escrows.map((escrow) => this.formatEscrowResponse(escrow));
+  }
+
+  /**
+   * Get escrows by project ID (across all campaigns)
+   */
+  async findByProject(projectId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { project_id: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    const escrows = await this.prisma.escrow.findMany({
+      where: { project_id: projectId },
+      include: {
+        campaign: {
+          include: {
+            repositories: {
+              include: {
+                repository: true,
+              },
+            },
+          },
+        },
+        project: true,
       },
       orderBy: {
         created_at: 'desc',
@@ -171,6 +255,7 @@ export class EscrowsService {
             },
           },
         },
+        project: true,
       },
     });
 
@@ -178,13 +263,36 @@ export class EscrowsService {
   }
 
   /**
-   * Format escrow response with campaign and repositories
+   * Check if an escrow exists for a campaign and project
+   */
+  async checkEscrowExists(campaignId: string, projectId: string) {
+    const escrow = await this.prisma.escrow.findUnique({
+      where: {
+        campaign_id_project_id: {
+          campaign_id: campaignId,
+          project_id: projectId,
+        },
+      },
+    });
+
+    return {
+      exists: !!escrow,
+      escrow_id: escrow?.escrow_id,
+      message: escrow
+        ? `An escrow already exists for this campaign and project`
+        : `No escrow exists for this campaign and project`,
+    };
+  }
+
+  /**
+   * Format escrow response with campaign, project and repositories
    */
   private formatEscrowResponse(escrow: any) {
     return {
       escrow_id: escrow.escrow_id,
       escrow_type: escrow.escrow_type,
       campaign_id: escrow.campaign_id,
+      project_id: escrow.project_id,
       created_by: escrow.created_by,
       created_at: escrow.created_at,
       updated_at: escrow.updated_at,
@@ -200,6 +308,15 @@ export class EscrowsService {
               github_url: cr.repository.github_url,
               description: cr.repository.description,
             })),
+          }
+        : undefined,
+      project: escrow.project
+        ? {
+            project_id: escrow.project.project_id,
+            name: escrow.project.name,
+            github_handle: escrow.project.github_handle,
+            short_description: escrow.project.short_description,
+            status: escrow.project.status,
           }
         : undefined,
     };

@@ -26,13 +26,14 @@ import { AddRepositoryDto } from './dto/add-repository.dto';
 import { AddMultipleRepositoriesDto } from './dto/add-multiple-repositories.dto';
 import { RepositoryResponseDto } from './dto/repository-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('repositories')
 @Controller('repositories')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class RepositoriesController {
   constructor(
     private readonly repositoriesService: RepositoriesService,
@@ -85,6 +86,7 @@ export class RepositoriesController {
     return this.repositoriesService.addMultipleToProject(projectId, dto, user.user_id);
   }
 
+  @Public()  
   @Get('project/:projectId')
   @ApiOperation({
     summary: 'Get repositories by project',
@@ -110,6 +112,7 @@ export class RepositoriesController {
     return this.repositoriesService.findByProject(projectId, includeInactive);
   }
 
+  @Public()  
   @Get(':repoId')
   @ApiOperation({
     summary: 'Get a repository by ID',
@@ -183,6 +186,7 @@ export class RepositoriesController {
     return this.repositoriesService.reactivate(repoId, user.user_id);
   }
 
+  @Public()  
   @Get(':repoId/github-data')
   @ApiOperation({
     summary: 'Get GitHub metadata for a repository',
@@ -203,6 +207,7 @@ export class RepositoriesController {
     return this.campaignsExtendedService.getRepositoryGitHubData(repoId);
   }
 
+  @Public()  
   @Get(':repoId/github-issues')
   @ApiOperation({
     summary: 'Get GitHub issues for a repository',
@@ -223,6 +228,7 @@ export class RepositoriesController {
     return this.campaignsExtendedService.getRepositoryGitHubIssues(repoId);
   }
 
+  @Public()  
   @Get(':repoId/full-details')
   @ApiOperation({
     summary: 'Get complete repository details (ALL IN ONE)',

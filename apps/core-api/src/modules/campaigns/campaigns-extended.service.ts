@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-import { CampaignStatus, ProjectStatus } from '@prisma/client';
+import { CampaignStatus, ProjectStatus, UserRole } from '@prisma/client';
+import { UsersService } from '../users/users.service';
+import { WalletsService } from '../wallets/wallets.service';
 
 export interface GitHubRepoData {
   stars: number;
@@ -13,7 +15,11 @@ export interface GitHubRepoData {
 
 @Injectable()
 export class CampaignsExtendedService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+    private readonly walletsService: WalletsService,
+  ) {}
 
   /**
    * Obtiene una campaña con todos sus proyectos y repos
@@ -364,5 +370,276 @@ export class CampaignsExtendedService {
       issues: issuesData.issues || [],
       total_issues: issuesData.total_issues || 0,
     };
+  }
+
+  /**
+   * Obtiene los resultados completos de una campaña finalizada
+   * Incluye todos los issues con PR merged y validación de contributors
+   */
+  async getCampaignResults(campaignId: string, projectId: string) {
+    // 1. Validar que la campaña existe y está FINISHED
+    const campaign = await this.prisma.campaign.findUnique({
+      where: { campaign_id: campaignId },
+    });
+
+    if (!campaign) {
+      throw new NotFoundException(`Campaign with ID ${campaignId} not found`);
+    }
+
+    if (campaign.status !== CampaignStatus.FINISHED) {
+      throw new BadRequestException(
+        `Campaign must be FINISHED to get results. Current status: ${campaign.status}`,
+      );
+    }
+
+    // 2. Validar que el proyecto existe
+    const project = await this.prisma.project.findUnique({
+      where: { project_id: projectId },
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
+    // 3. Obtener todos los repositorios del proyecto asociados a esta campaña
+    const campaignRepositories = await this.prisma.campaignRepository.findMany({
+      where: {
+        campaign_id: campaignId,
+        repository: {
+          project_id: projectId,
+          is_active: true,
+        },
+      },
+      include: {
+        repository: true,
+      },
+    });
+
+    if (campaignRepositories.length === 0) {
+      throw new NotFoundException(
+        `No repositories found for project ${projectId} in campaign ${campaignId}`,
+      );
+    }
+
+    // 4. Por cada repositorio, obtener issues con label de la campaña y PRs merged
+    const allIssuesResults: any[] = [];
+
+    for (const cr of campaignRepositories) {
+      const repository = cr.repository;
+      
+      try {
+        const issuesFromRepo = await this.getIssuesWithMergedPRs(
+          repository.github_url,
+          campaign.name,
+        );
+
+        // Procesar cada issue para validar contributor
+        for (const issue of issuesFromRepo) {
+          const contributorData = await this.validateContributor(
+            issue.author_github_username,
+          );
+
+          allIssuesResults.push({
+            issue_id: issue.issue_id,
+            issue_number: issue.issue_number,
+            title: issue.title,
+            html_url: issue.html_url,
+            labels: issue.labels,
+            repository: {
+              name: repository.name,
+              github_url: repository.github_url,
+            },
+            pull_request: {
+              pr_number: issue.pr_number,
+              pr_url: issue.pr_url,
+              merged_at: issue.merged_at,
+              author_github_username: issue.author_github_username,
+            },
+            contributor_exists: contributorData.exists,
+            contributor_info: contributorData.exists
+              ? contributorData.info
+              : undefined,
+          });
+        }
+      } catch (error) {
+        console.error(
+          `Error processing repository ${repository.name}:`,
+          error,
+        );
+        // Continuar con el siguiente repo en caso de error
+        continue;
+      }
+    }
+
+    // 5. Contar contributors elegibles (con wallet)
+    const eligibleContributors = allIssuesResults.filter(
+      (issue) =>
+        issue.contributor_exists &&
+        issue.contributor_info?.primary_wallet !== undefined &&
+        issue.contributor_info?.primary_wallet !== null,
+    ).length;
+
+    return {
+      campaign_id: campaign.campaign_id,
+      campaign_name: campaign.name,
+      project_id: project.project_id,
+      project_name: project.name,
+      total_issues: allIssuesResults.length,
+      total_eligible_contributors: eligibleContributors,
+      issues: allIssuesResults,
+    };
+  }
+
+  /**
+   * Obtiene issues de un repositorio que tienen el label de la campaña
+   * y un PR merged asociado
+   */
+  private async getIssuesWithMergedPRs(
+    githubUrl: string,
+    campaignName: string,
+  ) {
+    // Extraer owner/repo desde la URL
+    const urlParts = githubUrl.split('/');
+    const owner = urlParts[urlParts.length - 2];
+    const repo = urlParts[urlParts.length - 1];
+
+    // Preparar headers con token
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'GrantFox-API',
+    };
+
+    if (process.env.GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
+
+    // 1. Obtener issues con el label de la campaña (state=all para incluir cerrados)
+    const issuesResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/issues?state=all&labels=${encodeURIComponent(campaignName)}&per_page=100`,
+      { headers },
+    );
+
+    if (!issuesResponse.ok) {
+      console.error(
+        `GitHub API error fetching issues: ${issuesResponse.status}`,
+      );
+      return [];
+    }
+
+    const issues = await issuesResponse.json();
+
+    // 2. Para cada issue, buscar PRs merged asociados
+    const issuesWithMergedPRs: any[] = [];
+
+    for (const issue of issues) {
+      // Skip si es un PR (GitHub devuelve PRs en el endpoint de issues)
+      if (issue.pull_request) {
+        continue;
+      }
+
+      try {
+        // Buscar PRs que referencien este issue y estén merged
+        const prSearchQuery = `repo:${owner}/${repo} type:pr is:merged ${issue.number}`;
+        const prSearchResponse = await fetch(
+          `https://api.github.com/search/issues?q=${encodeURIComponent(prSearchQuery)}&per_page=10`,
+          { headers },
+        );
+
+        if (!prSearchResponse.ok) {
+          console.error(
+            `GitHub API error searching PRs for issue #${issue.number}`,
+          );
+          continue;
+        }
+
+        const prSearchData = await prSearchResponse.json();
+
+        // Si encontramos PRs merged, tomar el primero (más común)
+        if (prSearchData.items && prSearchData.items.length > 0) {
+          const mergedPR = prSearchData.items[0];
+
+          // Obtener detalles completos del PR
+          const prDetailsResponse = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/pulls/${mergedPR.number}`,
+            { headers },
+          );
+
+          if (prDetailsResponse.ok) {
+            const prDetails = await prDetailsResponse.json();
+
+            if (prDetails.merged) {
+              issuesWithMergedPRs.push({
+                issue_id: issue.id,
+                issue_number: issue.number,
+                title: issue.title,
+                html_url: issue.html_url,
+                labels: issue.labels.map((l: any) => l.name),
+                pr_number: prDetails.number,
+                pr_url: prDetails.html_url,
+                merged_at: prDetails.merged_at,
+                author_github_username: prDetails.user.login,
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error(
+          `Error processing issue #${issue.number}:`,
+          error,
+        );
+        continue;
+      }
+    }
+
+    return issuesWithMergedPRs;
+  }
+
+  /**
+   * Valida si un usuario de GitHub existe en nuestra BD
+   * y obtiene su wallet primaria si es contributor
+   */
+  private async validateContributor(githubUsername: string) {
+    try {
+      // Buscar usuario por username (GitHub username)
+      const user = await this.usersService.findByUsername(githubUsername);
+
+      // Verificar si tiene rol CONTRIBUTOR
+      const hasContributorRole = user.roles.includes(UserRole.CONTRIBUTOR);
+
+      // Intentar obtener wallet primaria solo si tiene rol contributor
+      let primaryWallet: string | null = null;
+
+      if (hasContributorRole) {
+        try {
+          const wallet = await this.walletsService.findPrimaryByUser(
+            user.user_id,
+            UserRole.CONTRIBUTOR,
+          );
+          primaryWallet = wallet.address;
+        } catch (error) {
+          // Usuario existe pero no tiene wallet primaria como contributor
+          console.warn(
+            `User ${githubUsername} has CONTRIBUTOR role but no primary wallet`,
+          );
+        }
+      }
+
+      return {
+        exists: true,
+        info: {
+          user_id: user.user_id,
+          username: user.username,
+          email: user.email,
+          has_contributor_role: hasContributorRole,
+          primary_wallet: primaryWallet,
+        },
+      };
+    } catch (error) {
+      // Usuario no existe en nuestra BD
+      return {
+        exists: false,
+        info: undefined,
+      };
+    }
   }
 }

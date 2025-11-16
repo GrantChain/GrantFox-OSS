@@ -1,5 +1,4 @@
 import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
-import { NumberTicker } from "@/components/ui/number-ticker";
 import { PulsatingButton } from "@/components/ui/pulsating-button";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
@@ -8,17 +7,18 @@ import { ApiUser } from "@/types/user.type";
 import { useCampaignsMutations } from "../hooks/useCampaignMutation";
 import { Card } from "@/components/ui/card";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
+import { Clock } from "lucide-react";
 
 interface CampaignHeroProps {
   activeCampaign: Campaign | null;
-  contributorsCount: number;
   contributors?: ApiUser[];
+  isUpcoming: boolean;
 }
 
 export const CampaignHero = ({
   activeCampaign,
-  contributorsCount,
   contributors,
+  isUpcoming,
 }: CampaignHeroProps) => {
   const { user } = useUser();
   const { registerContributor } = useCampaignsMutations();
@@ -48,7 +48,15 @@ export const CampaignHero = ({
           squaresClassName="hover:fill-gray-500"
         />
         <div className="w-full flex justify-between items-center">
-          <h1 className="text-3xl font-bold">{activeCampaign?.name}</h1>
+          <div className="w-full flex justify-between items-center">
+            <h1 className="text-3xl font-semibold">
+              <span className="font-bold flex items-center gap-2 ml-4 mb-4">
+                {isUpcoming && <Clock className="size-6 text-yellow-500" />}
+                {isUpcoming && "Upcoming Campaign: "}
+              </span>
+              {activeCampaign?.name}
+            </h1>
+          </div>
           {!isRegistered && (
             <PulsatingButton
               onClick={() =>

@@ -12,8 +12,6 @@ type UsePaymentMethodsReturn = {
   isLoading: boolean;
   addressInput: string;
   setAddressInput: (value: string) => void;
-  error: string | null;
-  setError: (value: string | null) => void;
   isAdding: boolean;
   addWallet: (rawAddress: string) => Promise<void>;
 };
@@ -33,31 +31,23 @@ export function usePaymentMethods(
     enabled: Boolean(userId),
     queryFn: async () => {
       if (!userId) return [];
-      const apiUser = await authService.getUser(userId);
-      return apiUser?.wallets ?? [];
+      return await authService.getWallets(userId);
     },
   });
 
   const [addressInput, setAddressInput] = React.useState<string>("");
-  const [error, setError] = React.useState<string | null>(null);
   const [isAdding, setIsAdding] = React.useState<boolean>(false);
 
   const addWallet = React.useCallback(
     async (rawAddress: string) => {
       if (!userId) return;
       const address = rawAddress.trim();
-      if (address.length === 0) {
-        setError("Address is required");
-        return;
-      }
 
       setIsAdding(true);
-      setError(null);
       try {
-        const validation = await authService.walletExists(address);
+        const validation = await authService.walletExists(address, userId);
         if (validation.exists) {
-          setError("Wallet already exists");
-          toast.error("La wallet ya existe");
+          toast.error("Wallet already exists");
           return;
         }
 
@@ -81,10 +71,9 @@ export function usePaymentMethods(
           }
         );
         setAddressInput("");
-        toast.success("Wallet agregada correctamente");
+        toast.success("Wallet added successfully");
       } catch {
-        setError("Failed to add wallet");
-        toast.error("No se pudo agregar la wallet");
+        toast.error("Failed to add wallet");
       } finally {
         setIsAdding(false);
       }
@@ -97,8 +86,6 @@ export function usePaymentMethods(
     isLoading,
     addressInput,
     setAddressInput,
-    error,
-    setError,
     isAdding,
     addWallet,
   };

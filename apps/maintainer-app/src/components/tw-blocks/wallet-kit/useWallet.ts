@@ -15,7 +15,9 @@ export const useWallet = () => {
    * Opens a modal for wallet selection and handles the connection process
    * Automatically sets wallet information in the context upon successful connection
    */
-  const connectWallet = async () => {
+  const connectWallet = async (
+    onConnected?: (address: string, name: string) => void
+  ) => {
     await kit.openModal({
       modalTitle: "Connect to your favorite wallet",
       onWalletSelected: async (option: ISupportedWallet) => {
@@ -28,6 +30,11 @@ export const useWallet = () => {
 
         // Store wallet information in the context and localStorage
         setWalletInfo(address, name);
+
+        // Notify consumer about successful connection
+        if (onConnected) {
+          onConnected(address, name);
+        }
       },
     });
   };
@@ -46,9 +53,11 @@ export const useWallet = () => {
    * Handle wallet connection with error handling
    * Wraps the connectWallet function in a try-catch block for better error management
    */
-  const handleConnect = async () => {
+  const handleConnect = async (
+    onConnected?: (address: string, name: string) => void
+  ) => {
     try {
-      await connectWallet();
+      await connectWallet(onConnected);
     } catch (error) {
       console.error("Error connecting wallet:", error);
       // You can add additional error handling here, such as showing user notifications

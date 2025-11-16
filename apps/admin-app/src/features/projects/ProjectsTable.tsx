@@ -432,6 +432,17 @@ export const ProjectsTable = ({ projects }: ProjectsTableProps) => {
                             <ProjectGeneralInfo organization={org} />
                           ) : null;
                         })()}
+
+                        <div className="grid gap-4 mb-4">
+                          <div className="space-y-1">
+                            <h4 className="font-medium">Description</h4>
+                            <p className="text-muted-foreground">
+                              {row.original.description} <br />
+                              {row.original.short_description}
+                            </p>
+                          </div>
+                        </div>
+
                         <div className="grid gap-4 sm:grid-cols-2">
                           <div className="space-y-2">
                             <h4 className="font-medium">Repositories</h4>
