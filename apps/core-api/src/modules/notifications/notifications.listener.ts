@@ -28,7 +28,7 @@ export class NotificationsListener {
       const notifications = event.maintainerIds.map((maintainerId) => ({
         user_id: maintainerId,
         type: 'PROJECT_APPROVED' as const,
-        title: '🎉 Project Approved!',
+        title: 'Project Approved!',
         description: `Your project "${event.projectName}" has been approved and is now active.`,
         icon: 'check-circle',
         url: `/maintainer/projects/${event.projectId}`,
@@ -64,7 +64,7 @@ export class NotificationsListener {
       const notifications = event.maintainerIds.map((maintainerId) => ({
         user_id: maintainerId,
         type: 'PROJECT_REJECTED' as const,
-        title: '❌ Project Rejected',
+        title: 'Project Rejected',
         description: `Your project "${event.projectName}" has been rejected. ${event.reason ? `Reason: ${event.reason}` : ''}`,
         icon: 'x-circle',
         url: `/maintainer/projects/${event.projectId}`,
@@ -101,7 +101,7 @@ export class NotificationsListener {
       await this.notificationsService.create({
         user_id: event.newMaintainerId,
         type: 'MAINTAINER_ADDED',
-        title: '👥 Added to Project',
+        title: 'Added to Project',
         description: `You've been added as a maintainer to "${event.projectName}"${event.addedByUsername ? ` by ${event.addedByUsername}` : ''}.`,
         icon: 'user-plus',
         url: `/maintainer/projects/${event.projectId}`,

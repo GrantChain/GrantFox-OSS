@@ -1,11 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationResponseDto } from './dto/notification-response.dto';
+import { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => NotificationsGateway))
+    private notificationsGateway: NotificationsGateway,
+  ) {}
 
   /**
    * Helper method to transform Prisma notification (with null) to DTO (with undefined)
@@ -29,6 +34,9 @@ export class NotificationsService {
       data: createNotificationDto,
     });
 
+    // Send real-time notification via WebSocket
+    this.notificationsGateway.notifyUser(notification.user_id, notification);
+
     return this.toDto(notification);
   }
 
@@ -38,11 +46,19 @@ export class NotificationsService {
   async createMany(
     createNotificationDtos: CreateNotificationDto[],
   ): Promise<{ count: number }> {
-    const result = await this.prisma.notification.createMany({
-      data: createNotificationDtos,
+    // Create notifications one by one to get the full records back
+    const notifications = await Promise.all(
+      createNotificationDtos.map((dto) =>
+        this.prisma.notification.create({ data: dto }),
+      ),
+    );
+
+    // Send real-time notifications via WebSocket
+    notifications.forEach((notification) => {
+      this.notificationsGateway.notifyUser(notification.user_id, notification);
     });
 
-    return { count: result.count };
+    return { count: notifications.length };
   }
 
   /**
