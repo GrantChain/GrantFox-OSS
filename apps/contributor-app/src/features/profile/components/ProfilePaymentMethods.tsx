@@ -10,9 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { Loader2, FileIcon } from "lucide-react";
+import { Loader2, FileIcon, InfoIcon } from "lucide-react";
 import { WalletsTable } from "./WalletsTable";
 import { usePaymentMethods } from "@/features/profile/hooks/usePaymentMethods";
+import { z } from "zod";
+import { isValidWallet } from "@/components/tw-blocks/wallet-kit/validators";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+const walletSchema = z
+  .string()
+  .trim()
+  .min(1, "Address is required")
+  .refine(
+    isValidWallet,
+    "Invalid wallet. It must be a valid Stellar wallet address."
+  );
 
 export const ProfilePaymentMethods = () => {
   const { user } = useUser();
@@ -22,7 +38,6 @@ export const ProfilePaymentMethods = () => {
     isLoading,
     addressInput,
     setAddressInput,
-    error,
     isAdding,
     addWallet,
   } = usePaymentMethods(user?.id);
@@ -35,9 +50,24 @@ export const ProfilePaymentMethods = () => {
         shineColor={["#9c40ff", "#ffaa40", "#22d3ee"]}
       />
       <CardHeader>
-        <CardTitle className="font-semibold">Payment Methods</CardTitle>
+        <CardTitle className="font-semibold flex items-center gap-2">
+          Payment Methods{" "}
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="size-4" />
+            </TooltipTrigger>
+            <TooltipContent>
+              If you&apos;re both a maintainer and contributor, your wallets are
+              shared across roles — but you can choose a different primary
+              wallet for each app.
+            </TooltipContent>
+          </Tooltip>
+        </CardTitle>
         <CardDescription className="text-muted-foreground">
-          Manage your payment methods here.
+          Manage your payment methods here. As a contributor, your rewards are
+          sent to the wallet that&apos;s set as primary at the time the reward
+          is issued — even if you change it later. Make sure your primary wallet
+          is set correctly.
         </CardDescription>
       </CardHeader>
 
@@ -45,24 +75,27 @@ export const ProfilePaymentMethods = () => {
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
           <Input
             value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setAddressInput(value);
+            }}
             placeholder="Paste your wallet address"
             className="flex-1"
             disabled={isAdding || isLoading}
           />
           <Button
             onClick={() => addWallet(addressInput)}
-            disabled={isAdding || isLoading || !user?.id}
-            className="shrink-0"
+            disabled={
+              isAdding ||
+              isLoading ||
+              !user?.id ||
+              !walletSchema.safeParse(addressInput).success
+            }
+            className="shrink-0 cursor-pointer"
           >
             {isAdding ? "Adding..." : "Add wallet"}
           </Button>
         </div>
-        {error ? (
-          <p className="text-sm text-destructive mt-2" role="alert">
-            {error}
-          </p>
-        ) : null}
 
         <div className="mt-4">
           {isLoading ? (
@@ -87,5 +120,3 @@ export const ProfilePaymentMethods = () => {
     </Card>
   );
 };
-
-

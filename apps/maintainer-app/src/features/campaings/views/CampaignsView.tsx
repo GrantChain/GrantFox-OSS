@@ -10,9 +10,14 @@ import { FileIcon, Loader2 } from "lucide-react";
 import { CampaignAndRepos } from "../components/CampaignAndRepos";
 
 export const CampaignView = () => {
-  const { activeCampaign, isLoading } = useCampaignContext();
+  const { activeCampaign, upcomingCampaign, isLoading } = useCampaignContext();
+
+  const campaign = activeCampaign ?? upcomingCampaign;
+
+  const isUpcoming = !activeCampaign && upcomingCampaign !== null;
+
   const { data: contributors } = useCampaignQuery({
-    campaignId: activeCampaign?.campaign_id,
+    campaignId: campaign?.campaign_id,
   });
 
   return (
@@ -20,28 +25,30 @@ export const CampaignView = () => {
       {isLoading ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <Loader2 className="size-10 animate-spin" />
-          <span className="text-sm text-muted-foreground">Loading campaign…</span>
+          <span className="text-sm text-muted-foreground">
+            Loading campaign…
+          </span>
         </Card>
-      ) : !activeCampaign ? (
+      ) : !campaign ? (
         <Card className="p-4 flex items-center gap-2 text-sm flex-col w-full h-full justify-center">
           <FileIcon className="size-10" />
           <span className="text-sm text-muted-foreground">
-            No active campaign found
+            No campaign found
           </span>
         </Card>
       ) : (
         <>
           <CampaignHero
-            activeCampaign={activeCampaign}
-            contributorsCount={contributors?.length ?? 0}
+            activeCampaign={campaign}
             contributors={contributors}
+            isUpcoming={isUpcoming}
           />
-          <CampaignTags tags={activeCampaign?.tags ?? []} />
+          <CampaignTags tags={campaign?.tags ?? []} />
           <CampaignTimeRemaining
-            startDate={activeCampaign?.start_date}
-            endDate={activeCampaign?.end_date}
+            startDate={campaign?.start_date}
+            endDate={campaign?.end_date}
           />
-          <CampaignAndRepos activeCampaign={activeCampaign ?? null} />
+          <CampaignAndRepos activeCampaign={campaign ?? null} />
         </>
       )}
     </>

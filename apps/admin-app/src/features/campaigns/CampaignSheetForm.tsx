@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/form";
 import { useCampaignContext } from "@/context/CampaignContext";
 import Image from "next/image";
+import { Label } from "@/components/ui/label";
 
 type SheetMode = "create" | "edit";
 
@@ -53,8 +54,12 @@ export const CampaignSheetForm = ({
 
   const [open, setOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [startTime, setStartTime] = useState<string>("00:00:00");
+  const [endTime, setEndTime] = useState<string>("23:59:59");
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const CENTRAL_TZ = "America/Guatemala";
+  const CENTRAL_OFFSET = "-06:00";
 
   const { form, onSubmit } = useCampaigns({
     mode,
@@ -89,6 +94,23 @@ export const CampaignSheetForm = ({
         : undefined;
       const to = campaign.end_date ? new Date(campaign.end_date) : undefined;
       setDateRange({ from, to });
+
+      const getTimeInTz = (d: Date) => {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: CENTRAL_TZ,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).formatToParts(d);
+        const h = parts.find((p) => p.type === "hour")?.value ?? "00";
+        const m = parts.find((p) => p.type === "minute")?.value ?? "00";
+        const s = parts.find((p) => p.type === "second")?.value ?? "00";
+        return `${h}:${m}:${s}`;
+      };
+
+      if (from) setStartTime(getTimeInTz(from));
+      if (to) setEndTime(getTimeInTz(to));
     }
     if (campaign.image_url) {
       setImagePreview(campaign.image_url);
@@ -97,32 +119,24 @@ export const CampaignSheetForm = ({
 
   const handleSubmit = form.handleSubmit(onSubmit);
 
+  const toCentralISOStringWithTime = (date: Date, time: string) => {
+    const [hh = "00", mm = "00", ss = "00"] = time.split(":");
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const y = date.getFullYear();
+    const m = pad(date.getMonth() + 1);
+    const d = pad(date.getDate());
+    return `${y}-${m}-${d}T${hh}:${mm}:${ss}${CENTRAL_OFFSET}`;
+  };
+
   const onDateChange = (range?: DateRange) => {
     setDateRange(range);
     if (range?.from) {
       const start = new Date(range.from);
-      form.setValue(
-        "start_date",
-        new Date(
-          Date.UTC(
-            start.getFullYear(),
-            start.getMonth(),
-            start.getDate(),
-            23,
-            59,
-            59
-          )
-        ).toISOString()
-      );
+      form.setValue("start_date", toCentralISOStringWithTime(start, startTime));
     }
     if (range?.to) {
       const end = new Date(range.to);
-      form.setValue(
-        "end_date",
-        new Date(
-          Date.UTC(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59)
-        ).toISOString()
-      );
+      form.setValue("end_date", toCentralISOStringWithTime(end, endTime));
     }
   };
 
@@ -203,7 +217,7 @@ export const CampaignSheetForm = ({
 
               <FormItem className="w-full">
                 <FormLabel>Date range</FormLabel>
-                <div>
+                <div className="flex flex-col md:flex-row gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -219,8 +233,16 @@ export const CampaignSheetForm = ({
                         {(() => {
                           const s = form.getValues("start_date");
                           const e = form.getValues("end_date");
+                          const opts: Intl.DateTimeFormatOptions = {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            timeZone: CENTRAL_TZ,
+                          };
                           return s && e
-                            ? `${new Date(s).toLocaleDateString()} - ${new Date(e).toLocaleDateString()}`
+                            ? `${new Date(s).toLocaleString("es-ES", opts)} - ${new Date(e).toLocaleString("es-ES", opts)}`
                             : "Pick a date range";
                         })()}
                         <CalendarIcon className="ml-auto size-4 opacity-50" />
@@ -241,6 +263,55 @@ export const CampaignSheetForm = ({
                     </p>
                   ) : null}
                 </div>
+
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                  <div className="flex flex-col gap-1">
+                    <Label htmlFor="start-time">Start time UTC-6</Label>
+                    <Input
+                      type="time"
+                      id="start-time"
+                      step="1"
+                      value={startTime}
+                      onChange={(e) => {
+                        const t = e.target.value;
+                        setStartTime(t);
+                        if (dateRange?.from) {
+                          form.setValue(
+                            "start_date",
+                            toCentralISOStringWithTime(
+                              new Date(dateRange.from),
+                              t
+                            )
+                          );
+                        }
+                      }}
+                      className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label htmlFor="end-time">End time UTC-6</Label>
+                    <Input
+                      type="time"
+                      id="end-time"
+                      step="1"
+                      value={endTime}
+                      onChange={(e) => {
+                        const t = e.target.value;
+                        setEndTime(t);
+                        if (dateRange?.to) {
+                          form.setValue(
+                            "end_date",
+                            toCentralISOStringWithTime(
+                              new Date(dateRange.to),
+                              t
+                            )
+                          );
+                        }
+                      }}
+                      className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                    />
+                  </div>
+                </div>
               </FormItem>
 
               <FormItem className="w-full">
@@ -248,11 +319,11 @@ export const CampaignSheetForm = ({
                 <div className="space-y-2">
                   {imagePreview && (
                     <Image
-                      width={500}
-                      height={500}
+                      width={300}
+                      height={300}
                       src={imagePreview}
                       alt="Preview"
-                      className="aspect-video w-full rounded-md object-cover"
+                      className="aspect-video mx-auto rounded-md object-cover"
                     />
                   )}
                   <Input

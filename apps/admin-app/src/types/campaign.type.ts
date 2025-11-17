@@ -1,12 +1,14 @@
 import { Project } from "./project.type";
 import { Repository } from "./repository.type";
 import { Maintainer } from "./maintainer.type";
+import { Contributor } from "./contributor.type";
 
 export enum CampaignStatus {
   PENDING = "PENDING",
   UPCOMING = "UPCOMING",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
+  FINISHED = "FINISHED",
 }
 
 export interface Campaign {
@@ -22,6 +24,7 @@ export interface Campaign {
   created_at: string;
   updated_at: string;
   repositories: Repository[];
+  contributors: Contributor[];
 }
 
 export type CampaignProject = Omit<

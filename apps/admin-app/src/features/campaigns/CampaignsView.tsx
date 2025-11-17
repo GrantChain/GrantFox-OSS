@@ -43,7 +43,7 @@ export const CampaignsView = () => {
           </span>
         </Card>
       ) : campaigns && campaigns.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
           {campaigns?.map((campaign) => (
             <CampaignCard key={campaign.campaign_id} campaign={campaign} />
           ))}

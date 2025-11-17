@@ -32,6 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert } from "@/components/shared/Alert";
 
 export const Repositories = ({
   orgLogin,
@@ -135,11 +136,11 @@ export const Repositories = ({
                 actionLabel={
                   isAlreadyRegistered
                     ? removingProjectId === repository.id
-                      ? "Removing..."
-                      : "Remove from Project"
+                      ? "Processing..."
+                      : "Unlink from Project"
                     : registeringId === repository.id
-                      ? "Registering..."
-                      : "Register to Project"
+                      ? "Processing..."
+                      : "Link to Project"
                 }
                 isLoading={isBusy}
                 isDangerous={isAlreadyRegistered}
@@ -216,6 +217,7 @@ export const RegisteredRepositories = ({
 }) => {
   const { activeCampaign, upcomingCampaign } = useCampaignContext();
   const targetCampaign = activeCampaign ?? upcomingCampaign;
+  const hasActiveCampaign = !!activeCampaign?.campaign_id;
   const { data, isLoading, isError } = useProjectRepositories(projectId);
 
   const [registeringRepo, setRegisteringRepo] = useState<number | null>(null);
@@ -295,6 +297,16 @@ export const RegisteredRepositories = ({
           All of your issues should be labeled with the campaign name.
         </p>
       </div>
+
+      {!hasActiveCampaign && (
+        <Alert
+          title="No active campaign"
+          description="There is no active campaign, so you can't register repositories to a campaign."
+          variant="warning"
+          className="w-full"
+        />
+      )}
+
       <RepoGrid
         items={repos}
         renderItem={(repository: GitHubRepository) => {
@@ -315,25 +327,33 @@ export const RegisteredRepositories = ({
                     <Badge variant="outline">In campaign</Badge>
                   ) : null
                 }
-                action={isIn ? "remove" : "register"}
+                action={
+                  hasActiveCampaign ? (isIn ? "remove" : "register") : "none"
+                }
                 actionLabel={
-                  isIn
-                    ? removingId === repository.id
-                      ? "Removing..."
-                      : "Remove from Campaign"
-                    : registeringRepo === repository.id
-                      ? "Registering..."
-                      : "Register to Active Campaign"
+                  hasActiveCampaign
+                    ? isIn
+                      ? removingId === repository.id
+                        ? "Removing..."
+                        : "Remove from Campaign"
+                      : registeringRepo === repository.id
+                        ? "Registering..."
+                        : "Register to Active Campaign"
+                    : undefined
                 }
                 isLoading={isBusy}
                 isDangerous={isIn}
-                onAction={() => {
-                  if (isIn) {
-                    setConfirmRemoveId(repository.id);
-                  } else {
-                    handleRegister(repository);
-                  }
-                }}
+                onAction={
+                  hasActiveCampaign
+                    ? () => {
+                        if (isIn) {
+                          setConfirmRemoveId(repository.id);
+                        } else {
+                          handleRegister(repository);
+                        }
+                      }
+                    : undefined
+                }
               />
               <AlertDialog
                 open={confirmRemoveId === repository.id}

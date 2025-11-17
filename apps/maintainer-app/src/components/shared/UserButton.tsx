@@ -69,7 +69,10 @@ export function UserButton() {
           role="menu"
         >
           <div className="rounded-lg bg-card p-3">
-            <Link href={`/profile/${user.user_metadata?.user_name}`}>
+            <Link
+              href={`/profile/${user.user_metadata?.user_name}`}
+              onClick={() => setOpen(false)}
+            >
               <div className="flex items-center gap-3">
                 <Image
                   src={

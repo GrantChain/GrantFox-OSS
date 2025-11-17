@@ -43,14 +43,12 @@ notifications/
 ├── events/                          # Clases de eventos
 │   ├── project-approved.event.ts
 │   ├── project-rejected.event.ts
-│   ├── project-changes-requested.event.ts
 │   ├── maintainer-added.event.ts
 │   └── index.ts
-├── dto/                             # Data Transfer Objects
-│   ├── notification-response.dto.ts
-│   ├── create-notification.dto.ts
-│   └── unread-count-response.dto.ts
-└── README.md
+└── dto/                             # Data Transfer Objects
+    ├── notification-response.dto.ts
+    ├── create-notification.dto.ts
+    └── unread-count-response.dto.ts
 ```
 
 ## 🎯 Eventos Implementados
@@ -67,13 +65,7 @@ notifications/
 **Quién lo escucha:** `NotificationsListener.handleProjectRejected()`  
 **Notificación creada para:** Todos los maintainers del proyecto
 
-### 3. `project.changes-requested`
-**Cuándo se emite:** Cuando un admin solicita cambios en un proyecto  
-**Quién lo emite:** `ProjectReviewsService.createReview()`  
-**Quién lo escucha:** `NotificationsListener.handleProjectChangesRequested()`  
-**Notificación creada para:** Todos los maintainers del proyecto
-
-### 4. `maintainer.added`
+### 3. `maintainer.added`
 **Cuándo se emite:** Cuando se agrega un maintainer a un proyecto  
 **Quién lo emite:** `ProjectsService.addMaintainer()`  
 **Quién lo escucha:** `NotificationsListener.handleMaintainerAdded()`  
@@ -146,11 +138,7 @@ model Notification {
 enum NotificationType {
   PROJECT_APPROVED
   PROJECT_REJECTED
-  PROJECT_CHANGES_REQUESTED
   MAINTAINER_ADDED
-  MAINTAINER_REMOVED
-  CAMPAIGN_STARTED
-  CAMPAIGN_ENDED
 }
 ```
 

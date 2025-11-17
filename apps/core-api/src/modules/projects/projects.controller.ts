@@ -17,6 +17,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -25,13 +26,15 @@ import { ProjectResponseDto } from './dto/project-response.dto';
 import { AddMaintainerDto } from './dto/add-maintainer.dto';
 import { GithubHandleValidationResponseDto } from './dto/github-handle-validation-response.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole, ProjectStatus } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('projects')
 @Controller('projects')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
@@ -52,6 +55,7 @@ export class ProjectsController {
     return this.projectsService.create(dto, user.user_id);
   }
 
+  @Public()  
   @Get()
   @ApiOperation({
     summary: 'Get all projects',
@@ -72,6 +76,7 @@ export class ProjectsController {
     return this.projectsService.findAll(status);
   }
 
+  @Public()  
   @Get('user/:userId')
   @ApiOperation({
     summary: 'Get projects by user',
@@ -87,6 +92,7 @@ export class ProjectsController {
     return this.projectsService.findByUser(userId);
   }
 
+  @Public()  
   @Get('validate-github-handle/:githubHandle')
   @ApiOperation({
     summary: 'Validate if a project with this GitHub handle exists',
@@ -107,6 +113,7 @@ export class ProjectsController {
     return this.projectsService.validateGithubHandle({ github_handle: githubHandle });
   }
 
+  @Public()  
   @Get(':id')
   @ApiOperation({
     summary: 'Get a project by ID',

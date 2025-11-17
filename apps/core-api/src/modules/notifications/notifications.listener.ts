@@ -4,7 +4,6 @@ import { NotificationsService } from './notifications.service';
 import {
   ProjectApprovedEvent,
   ProjectRejectedEvent,
-  ProjectChangesRequestedEvent,
   MaintainerAddedEvent,
 } from './events';
 
@@ -32,7 +31,7 @@ export class NotificationsListener {
         title: '🎉 Project Approved!',
         description: `Your project "${event.projectName}" has been approved and is now active.`,
         icon: 'check-circle',
-        url: `/projects/${event.projectId}`,
+        url: `/maintainer/projects/${event.projectId}`,
         metadata: {
           projectId: event.projectId,
           projectName: event.projectName,
@@ -68,7 +67,7 @@ export class NotificationsListener {
         title: '❌ Project Rejected',
         description: `Your project "${event.projectName}" has been rejected. ${event.reason ? `Reason: ${event.reason}` : ''}`,
         icon: 'x-circle',
-        url: `/projects/${event.projectId}`,
+        url: `/maintainer/projects/${event.projectId}`,
         metadata: {
           projectId: event.projectId,
           projectName: event.projectName,
@@ -83,43 +82,6 @@ export class NotificationsListener {
     } catch (error) {
       this.logger.error(
         `Error creating notifications for project rejection: ${error.message}`,
-        error.stack,
-      );
-    }
-  }
-
-  /**
-   * Handle project changes requested event
-   * Creates notifications for all maintainers of the project
-   */
-  @OnEvent('project.changes-requested')
-  async handleProjectChangesRequested(event: ProjectChangesRequestedEvent) {
-    this.logger.log(
-      `Handling project.changes-requested event for project: ${event.projectName}`,
-    );
-
-    try {
-      const notifications = event.maintainerIds.map((maintainerId) => ({
-        user_id: maintainerId,
-        type: 'PROJECT_CHANGES_REQUESTED' as const,
-        title: '📝 Changes Requested',
-        description: `Changes have been requested for your project "${event.projectName}". ${event.reason ? `Reason: ${event.reason}` : ''}`,
-        icon: 'edit',
-        url: `/projects/${event.projectId}`,
-        metadata: {
-          projectId: event.projectId,
-          projectName: event.projectName,
-          reason: event.reason,
-        },
-      }));
-
-      const result = await this.notificationsService.createMany(notifications);
-      this.logger.log(
-        `Created ${result.count} notifications for changes requested`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Error creating notifications for changes requested: ${error.message}`,
         error.stack,
       );
     }
@@ -142,7 +104,7 @@ export class NotificationsListener {
         title: '👥 Added to Project',
         description: `You've been added as a maintainer to "${event.projectName}"${event.addedByUsername ? ` by ${event.addedByUsername}` : ''}.`,
         icon: 'user-plus',
-        url: `/projects/${event.projectId}`,
+        url: `/maintainer/projects/${event.projectId}`,
         metadata: {
           projectId: event.projectId,
           projectName: event.projectName,

@@ -7,6 +7,7 @@ import { RepositoryGrowthChart } from "./RepositoryGrowthChart";
 import { CategoryDistributionPie } from "./CategoryDistributionPie";
 import { TechStackBar } from "./TechStackBar";
 import { ReposPerProjectBar } from "./ReposPerProjectBar";
+import { ContributorsTimelineArea } from "./ContributorsTimelineArea";
 
 export function DashboardCharts({
   data,
@@ -25,6 +26,10 @@ export function DashboardCharts({
       />
 
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-12">
+        <ContributorsTimelineArea
+          contributors={data.campaign.contributors}
+          className="md:col-span-2 lg:col-span-12 xl:col-span-12 overflow-hidden"
+        />
         <RepositoryGrowthChart data={chartData.repositoryGrowth} />
 
         <CategoryDistributionPie

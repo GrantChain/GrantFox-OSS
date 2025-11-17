@@ -15,6 +15,7 @@ export const Alert = ({
   link,
   notFound = false,
   children,
+  className,
 }: {
   title: string;
   description: string;
@@ -22,12 +23,14 @@ export const Alert = ({
   link?: string;
   notFound?: boolean;
   children?: React.ReactNode;
+  className?: string;
 }) => {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       <div
         className={cn(
-          "flex-col gap-2 border rounded-lg transition-colors duration-200 px-4 py-2 w-full sm:w-1/2",
+          "flex-col gap-2 border rounded-lg transition-colors duration-200 px-4 py-2 w-full",
+          className,
           variant === "warning" &&
             "bg-yellow-50 border-yellow-200 dark:border-yellow-700/50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-900",
           variant === "error" &&

@@ -22,6 +22,7 @@ import {
   ApiQuery,
   ApiConsumes,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CampaignsService } from './campaigns.service';
 import { CampaignsExtendedService } from './campaigns-extended.service';
@@ -29,14 +30,17 @@ import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { UpdateCampaignStatusDto } from './dto/update-campaign-status.dto';
 import { CampaignResponseDto } from './dto/campaign-response.dto';
+import { CampaignResultsResponseDto } from './dto/campaign-results.dto';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { Roles, Public } from '../../common/decorators';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserRole, CampaignStatus } from '@prisma/client';
+import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 
 @ApiTags('campaigns')
 @Controller('campaigns')
-@UseGuards(RolesGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)  // SupabaseAuthGuard PRIMERO, luego RolesGuard
+@ApiBearerAuth()
 export class CampaignsController {
   constructor(
     private readonly campaignsService: CampaignsService,
@@ -81,6 +85,7 @@ export class CampaignsController {
     return this.campaignsService.create(createCampaignDto, user.user_id, image);
   }
 
+  @Public()  
   @Get()
   @ApiOperation({
     summary: 'Get all campaigns',
@@ -101,6 +106,7 @@ export class CampaignsController {
     return this.campaignsService.findAll(status);
   }
 
+  @Public()  
   @Get(':id')
   @ApiOperation({
     summary: 'Get a campaign by ID',
@@ -141,7 +147,10 @@ export class CampaignsController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Update campaign status (ADMIN only)',
-    description: 'Changes the status of a campaign (PENDING, UPCOMING, ACTIVE, INACTIVE)',
+    description: `Changes the status of a campaign. Business rules:
+    - Only 1 ACTIVE campaign allowed at a time
+    - Only 1 UPCOMING campaign allowed at a time
+    - Only 1 FINISHED campaign allowed at a time (most recent finished campaign for rewards release)`,
   })
   @ApiParam({ name: 'id', type: String, description: 'Campaign UUID' })
   @ApiResponse({
@@ -151,6 +160,10 @@ export class CampaignsController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden - ADMIN role required' })
   @ApiResponse({ status: 404, description: 'Campaign not found' })
+  @ApiResponse({ 
+    status: 409, 
+    description: 'Conflict - Another campaign already has the requested status (ACTIVE/UPCOMING/FINISHED)' 
+  })
   updateStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateCampaignStatusDto,
@@ -178,6 +191,7 @@ export class CampaignsController {
     return this.campaignsService.remove(id);
   }
 
+  @Public()  
   @Get('active/with-projects')
   @ApiOperation({
     summary: 'Get all active campaigns with projects and repositories',
@@ -192,6 +206,7 @@ export class CampaignsController {
     return this.campaignsExtendedService.getActiveCampaignsWithProjects();
   }
 
+  @Public()  
   @Get(':id/projects-with-repos')
   @ApiOperation({
     summary: 'Get campaign with all projects and repositories',
@@ -206,6 +221,28 @@ export class CampaignsController {
   @ApiResponse({ status: 404, description: 'Campaign not found' })
   getCampaignWithProjectsAndRepos(@Param('id') id: string) {
     return this.campaignsExtendedService.getCampaignWithProjectsAndRepos(id);
+  }
+
+  @Get(':campaignId/projects/:projectId/results')
+  @ApiOperation({
+    summary: 'Get campaign results for a specific project',
+    description:
+      'Returns all completed issues (with merged PRs) for a FINISHED campaign, including contributor validation and wallet information.',
+  })
+  @ApiParam({ name: 'campaignId', type: String, description: 'Campaign UUID' })
+  @ApiParam({ name: 'projectId', type: String, description: 'Project UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Campaign results with contributor information',
+    type: CampaignResultsResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Campaign is not FINISHED' })
+  @ApiResponse({ status: 404, description: 'Campaign or Project not found' })
+  getCampaignResults(
+    @Param('campaignId') campaignId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.campaignsExtendedService.getCampaignResults(campaignId, projectId);
   }
 }
 

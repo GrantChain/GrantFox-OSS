@@ -5,9 +5,9 @@ import { EscrowType } from '@prisma/client';
 export class CreateEscrowDto {
   @ApiProperty({
     description: 'Escrow ID from Stellar blockchain',
-    example: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    example: 'stellar-escrow-12345',
   })
-  @IsUUID()
+  @IsString()
   @IsNotEmpty()
   escrow_id: string;
 
@@ -27,4 +27,12 @@ export class CreateEscrowDto {
   @IsUUID()
   @IsNotEmpty()
   campaign_id: string;
+
+  @ApiProperty({
+    description: 'Project ID',
+    example: 'c2ggdd99-9d2c-4cg0-bb8d-7bb0ce491c33',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  project_id: string;
 }

@@ -39,11 +39,24 @@ export interface ApiUser {
   wallets?: Wallet[];
 }
 
-export interface AddWalletResponse {
+export type AddWalletResponse = {
   wallet_id: string;
   user_id: string;
   address: string;
   is_primary: boolean;
   created_at: string;
   updated_at: string;
-}
+};
+
+export type WalletValidationResponse = {
+  canUse: boolean;
+  exists: boolean;
+  reason: string;
+  address: string;
+  count: number;
+  roles: UserRole[];
+  existingWallets: {
+    role: UserRole;
+    is_primary: boolean;
+  }[];
+};

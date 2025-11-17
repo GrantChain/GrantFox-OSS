@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
 import { UserRole } from '@prisma/client';
+import { PrimaryWalletDto } from './dto/primary-wallet.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,28 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly uploadsService: UploadsService,
   ) {}
+
+  /**
+   * Helper method to get primary wallets for a user
+   * Returns an array of primary wallets grouped by role
+   */
+  private async getPrimaryWallets(userId: string): Promise<PrimaryWalletDto[]> {
+    const primaryWallets = await this.prisma.wallet.findMany({
+      where: {
+        user_id: userId,
+        is_primary: true,
+      },
+      select: {
+        role: true,
+        address: true,
+      },
+    });
+
+    return primaryWallets.map((wallet) => ({
+      role: wallet.role,
+      primaryWallet: wallet.address,
+    }));
+  }
 
   /**
    * Create a new user with a specific role and optional avatar
@@ -119,7 +142,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(userId);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
   }
 
   /**
@@ -139,7 +167,12 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(user.user_id);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
   }
 
   /**
@@ -154,7 +187,42 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    const primaryWallets = await this.getPrimaryWallets(user.user_id);
+
+    return {
+      ...user,
+      primaryWallets,
+    };
+  }
+
+  /**
+   * Get user by wallet address
+   * Searches across all wallets regardless of role or is_primary status
+   */
+  async findByWallet(address: string) {
+    const wallet = await this.prisma.wallet.findFirst({
+      where: { address },
+      include: {
+        user: {
+          include: {
+            maintainer_profile: true,
+            contributor_profile: true,
+            admin_profile: true,
+          },
+        },
+      },
+    });
+
+    if (!wallet) {
+      throw new NotFoundException('Wallet not found');
+    }
+
+    const primaryWallets = await this.getPrimaryWallets(wallet.user.user_id);
+
+    return {
+      ...wallet.user,
+      primaryWallets,
+    };
   }
 
   /**
@@ -189,6 +257,7 @@ export class UsersService {
 
   /**
    * Add a role to a user (doesn't overwrite existing roles)
+   * Uses a Set to ensure no duplicate roles even with concurrent requests
    */
   async addRole(userId: string, dto: AddRoleDto) {
     const user = await this.prisma.user.findUnique({
@@ -204,13 +273,14 @@ export class UsersService {
       throw new BadRequestException('User already has this role');
     }
 
-    // Add the new role to the existing roles array
+    // Use Set to prevent duplicates even with race conditions
+    const uniqueRoles = Array.from(new Set([...user.roles, dto.role]));
+
+    // Update with the complete unique roles array
     return await this.prisma.user.update({
       where: { user_id: userId },
       data: {
-        roles: {
-          push: dto.role,
-        },
+        roles: uniqueRoles,
       },
     });
   }
@@ -309,5 +379,34 @@ export class UsersService {
       },
       orderBy: { created_at: 'desc' },
     });
+  }
+
+  /**
+   * Clean duplicate roles from a user
+   * This is a utility method to fix existing data issues
+   */
+  async cleanDuplicateRoles(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Remove duplicates using Set
+    const uniqueRoles = Array.from(new Set(user.roles));
+
+    // Only update if there were duplicates
+    if (uniqueRoles.length !== user.roles.length) {
+      return await this.prisma.user.update({
+        where: { user_id: userId },
+        data: {
+          roles: uniqueRoles,
+        },
+      });
+    }
+
+    return user;
   }
 }

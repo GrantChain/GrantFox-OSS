@@ -5,7 +5,7 @@ import { type CampaignWithProjectsAndRepos } from "@/types/campaign.type";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { formatDate } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import { Calendar, GitFork, Package } from "lucide-react";
 import { ProjectCard } from "../projects/ProjectCard";
 import { ProjectsFiltersBar } from "./ProjectsFiltersBar";
@@ -48,8 +48,8 @@ export const Details = ({ data }: CampaignDetailViewProps) => {
                 <div className="flex flex-col gap-1">
                   <p className="text-xs text-muted-foreground">Duration</p>
                   <p className="text-sm font-medium">
-                    {formatDate(data.campaign.start_date)} -{" "}
-                    {formatDate(data.campaign.end_date)}
+                    {formatDateTime(data.campaign.start_date)} -{" "}
+                    {formatDateTime(data.campaign.end_date)}
                   </p>
                 </div>
               </div>

@@ -15,6 +15,7 @@ import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 import { UserButton } from "./UserButton";
 import { useUser } from "@/context/UserContext";
 import { usePathname } from "next/navigation";
+import { Folder, Tent } from "lucide-react";
 
 export const Navbar = () => {
   const isMobile = useIsMobile();
@@ -90,8 +91,8 @@ export const Navbar = () => {
               </NavigationMenuContent>
             </NavigationMenuItem> */}
             <NavigationMenuItem className="w-full sm:w-auto">
-              <NavigationMenuLink
-                asChild
+              <Link
+                href="/maintainer/projects"
                 className={navigationMenuTriggerStyle({
                   className: `${
                     pathname === "/maintainer/projects" ||
@@ -99,23 +100,24 @@ export const Navbar = () => {
                     pathname.startsWith("/maintainer/projects/")
                       ? "bg-muted/90"
                       : ""
-                  } w-full justify-center text-center sm:w-auto`,
+                  } w-full justify-center text-center sm:w-auto gap-2`,
                 })}
               >
-                <Link href="/maintainer/projects">Projects</Link>
-              </NavigationMenuLink>
+                <Folder className="size-4" /> Projects
+              </Link>
             </NavigationMenuItem>
+
             <NavigationMenuItem className="w-full sm:w-auto">
-              <NavigationMenuLink
-                asChild
+              <Link
+                href="/maintainer/campaigns"
                 className={navigationMenuTriggerStyle({
                   className: `${
                     pathname === "/maintainer/campaigns" ? "bg-muted/90" : ""
-                  } w-full justify-center text-center sm:w-auto`,
+                  } w-full justify-center text-center sm:w-auto gap-2`,
                 })}
               >
-                <Link href="/maintainer/campaigns">Active Campaign</Link>
-              </NavigationMenuLink>
+                <Tent className="size-4" /> Campaign
+              </Link>
             </NavigationMenuItem>
             {/* <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
