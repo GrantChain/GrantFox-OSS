@@ -14,6 +14,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProjectReviewsService } from './project-reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -27,6 +28,7 @@ import { SupabaseAuthGuard } from '../../auth/supabase-auth.guard';
 @ApiTags('project-reviews')
 @Controller('project-reviews')
 @UseGuards(SupabaseAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class ProjectReviewsController {
   constructor(
     private readonly projectReviewsService: ProjectReviewsService,

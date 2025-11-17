@@ -16,6 +16,7 @@ import { UserButton } from "./UserButton";
 import { useUser } from "@/context/UserContext";
 import { usePathname } from "next/navigation";
 import { Folder, Tent } from "lucide-react";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 export const Navbar = () => {
   const isMobile = useIsMobile();
@@ -136,6 +137,8 @@ export const Navbar = () => {
       )}
 
       <div className="flex w-full items-center justify-center gap-3 sm:w-auto sm:ml-auto">
+        <NotificationBell />
+        
         <UserButton />
 
         <AnimatedThemeToggler
