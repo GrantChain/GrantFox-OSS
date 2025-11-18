@@ -15,7 +15,7 @@ export const CampaignTimeRemaining = ({
     startDate || "",
     endDate || ""
   );
-  const { activeCampaign } = useCampaignContext();
+  const { activeCampaign, upcomingCampaign } = useCampaignContext();
 
   const hasStarted =
     remaining.days <= 0 &&
@@ -40,7 +40,11 @@ export const CampaignTimeRemaining = ({
     <div className="flex flex-col sm:flex-row justify-center items-center gap-8 md:gap-12 my-6">
       <div className="relative w-full max-w-md md:max-w-sm mx-auto md:mx-0 aspect-[16/9] md:aspect-[4/3] overflow-hidden rounded-xl  border border-border">
         <Image
-          src={activeCampaign?.image_url || "/assets/grantfox-stellar-dark.svg"}
+          src={
+            activeCampaign?.image_url ||
+            upcomingCampaign?.image_url ||
+            "/assets/grantfox-stellar-dark.svg"
+          }
           alt="Campaign banner"
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"

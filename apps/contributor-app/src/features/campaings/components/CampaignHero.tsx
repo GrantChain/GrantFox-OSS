@@ -57,7 +57,7 @@ export const CampaignHero = ({
               {activeCampaign?.name}
             </h1>
           </div>
-          {!isRegistered && (
+          {!isRegistered && !isUpcoming && (
             <PulsatingButton
               onClick={() =>
                 registerContributor({
@@ -75,11 +75,13 @@ export const CampaignHero = ({
             {activeCampaign?.description ?? ""}
           </p>
 
-          <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-medium">Contributors</h3>
+          {!isUpcoming && (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-medium">Contributors</h3>
 
-            <AvatarCircles numPeople={remaining} avatarUrls={avatarUrls} />
-          </div>
+              <AvatarCircles numPeople={remaining} avatarUrls={avatarUrls} />
+            </div>
+          )}
         </div>
       </Card>
     </>
