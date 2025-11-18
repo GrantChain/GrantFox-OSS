@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, ChevronDown, Projector } from "lucide-react";
+import { LogOut, ChevronDown, ChevronRight, Projector } from "lucide-react";
 import { useState } from "react";
 import { Separator } from "../ui/separator";
 
@@ -72,42 +72,52 @@ export function UserButton() {
             <Link
               href={`/profile/${user.user_metadata?.user_name}`}
               onClick={() => setOpen(false)}
+              role="menuitem"
+              aria-label="View profile"
+              title="View profile"
+              className="block group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
             >
-              <div className="flex items-center gap-3">
-                <Image
-                  src={
-                    user.user_metadata?.avatar_url ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              <div className="flex items-center justify-between gap-3 rounded-lg px-2 py-1 hover:bg-accent transition-colors">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={
+                      user.user_metadata?.avatar_url ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user.user_metadata?.full_name ||
+                          user.user_metadata?.user_name ||
+                          user.user_metadata?.name ||
+                          user.email ||
+                          "User"
+                      )}&background=random`
+                    }
+                    alt={
                       user.user_metadata?.full_name ||
-                        user.user_metadata?.user_name ||
-                        user.user_metadata?.name ||
-                        user.email ||
-                        "User"
-                    )}&background=random`
-                  }
-                  alt={
-                    user.user_metadata?.full_name ||
-                    user.user_metadata?.user_name ||
-                    user.user_metadata?.name ||
-                    user.email ||
-                    "User"
-                  }
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-                <div>
-                  <div className="text-sm font-medium">
-                    {user.user_metadata?.user_name ||
-                      user.user_metadata?.full_name ||
+                      user.user_metadata?.user_name ||
                       user.user_metadata?.name ||
                       user.email ||
-                      "User"}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {user.email ?? ""}
+                      "User"
+                    }
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div>
+                    <div className="text-sm font-medium">
+                      {user.user_metadata?.user_name ||
+                        user.user_metadata?.full_name ||
+                        user.user_metadata?.name ||
+                        user.email ||
+                        "User"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      View profile
+                    </div>
                   </div>
                 </div>
+                <ChevronRight
+                  className="size-4 text-muted-foreground opacity-70 transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </div>
             </Link>
           </div>
