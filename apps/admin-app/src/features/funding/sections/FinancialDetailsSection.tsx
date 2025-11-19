@@ -1,4 +1,4 @@
-import { DollarSign, Landmark, Percent, PiggyBank } from "lucide-react";
+import { DollarSign, Landmark, Percent } from "lucide-react";
 import {
   GetEscrowsFromIndexerResponse as Escrow,
   SingleReleaseEscrow,
@@ -40,21 +40,11 @@ export const FinancialDetailsSection = ({
         </div>
 
         <div className="flex items-start gap-3">
-          <PiggyBank className="h-4 w-4 text-muted-foreground mt-0.5" />
-          <div>
-            <p className="font-medium">Balance</p>
-            <p className="text-muted-foreground text-xs">
-              {escrow?.balance || "0"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-start gap-3">
           <Percent className="h-4 w-4 text-muted-foreground mt-0.5" />
           <div>
             <p className="font-medium">Platform Fee</p>
             <p className="text-muted-foreground text-xs">
-              {escrow?.platformFee ? Number(escrow.platformFee) / 100 : 0}%
+              {escrow?.platformFee && Number(escrow.platformFee)}%
             </p>
           </div>
         </div>
