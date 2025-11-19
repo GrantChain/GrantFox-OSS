@@ -90,13 +90,12 @@ export const HeaderSection = ({ escrow }: HeaderSectionProps) => {
           </Link>
 
           <Badge
-            variant="outline"
-            className={
+            variant={
               statusFlags?.released || statusFlags?.resolved
-                ? "bg-green-100 text-green-800 hover:bg-green-200"
+                ? "success"
                 : statusFlags?.disputed
-                  ? "bg-destructive text-white hover:bg-destructive/90"
-                  : ""
+                  ? "destructive"
+                  : "outline"
             }
           >
             {statusFlags?.released ? (
