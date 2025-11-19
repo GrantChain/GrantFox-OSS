@@ -6,12 +6,12 @@ import { useState } from "react";
  * @returns The copied key id and the function to copy to clipboard
  */
 export const useCopy = () => {
-  const [copiedKeyId, setCopiedKeyId] = useState(false);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
-  const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async (text: string, keyId?: string) => {
     await navigator.clipboard.writeText(text);
-    setCopiedKeyId(true);
-    setTimeout(() => setCopiedKeyId(false), 1500);
+    setCopiedKeyId(keyId ?? text);
+    setTimeout(() => setCopiedKeyId(null), 1500);
   };
 
   return { copiedKeyId, copyToClipboard };
