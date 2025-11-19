@@ -18,7 +18,7 @@ const buttonVariants = cva(
         warning:
           "flex items-center gap-2 px-4 py-2 text-xs text-yellow-700 dark:text-yellow-400 bg-yellow-50 border border-yellow-200 dark:border-yellow-700/50 rounded-lg hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-900 transition-colors duration-200",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "flex items-center gap-2 px-4 py-2 text-xs rounded-lg border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
