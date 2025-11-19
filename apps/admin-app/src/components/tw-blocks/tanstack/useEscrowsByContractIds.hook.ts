@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +21,9 @@ export const formSchema = z.object({
     .min(1, "At least one contract ID is required"),
 });
 
-export const useGetEscrowsByContractIdsForm = () => {
+export const useGetEscrowsByContractIdsForm = (
+  initialContractId?: string
+) => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] =
     useState<GetEscrowsFromIndexerResponse | null>(null);
@@ -32,7 +34,7 @@ export const useGetEscrowsByContractIdsForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      contractIds: [{ value: "" }],
+      contractIds: [{ value: initialContractId ?? "" }],
     },
   });
 
@@ -70,6 +72,20 @@ export const useGetEscrowsByContractIdsForm = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!initialContractId) return;
+
+    const payload: z.infer<typeof formSchema> = {
+      contractIds: [{ value: initialContractId }],
+    };
+
+    form.setValue("contractIds.0.value", initialContractId);
+    // Auto-load escrow when an initial contract id is provided
+    onSubmit(payload);
+    // We intentionally skip onSubmit from dependencies to avoid re-calls
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialContractId, form]);
 
   return { form, loading, response, error, onSubmit, fields, append, remove };
 };

@@ -58,33 +58,10 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
   );
   const [userRolesInEscrow, setUserRolesInEscrowState] = useState<string[]>([]);
 
-  /**
-   * Get the selected escrow from the local storage
-   */
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (stored) {
-        const parsed: Escrow = JSON.parse(stored);
-        setSelectedEscrowState(parsed);
-      }
-    } catch (_err) {
-      console.error("Error getting selected escrow from local storage:", _err);
-      // ignore malformed localStorage content
-    }
-  }, []);
-
-  /**
-   * Persist the selected escrow to the local storage
-   *
-   * @param value - The escrow to persist
-   */
-  const persist = (value: Escrow | null) => {
-    if (value) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
-    } else {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    }
+  // NOTE: In the admin app we do NOT persist the selected escrow across reloads.
+  // The escrow should only be visible after it is explicitly loaded again.
+  const persist = (_value: Escrow | null) => {
+    // no-op: disable persistence for admin app
   };
 
   /**
