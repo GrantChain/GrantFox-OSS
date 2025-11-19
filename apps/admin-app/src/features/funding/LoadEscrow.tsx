@@ -6,10 +6,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoadEscrowForm } from "./LoadEscrowForm";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 
-export const LoadEscrow = () => {
+type LoadEscrowProps = {
+  contractId?: string;
+};
+
+export const LoadEscrow = ({ contractId }: LoadEscrowProps) => {
+  const { selectedEscrow } = useEscrowContext();
+  const { walletAddress } = useWalletContext();
   return (
-    <Card className="w-full max-w-2xl">
+    <Card
+      className={`${selectedEscrow && walletAddress ? "w-full sm:w-3/4" : "w-full "}`}
+    >
       <CardHeader>
         <CardTitle>Load Escrow by Contract ID</CardTitle>
         <CardDescription>
@@ -17,7 +27,7 @@ export const LoadEscrow = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <LoadEscrowForm />
+        <LoadEscrowForm initialContractId={contractId} />
       </CardContent>
     </Card>
   );
