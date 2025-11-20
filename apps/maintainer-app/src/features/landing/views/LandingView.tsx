@@ -5,9 +5,11 @@ import { AnimatedList } from "../AnimatedList";
 import { useCampaignContext } from "@/context/CampaignContext";
 import { useCampaignQuery } from "@/features/campaings/hooks/useCampaignQuery";
 import { MarqueeContributors } from "../MarqueeContributors";
+import { CampaignCard } from "@/features/projects/components/CampaignCard";
 
 export const LandingView = () => {
-  const { activeCampaign } = useCampaignContext();
+  const { activeCampaign, finishedCampaign, upcomingCampaign } =
+    useCampaignContext();
 
   const { data: contributors } = useCampaignQuery({
     campaignId: activeCampaign?.campaign_id,
@@ -29,6 +31,25 @@ export const LandingView = () => {
               Create your project, register your repositories to campaigns, and
               become eligible for funding.
             </p>
+
+            {activeCampaign && (
+              <CampaignCard
+                title="Current Campaign"
+                campaign={activeCampaign}
+              />
+            )}
+            {upcomingCampaign && (
+              <CampaignCard
+                title="Upcoming Campaign"
+                campaign={upcomingCampaign}
+              />
+            )}
+            {finishedCampaign && (
+              <CampaignCard
+                title="Finished Campaign"
+                campaign={finishedCampaign}
+              />
+            )}
           </section>
 
           <AnimatedList repositories={activeCampaign?.repositories ?? []} />
