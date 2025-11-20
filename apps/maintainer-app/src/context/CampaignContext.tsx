@@ -16,6 +16,7 @@ import { http } from "@/lib/api";
 interface CampaignContextValue {
   activeCampaign: Campaign | null;
   upcomingCampaign: Campaign | null;
+  finishedCampaign: Campaign | null;
   isLoading: boolean;
   refreshActiveCampaign: () => Promise<void>;
 }
@@ -28,6 +29,9 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   const service = useMemo(() => new CampaignService(http), []);
   const [activeCampaign, setActiveCampaign] = useState<Campaign | null>(null);
   const [upcomingCampaign, setUpcomingCampaign] = useState<Campaign | null>(
+    null
+  );
+  const [finishedCampaign, setFinishedCampaign] = useState<Campaign | null>(
     null
   );
   const loadingRef = useRef<boolean>(false);
@@ -55,6 +59,13 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
         return st === "UPCOMING";
       });
       setUpcomingCampaign(upcoming ?? null);
+
+      // select the one marked as FINISHED
+      const finished = (all ?? []).find((c) => {
+        const st = (c.status ?? "").toUpperCase();
+        return st === "FINISHED";
+      });
+      setFinishedCampaign(finished ?? null);
     } catch (error) {
       console.error(error);
     } finally {
@@ -87,8 +98,20 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   }, [refreshActiveCampaign]);
 
   const value = useMemo<CampaignContextValue>(
-    () => ({ activeCampaign, upcomingCampaign, isLoading, refreshActiveCampaign }),
-    [activeCampaign, upcomingCampaign, isLoading, refreshActiveCampaign]
+    () => ({
+      activeCampaign,
+      upcomingCampaign,
+      finishedCampaign,
+      isLoading,
+      refreshActiveCampaign,
+    }),
+    [
+      activeCampaign,
+      upcomingCampaign,
+      finishedCampaign,
+      isLoading,
+      refreshActiveCampaign,
+    ]
   );
 
   return (
