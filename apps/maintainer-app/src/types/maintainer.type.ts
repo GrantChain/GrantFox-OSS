@@ -5,6 +5,8 @@ export type Maintainer = {
   email: string;
   username: string;
   avatar_url?: string;
+  isOwner: boolean;
+  joinedAt: string;
 };
 
 export type MaintainerPayload = {
