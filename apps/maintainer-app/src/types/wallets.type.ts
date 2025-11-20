@@ -9,3 +9,8 @@ export interface Wallet {
   created_at: string;
   updated_at: string;
 }
+
+export interface PrimaryWallet {
+  role: UserRole;
+  primaryWallet: string;
+}
