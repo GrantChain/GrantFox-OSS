@@ -6,6 +6,7 @@ import type { Wallet } from "@/types/wallets.type";
 import { AuthService } from "@/features/auth/services/auth.service";
 import { http } from "@/lib/api";
 import { toast } from "sonner";
+import { useUser } from "@/context/UserContext";
 
 type UsePaymentMethodsReturn = {
   wallets: Wallet[];
@@ -25,6 +26,7 @@ export function usePaymentMethods(
     [providedService]
   );
   const queryClient = useQueryClient();
+  const { refreshApiUser } = useUser();
 
   const { data: wallets = [], isLoading } = useQuery<Wallet[]>({
     queryKey: ["wallets", userId],
@@ -46,8 +48,9 @@ export function usePaymentMethods(
       setIsAdding(true);
       try {
         const validation = await authService.walletExists(address, userId);
-        if (validation.exists) {
-          toast.error("Wallet already exists");
+
+        if (!validation.canUse) {
+          toast.error(validation.reason);
           return;
         }
 
@@ -71,6 +74,7 @@ export function usePaymentMethods(
           }
         );
         setAddressInput("");
+        await refreshApiUser();
         toast.success("Wallet added successfully");
       } catch {
         toast.error("Failed to add wallet");
@@ -78,7 +82,7 @@ export function usePaymentMethods(
         setIsAdding(false);
       }
     },
-    [userId, authService, queryClient, wallets.length]
+    [userId, authService, queryClient, wallets.length, refreshApiUser]
   );
 
   return {
