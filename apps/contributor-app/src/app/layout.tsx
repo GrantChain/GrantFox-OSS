@@ -10,6 +10,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { Footer } from "@/components/shared/Footer";
 import { PostHogProvider } from "@/providers/PostHogProvider";
+import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,17 +45,19 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TanstackProvider>
-              <UserProvider>
-                <WalletProvider>
-                  <NavBar />
-                  <main className="min-h-[calc(100vh-56px)] flex-1">
-                    {children}
-                  </main>
-                  <Footer />
+              <TrustlessWorkProvider>
+                <UserProvider>
+                  <WalletProvider>
+                    <NavBar />
+                    <main className="min-h-[calc(100vh-56px)] flex-1">
+                      {children}
+                    </main>
+                    <Footer />
 
-                  <Toaster />
-                </WalletProvider>
-              </UserProvider>
+                    <Toaster />
+                  </WalletProvider>
+                </UserProvider>
+              </TrustlessWorkProvider>
             </TanstackProvider>
           </ThemeProvider>
         </PostHogProvider>
