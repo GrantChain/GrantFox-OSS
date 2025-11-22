@@ -120,6 +120,22 @@ export const Navbar = () => {
                 <Tent className="size-4" /> Campaign
               </Link>
             </NavigationMenuItem>
+
+            {/* <NavigationMenuItem className="w-full sm:w-auto">
+              <Link
+                href="/maintainer/financial"
+                className={navigationMenuTriggerStyle({
+                  className: `${
+                    pathname === "/maintainer/financial" ||
+                    pathname.startsWith("/maintainer/financial/")
+                      ? "bg-muted/90"
+                      : ""
+                  } w-full justify-center text-center sm:w-auto gap-2`,
+                })}
+              >
+                <Wallet className="size-4" /> Financial
+              </Link>
+            </NavigationMenuItem> */}
             {/* <NavigationMenuItem className="w-full sm:w-auto">
               <NavigationMenuLink
                 asChild

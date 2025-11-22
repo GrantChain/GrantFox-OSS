@@ -10,8 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useGetEscrowsByContractIdsForm } from "@/components/tw-blocks/tanstack/useEscrowsByContractIds.hook";
 
-export const LoadEscrowForm = () => {
-  const { form, loading, error, onSubmit } = useGetEscrowsByContractIdsForm();
+type LoadEscrowFormProps = {
+  initialContractId?: string;
+};
+
+export const LoadEscrowForm = ({ initialContractId }: LoadEscrowFormProps) => {
+  const { form, loading, error, onSubmit } =
+    useGetEscrowsByContractIdsForm(initialContractId);
   return (
     <>
       <Form {...form}>

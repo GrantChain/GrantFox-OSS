@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { CircleDollarSign, Folder, Home, Tent } from "lucide-react";
+import {
+  CircleDollarSign,
+  Folder,
+  Home,
+  SquareTerminal,
+  Tent,
+} from "lucide-react";
 import { NavUser } from "@/components/ui/nav-user";
 import { TeamSwitcher } from "@/components/ui/team-switcher";
 import {
@@ -14,7 +20,8 @@ import {
 import { NavMain } from "./nav-main";
 import { WalletButton } from "../tw-blocks/wallet-kit/WalletButtons";
 
-// This is sample data.
+// Navigation items for the sidebar.
+// "Funding" includes two nested options, similar to the shadcn "Playground" example.
 const data = {
   items: [
     {
@@ -36,6 +43,16 @@ const data = {
       name: "Funding",
       url: "/dashboard/funding",
       icon: CircleDollarSign,
+      items: [
+        {
+          name: "Overview",
+          url: "/dashboard/funding",
+        },
+        {
+          name: "Load Escrow",
+          url: "/dashboard/funding/load",
+        },
+      ],
     },
   ],
 };

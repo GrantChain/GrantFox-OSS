@@ -8,6 +8,8 @@ import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider
 import { EscrowProvider } from "@/components/tw-blocks/providers/EscrowProvider";
 import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
 import { ThemeProvider } from "next-themes";
+import { EscrowAmountProvider } from "@/components/tw-blocks/providers/EscrowAmountProvider";
+import { EscrowDialogsProvider } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,9 +46,13 @@ export default function RootLayout({
             <TrustlessWorkProvider>
               <WalletProvider>
                 <EscrowProvider>
-                  <UserProvider>{children}</UserProvider>
+                  <EscrowDialogsProvider>
+                    <EscrowAmountProvider>
+                      <UserProvider>{children}</UserProvider>
 
-                  <Toaster position="top-right" richColors />
+                      <Toaster position="top-right" richColors />
+                    </EscrowAmountProvider>
+                  </EscrowDialogsProvider>
                 </EscrowProvider>
               </WalletProvider>
             </TrustlessWorkProvider>

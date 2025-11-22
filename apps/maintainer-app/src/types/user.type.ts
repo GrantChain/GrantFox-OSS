@@ -1,4 +1,4 @@
-import { Wallet } from "./wallets.type";
+import { PrimaryWallet, Wallet } from "./wallets.type";
 
 export enum UserRole {
   ADMIN = "ADMIN",
@@ -37,6 +37,7 @@ export interface ApiUser {
   created_at: string;
   updated_at: string;
   wallets?: Wallet[];
+  primaryWallets?: PrimaryWallet[];
 }
 
 export type AddWalletResponse = {

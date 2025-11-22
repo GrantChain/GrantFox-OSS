@@ -1,30 +1,44 @@
+import { ProjectRewardsView } from "../financial/ProjectRewardsView";
 import { Maintainers } from "../maintainers/Maintainers";
-import {
-  RegisteredRepositories,
-  Repositories,
-} from "../repositories/Repositories";
+import { RepositoriesCombined } from "../repositories/RepositoriesCombined";
+import { FolderGit2, Users, Wallet } from "lucide-react";
 
 export const getProjectTabs = (orgLogin?: string, projectId?: string) => [
   {
-    name: "All Repositories",
+    name: (
+      <div className="flex items-center gap-2">
+        <FolderGit2 className="size-4" />
+        <span>Repositories</span>
+      </div>
+    ),
     value: "repositories",
     content: (
       <>
         {projectId ? (
-          <Repositories orgLogin={orgLogin} projectId={projectId} />
+          <RepositoriesCombined orgLogin={orgLogin} projectId={projectId} />
         ) : null}
       </>
     ),
   },
   {
-    name: "Repositories Registered",
-    value: "repositories-registered",
+    name: (
+      <div className="flex items-center gap-2">
+        <Wallet className="size-4" />
+        <span>Financial</span>
+      </div>
+    ),
+    value: "financial",
     content: (
-      <>{projectId ? <RegisteredRepositories projectId={projectId} /> : null}</>
+      <>{projectId ? <ProjectRewardsView projectId={projectId} /> : null}</>
     ),
   },
   {
-    name: "Maintainers",
+    name: (
+      <div className="flex items-center gap-2">
+        <Users className="size-4" />
+        <span>Maintainers</span>
+      </div>
+    ),
     value: "maintainers",
     content: <>{projectId ? <Maintainers projectId={projectId} /> : null}</>,
   },

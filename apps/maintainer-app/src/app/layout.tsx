@@ -4,12 +4,14 @@ import "./globals.css";
 import { Navbar } from "@/components/shared/Navbar";
 import UserProvider from "@/context/UserContext";
 import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
-import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { CampaignProvider } from "@/context/CampaignContext";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { Footer } from "@/components/shared/Footer";
 import { PostHogProvider } from "@/providers/PostHogProvider";
+import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
+import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { EscrowProvider } from "@/components/tw-blocks/providers/EscrowProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,19 +46,25 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ReactQueryClientProvider>
-              <UserProvider>
+              <TrustlessWorkProvider>
                 <WalletProvider>
-                  <CampaignProvider>
-                    <Navbar />
+                  <EscrowProvider>
+                    <UserProvider>
+                      <CampaignProvider>
+                        <Navbar />
 
-                    <div className="flex-1 w-full min-h-screen">{children}</div>
+                        <div className="flex-1 w-full min-h-screen">
+                          {children}
+                        </div>
 
-                    <Footer />
+                        <Footer />
 
-                    <Toaster />
-                  </CampaignProvider>
+                        <Toaster />
+                      </CampaignProvider>
+                    </UserProvider>
+                  </EscrowProvider>
                 </WalletProvider>
-              </UserProvider>
+              </TrustlessWorkProvider>
             </ReactQueryClientProvider>
           </ThemeProvider>
         </PostHogProvider>

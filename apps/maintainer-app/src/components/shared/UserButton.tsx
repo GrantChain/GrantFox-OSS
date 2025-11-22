@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, ChevronDown, ChevronRight, Projector } from "lucide-react";
+import {
+  LogOut,
+  ChevronDown,
+  Projector,
+  ExternalLink,
+  ChevronRight,
+} from "lucide-react";
 import { useState } from "react";
 import { Separator } from "../ui/separator";
 
@@ -68,7 +74,7 @@ export function UserButton() {
           className="absolute right-0 mt-2 w-64 rounded-xl border bg-popover p-2 text-popover-foreground shadow-lg"
           role="menu"
         >
-          <div className="rounded-lg bg-card p-3">
+          <div className="rounded-lg bg-card">
             <Link
               href={`/profile/${user.user_metadata?.user_name}`}
               onClick={() => setOpen(false)}

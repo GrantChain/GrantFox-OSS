@@ -1,6 +1,6 @@
 "use client";
 
-import { CardContent } from "@/components/ui/card";
+import { CardContent, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
@@ -14,38 +14,45 @@ import { HeaderSection } from "./HeaderSection";
 import {
   MultiReleaseMilestone,
   SingleReleaseMilestone,
+  SingleReleaseEscrow,
+  MultiReleaseEscrow,
 } from "@trustless-work/escrow/types";
+import { BalanceProgressDonut } from "@/components/tw-blocks/escrows/indicators/balance-progress/donut/BalanceProgress";
 
 export const EscrowCreatedSection = () => {
   const { selectedEscrow } = useEscrowContext();
 
   const totalMilestones = selectedEscrow?.milestones.length || 0;
-  const completedMilestones =
-    selectedEscrow?.milestones.filter(
-      (m: SingleReleaseMilestone | MultiReleaseMilestone) => {
-        if (selectedEscrow?.type === "single-release") {
-          const singleMilestone = m as SingleReleaseMilestone;
-          return (
-            singleMilestone.status === "approved" ||
-            singleMilestone.status === "completed" ||
-            singleMilestone.approved
-          );
-        } else {
-          const multiMilestone = m as MultiReleaseMilestone;
-          return (
-            multiMilestone.status === "approved" ||
-            multiMilestone.status === "completed" ||
-            multiMilestone.flags?.approved
-          );
-        }
-      }
-    ).length || 0;
+
+  // Calculate completed milestones based on escrow type
+  const completedMilestones = (() => {
+    if (!selectedEscrow || totalMilestones === 0) return 0;
+
+    if (selectedEscrow.type === "single-release") {
+      // For single-release: check escrow-level flags
+      const singleEscrow = selectedEscrow as SingleReleaseEscrow;
+      const isCompleted =
+        singleEscrow.flags?.released === true ||
+        singleEscrow.flags?.resolved === true;
+
+      // If escrow is released or resolved, all milestones are completed
+      return isCompleted ? totalMilestones : 0;
+    } else {
+      // For multi-release: count milestones with released or resolved flags
+      const multiEscrow = selectedEscrow as MultiReleaseEscrow;
+      return multiEscrow.milestones.filter(
+        (m: MultiReleaseMilestone) =>
+          m.flags?.released === true || m.flags?.resolved === true
+      ).length;
+    }
+  })();
+
   const progressPercentage =
     totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
   return selectedEscrow ? (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
-      <Card className="border-l-4 border-l-primary shadow-sm">
+    <div className="flex flex-col sm:flex-row gap-4 w-full">
+      <Card className="border-l-2 border-l-primary shadow-sm flex-1 w-full sm:w-1/2">
         <CardHeader className="pb-2">
           <HeaderSection escrow={selectedEscrow} />
         </CardHeader>
@@ -73,52 +80,61 @@ export const EscrowCreatedSection = () => {
 
           <Separator className="my-6" />
 
+          <BalanceProgressDonut
+            contractId={selectedEscrow?.contractId || ""}
+            target={
+              selectedEscrow?.milestones.reduce(
+                (acc, milestone) =>
+                  acc + (milestone as MultiReleaseMilestone).amount,
+                0
+              ) || 0
+            }
+            currency={selectedEscrow?.trustline.name || "USDC"}
+          />
+
+          <Separator className="my-6" />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <EntityCard
               name="Service Provider"
-              entity={selectedEscrow?.roles.serviceProvider || ""}
-              icon={<User size={20} />}
+              address={selectedEscrow?.roles.serviceProvider || ""}
             />
 
             <EntityCard
               name="Approver"
-              entity={selectedEscrow?.roles.approver || ""}
-              icon={<User size={20} />}
-            />
-
-            <EntityCard
-              name="Receiver"
-              entity={selectedEscrow?.roles.receiver || ""}
-              icon={<User size={20} />}
+              address={selectedEscrow?.roles.approver || ""}
             />
 
             <EntityCard
               name="Platform"
-              entity={selectedEscrow?.roles.platformAddress || ""}
-              icon={<User size={20} />}
+              address={selectedEscrow?.roles.platformAddress || ""}
             />
 
             <EntityCard
               name="Dispute Resolver"
-              entity={selectedEscrow?.roles.disputeResolver || ""}
-              icon={<User size={20} />}
+              address={selectedEscrow?.roles.disputeResolver || ""}
             />
 
             <EntityCard
               name="Release Signer"
-              entity={selectedEscrow?.roles.releaseSigner || ""}
-              icon={<User size={20} />}
+              address={selectedEscrow?.roles.releaseSigner || ""}
             />
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-l-4 border-l-primary shadow-sm">
+      <Card className="shadow-sm w-full sm:w-1/2">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2">
             <MilestoneIcon className="h-5 w-5 text-primary" />
             <CardTitle>Milestones</CardTitle>
           </div>
+          <CardDescription>
+            Once the Maintainer has created the escrow, you can approve or
+            reject the milestones. If the milestones are approved, the
+            Maintainer will be able to release the funds. If they are rejected,
+            you will be able to raise a dispute.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <EscrowMilestonesSection escrow={selectedEscrow} />

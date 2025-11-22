@@ -10,7 +10,11 @@ import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvid
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import { TriangleAlert } from "lucide-react";
 
-export const FundingView = () => {
+type FundingViewProps = {
+  contractId?: string;
+};
+
+export const FundingView = ({ contractId }: FundingViewProps) => {
   const { selectedEscrow, clearEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
 
@@ -39,31 +43,30 @@ export const FundingView = () => {
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start">
-        <div className="flex flex-col gap-4 w-full md:w-2/5 justify-center items-center">
-          <LoadEscrow />
+      <div className="flex flex-col sm:flex-row w-full gap-4 mb-4">
+        <LoadEscrow contractId={contractId} />
 
-          {selectedEscrow && walletAddress && <Fund />}
-          {selectedEscrow && !walletAddress && (
-            <Card className="w-full sm:w-1/2 gap-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TriangleAlert className="h-4 w-4 text-orange-500" /> Connect
-                  Wallet
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Please connect your wallet to fund the escrow.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {selectedEscrow && walletAddress && <Fund />}
+      </div>
 
-        <div className="w-full md:w-3/5">
-          <EscrowCreatedSection />
-        </div>
+      {selectedEscrow && !walletAddress && (
+        <Card className="w-full sm:w-1/2 gap-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TriangleAlert className="h-4 w-4 text-orange-500" /> Connect
+              Wallet
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Please connect your wallet to fund the escrow.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="flex gap-4 justify-between items-start">
+        <EscrowCreatedSection />
       </div>
     </>
   );

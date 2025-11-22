@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
-import { GitFork, Tent } from "lucide-react";
+import { DollarSign, GitFork, Tent } from "lucide-react";
 import { SearchCommand } from "@/components/shared/SearchCommand";
 import { UserButton } from "@/components/shared/UserButton";
 import { RainbowButton } from "../ui/rainbow-button";
@@ -56,6 +56,12 @@ export const NavBar = () => {
               <Link href="/my-applications" className="hidden sm:block">
                 <Button variant="outline" className="cursor-pointer">
                   <GitFork className="size-3" /> My Applications
+                </Button>
+              </Link>
+
+              <Link href="/financials" className="hidden sm:block">
+                <Button variant="outline" className="cursor-pointer">
+                  <DollarSign className="size-3" /> Financials
                 </Button>
               </Link>
             </>

@@ -9,11 +9,11 @@ import {
 
 export const Fund = () => {
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full sm:w-3/12">
       <CardHeader>
-        <CardTitle>Load Escrow by Contract ID</CardTitle>
+        <CardTitle>Fund Escrow</CardTitle>
         <CardDescription>
-          Paste a contract ID and load its escrow information.
+          Fund an escrow by providing the amount.
         </CardDescription>
       </CardHeader>
       <CardContent>

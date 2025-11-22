@@ -86,7 +86,7 @@ export class CampaignService {
   async getMergedIssuesInFinishedCampaign(
     campaignId: string,
     projectId: string
-  ): Promise<FinishedCampaignResults[]> {
+  ): Promise<FinishedCampaignResults> {
     try {
       const { data } = await this.http.get(
         `/campaigns/${campaignId}/projects/${projectId}/results`

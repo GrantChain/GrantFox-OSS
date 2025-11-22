@@ -1,4 +1,4 @@
-import { User, UserPayload } from "@/types/user.type";
+import { ApiUser, User, UserPayload } from "@/types/user.type";
 import { AxiosError, AxiosInstance } from "axios";
 
 export class AuthService {
@@ -27,6 +27,17 @@ export class AuthService {
       }
 
       throw new Error("Failed to get user", { cause: error });
+    }
+  }
+
+  async getUserByAddress(address: string): Promise<ApiUser | null> {
+    try {
+      const { data } = await this.httpUnauthorized.get(
+        `/users/by-wallet/${address}`
+      );
+      return data;
+    } catch (error: unknown) {
+      throw new Error("Failed to get user by address", { cause: error });
     }
   }
 }

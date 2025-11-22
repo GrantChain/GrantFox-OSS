@@ -10,12 +10,16 @@ import React, {
 import { supabase, type User } from "@/lib/supabase";
 import { AuthService } from "@/features/auth/services/auth.service";
 import { http } from "@/lib/api";
-import { UserRole } from "@/types/user.type";
+import { ApiUser, UserRole } from "@/types/user.type";
 import { setRuntimeGitHubToken } from "@/lib/http";
+import { PrimaryWallet } from "@/types/wallets.type";
 
 type UserContextValue = {
   user: User | null;
   loading: boolean;
+  apiUser: ApiUser | null;
+  hasMaintainerRole: boolean;
+  maintainerPrimaryWallet: PrimaryWallet | null;
   signOut: () => Promise<void>;
   signInWithGitHub: () => Promise<void>;
 };
@@ -29,6 +33,7 @@ export default function UserProvider({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [apiUser, setApiUser] = useState<ApiUser | null>(null);
   const authService = new AuthService(http);
 
   useEffect(() => {
@@ -54,6 +59,9 @@ export default function UserProvider({
         if (!hasRole) {
           await authService.addRole(authedUser.id, UserRole.MAINTAINER);
         }
+
+        // Store API user with wallets to be used across the app
+        setApiUser(existing);
       } catch (error) {
         console.error("Failed to sync user with API:", error);
       }
@@ -113,9 +121,39 @@ export default function UserProvider({
     }
   }
 
+  const hasMaintainerRole = useMemo<boolean>(() => {
+    return (apiUser?.roles ?? []).includes(UserRole.MAINTAINER);
+  }, [apiUser?.roles]);
+
+  const hasContributorRole = useMemo<boolean>(() => {
+    return (apiUser?.roles ?? []).includes(UserRole.CONTRIBUTOR);
+  }, [apiUser?.roles]);
+
+  const maintainerPrimaryWallet = useMemo<PrimaryWallet | null>(() => {
+    const list = apiUser?.primaryWallets ?? [];
+    const found = list.find((w) => w.role === UserRole.MAINTAINER) ?? null;
+    return found ?? null;
+  }, [apiUser?.primaryWallets]);
+
+  const contributorPrimaryWallet = useMemo<PrimaryWallet | null>(() => {
+    const list = apiUser?.primaryWallets ?? [];
+    const found = list.find((w) => w.role === UserRole.CONTRIBUTOR) ?? null;
+    return found ?? null;
+  }, [apiUser?.primaryWallets]);
+
   const value = useMemo<UserContextValue>(
-    () => ({ user, loading, signOut, signInWithGitHub }),
-    [user, loading]
+    () => ({
+      user,
+      loading,
+      apiUser,
+      hasMaintainerRole,
+      maintainerPrimaryWallet,
+      contributorPrimaryWallet,
+      hasContributorRole,
+      signOut,
+      signInWithGitHub,
+    }),
+    [user, loading, apiUser, hasMaintainerRole, maintainerPrimaryWallet]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

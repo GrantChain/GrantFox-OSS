@@ -21,6 +21,8 @@ export type AmountEscrowStore = {
   setReceiverResolve: (value: number) => void;
   setApproverResolve: (value: number) => void;
   setAmountMoonpay: (value: number) => void;
+  lastReleasedMilestoneIndex: number | null;
+  setLastReleasedMilestoneIndex: (index: number | null) => void;
 };
 
 const EscrowAmountContext = createContext<AmountEscrowStore | undefined>(
@@ -34,6 +36,9 @@ export const EscrowAmountProvider = ({ children }: { children: ReactNode }) => {
   const [receiverResolve, setReceiverResolve] = useState(0);
   const [approverResolve, setApproverResolve] = useState(0);
   const [amountMoonpay, setAmountMoonpay] = useState(0);
+  const [lastReleasedMilestoneIndex, setLastReleasedMilestoneIndex] = useState<
+    number | null
+  >(null);
 
   const setAmounts: AmountEscrowStore["setAmounts"] = useCallback(
     (totalAmount, platformFee) => {
@@ -62,6 +67,8 @@ export const EscrowAmountProvider = ({ children }: { children: ReactNode }) => {
       setReceiverResolve,
       setApproverResolve,
       setAmountMoonpay,
+      lastReleasedMilestoneIndex,
+      setLastReleasedMilestoneIndex,
     }),
     [
       receiverAmount,
@@ -70,6 +77,7 @@ export const EscrowAmountProvider = ({ children }: { children: ReactNode }) => {
       receiverResolve,
       approverResolve,
       amountMoonpay,
+      lastReleasedMilestoneIndex,
     ]
   );
 

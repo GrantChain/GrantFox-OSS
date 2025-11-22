@@ -31,7 +31,7 @@ export function createGitHubHttpClient(
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        console.log(session);
+
         token = session?.provider_token ?? null;
         if (token) {
           runtimeGitHubToken = token;
