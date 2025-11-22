@@ -94,7 +94,7 @@ export const ContributorPendingRewardsView = ({
           email: "vermudo.com@gmail.com",
           has_contributor_role: true,
           primary_wallet:
-            "GDSU26P6L2DDRIKZOU2WKLDJASMZL5ULDPVPFVDRNF2SUGPP4K2IVFJS",
+            "GBZOZAZFBVJBJWF3MS6DLNU2VM6TKRJHMQSKZOACQBPMBAO4QN7QOZGM",
         },
         amount: 0,
       },
@@ -122,7 +122,7 @@ export const ContributorPendingRewardsView = ({
           email: "vermudo.com@gmail.com",
           has_contributor_role: true,
           primary_wallet:
-            "GDSU26P6L2DDRIKZOU2WKLDJASMZL5ULDPVPFVDRNF2SUGPP4K2IVFJS",
+            "GBZOZAZFBVJBJWF3MS6DLNU2VM6TKRJHMQSKZOACQBPMBAO4QN7QOZGM",
         },
         amount: 0,
       },
